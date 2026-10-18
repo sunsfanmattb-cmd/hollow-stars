@@ -293,6 +293,22 @@ body.land #bdeck{height:auto;width:min(38%,300px);box-shadow:-1px 0 0 #3a3028}
 .lg .lf{top:-10%;bottom:-10%;left:0;width:34%;background:linear-gradient(90deg,transparent,#ffd0f022 25%,#ffffff55 48%,#a0f0ff33 60%,transparent);mix-blend-mode:screen;transform:translateX(-120%)}
 .card.r-L::before{content:"";position:absolute;inset:0;border-radius:inherit;pointer-events:none;z-index:5;box-shadow:inset 0 0 0 .14em #ffd07055,0 0 .9em #c040e066}
 @media (prefers-reduced-motion:reduce){.lg .lm,.lg .lf{display:none}}
+/* ---- v6: painted art + full-art legendaries ---- */
+.card .art,.unit .art,.hero .av,.tile .ta{background-size:cover;background-position:center}
+.lg .lv{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block;opacity:0;transition:opacity .5s}
+.lg.vid .lv{opacity:1}.lg.vid .lm{opacity:.35}.lg.vid .lgw{opacity:.18!important}
+.lg .lm{opacity:.5}
+.card.full{background:#050405}
+.card.full .art{left:0;right:0;top:0;height:100%;border-radius:inherit;clip-path:none!important;z-index:0;box-shadow:inset 0 0 0 .16em #000,inset 0 0 0 .3em #ffd07030,inset 0 0 2.4em #000c}
+.card.full .art::after{background:linear-gradient(180deg,#000a,transparent 16%,transparent 42%,#000a 66%,#000e);border-radius:inherit;z-index:2}
+.card.full .lg .lp{inset:-3%}
+.card.full .nm{top:50.5%;background:linear-gradient(90deg,transparent,#060308c8 14%,#060308c8 86%,transparent)!important;box-shadow:none;clip-path:none}
+.card.full .nm span{font-size:1.2em;text-shadow:0 0 .6em var(--glow),0 0 .25em #000,0 .08em 0 #000}
+.card.full .ty{top:59.4%;background:#05030699!important;box-shadow:0 0 0 1px #ffd07022}
+.card.full .tx{top:64.4%;bottom:8.5%;background:linear-gradient(180deg,#0a060ca8,#050307e0)!important;-webkit-backdrop-filter:blur(3px);backdrop-filter:blur(3px);box-shadow:0 0 0 1px #000,0 0 0 .1em #ffd07038,inset 0 0 1em #000a!important;border-radius:.3em}
+.card.full .rt{text-shadow:0 1px 2px #000}
+.card.full::before{z-index:5;box-shadow:inset 0 0 0 .14em #ffd07077,inset 0 0 0 .3em #c040e033,0 0 1em #c040e077!important}
+.card.full .plq{opacity:.9}
 #zoom .card{transition:transform .12s ease-out;transform-style:preserve-3d}
 #zoom .glare{position:absolute;inset:0;border-radius:inherit;pointer-events:none;z-index:6;mix-blend-mode:screen}
 
@@ -436,18 +452,18 @@ S('m11','Ion Lance','m',2,'C','beam','Deal 3 damage to a unit.','Point-defence, 
 S('m12','Emergency Purge','m',4,'U','beam','Deal 2 damage to all enemy units.','Venting compartments 4 through 19.',{cast:(g,pi)=>{for(const q of E(g,pi).board)hurtU(g,q,2,null)}});
 S('m13','Reboot Protocol','m',2,'C','rune','Restore 4 Sanity and remove 3 Madness.','Have you tried turning your mind off and on again?',{cast:(g,pi)=>{healH(g,pi,4);addMad(g,pi,-3)}});
 // ---- The Red Communion ----
-U('c1','Initiate of the Maw','c',1,2,1,'','C','robed','','Eager to give. Eager to be given.');
-U('c2','Bloodletter','c',2,2,2,'drain','C','robed','','Every wound is a prayer.');
+U('c1','Initiate of the Maw','c',1,2,2,'','C','robed','','Eager to give. Eager to be given.');
+U('c2','Bloodletter','c',2,2,3,'drain','C','robed','','Every wound is a prayer.');
 U('c3','Mutating Acolyte','c',2,1,3,'','U','flesh','At the start of your turn, this gains +1/+1.','Each morning, a little less human. A little more holy.',{start:(g,pi,u)=>{buff(u,1,1);fx(g,{k:'buff',id:'u'+u.uid})}});
-U('c4','Spore Carrier','c',2,1,2,'blight','C','flesh','','Breathe deep. Become.');
+U('c4','Spore Carrier','c',2,2,2,'blight','C','flesh','','Breathe deep. Become.');
 U('c5','Knife-Priest','c',3,3,3,'offering','U','robed','Offering: +2/+2.','The blade is blessed. The hand is not.',{play:(g,pi,u)=>{if(sacrifice(g,pi,u))buff(u,2,2)}});
-U('c6','Flesh Golem','c',4,4,5,'guard','C','flesh','','Assembled from the willing. And the unwilling.');
-U('c7','Hierophant of Rot','c',4,3,4,'blight drain','R','robed','','She preaches the gospel of the open wound.');
+U('c6','Flesh Golem','c',4,4,6,'guard','C','flesh','','Assembled from the willing. And the unwilling.');
+U('c7','Hierophant of Rot','c',4,3,5,'blight drain','R','robed','','She preaches the gospel of the open wound.');
 U('c8','Gorged Abomination','c',5,5,6,'offering','U','maw','Offering: draw 2 cards.','It was a congregation once.',{play:(g,pi,u)=>{if(sacrifice(g,pi,u))draw(g,pi,2)}});
 U('c9','The Thousand Mouths','c',8,6,6,'drain','L','maw','When it arrives, sacrifice all your other units. It gains +2/+2 for each.','All voices become one voice. All mouths become one hunger.',{play:(g,pi,u)=>{for(const q of g.p[pi].board)if(q!==u&&q.h>0){destroy(g,q);fx(g,{k:'sac',id:'u'+q.uid});buff(u,2,2)}}});
 S('c10','Blood Rite','c',1,'C','rune','Destroy a friendly unit. Draw 2 cards.','The stars only answer those who pay.',{tg:'friendlyUnit',cast:(g,pi,T)=>{destroy(g,T.u);draw(g,pi,2)}});
-S('c11','Hemorrhage','c',2,'C','rune','Deal 2 damage to an enemy or enemy unit. Restore 2 Sanity.','Your blood remembers the way out.',{tg:'enemy',cast:(g,pi,T)=>{hurt(g,T,2);healH(g,pi,2)}});
-S('c12','Feast of Flesh','c',3,'U','flesh','Give your units +1/+1.','The communion table is set. You are the meal.',{cast:(g,pi)=>{for(const q of g.p[pi].board){buff(q,1,1);fx(g,{k:'buff',id:'u'+q.uid})}}});
+S('c11','Hemorrhage','c',2,'C','rune','Deal 3 damage to an enemy or enemy unit. Restore 2 Sanity.','Your blood remembers the way out.',{tg:'enemy',cast:(g,pi,T)=>{hurt(g,T,3);healH(g,pi,2)}});
+S('c12','Feast of Flesh','c',2,'U','flesh','Give your units +1/+1.','The communion table is set. You are the meal.',{cast:(g,pi)=>{for(const q of g.p[pi].board){buff(q,1,1);fx(g,{k:'buff',id:'u'+q.uid})}}});
 S('c13','Final Ascension','c',6,'R','star','Destroy a unit. Restore Sanity equal to its health.','Rise, child. Leave the meat behind.',{tg:'unit',cast:(g,pi,T)=>{const h=Math.max(0,T.u.h);destroy(g,T.u);healH(g,pi,h)}});
 // ---- Wanderers ----
 S('n1','Lost Signal','n',0,'C','planet','Draw a card. You gain 1 Madness.','...is anyone out there... is anyone out there... is any—',{cast:(g,pi)=>{draw(g,pi,1);addMad(g,pi,1)}});
@@ -479,13 +495,13 @@ S('m20',"Dead Man's Switch",'m',3,'U','switch','Destroy a friendly unit. Deal da
 U('m21','Autosurgeon','m',5,3,6,'','R','surgeon','Start of your turn: restore 2 Sanity and give a random friendly unit +1/+1.','"Procedure 4,812 complete. Patient status: improved."',PK({start:(g,pi,u)=>{healH(g,pi,2);const b=g.p[pi].board.filter(x=>x.h>0);if(b.length){const t=pick(b);buff(t,1,1);fx(g,{k:'buff',id:'u'+t.uid})}}}));
 S('m22','Orbital Strike','m',6,'R','orbital','Deal 5 damage to a unit and 2 damage to the enemy.','The ship cannot land. It can still deliver.',PK({tg:'unit',cast:(g,pi,T)=>{hurt(g,T,5);hurtH(g,1-pi,2)}}));
 U('m23','The Hollow Armada','m',9,6,8,'guard','L','armada','When it arrives, fill your board with 1/1 Drones. They can attack this turn.','A thousand ships, one dead mind.',PK({play:(g,pi)=>{for(let i=0;i<5;i++){const d=summon(g,pi,'tD');if(d)d.ready=true}}}));
-U('c14','Flayed Penitent','c',1,1,2,'drain','C','penitent','','She offered her skin first. It was only the beginning.',PK());
-U('c15','Maggot Brood','c',2,1,1,'blight swift','C','maggot','','They will eat whatever the Communion leaves. Which is nothing.',PK());
-U('c16','Weeping Sister','c',3,2,4,'','C','sister','When it arrives, restore 3 Sanity.','She weeps for you. Her tears are red.',PK({play:(g,pi)=>healH(g,pi,3)}));
-U('c17','Butcher-Deacon','c',4,4,4,'offering','U','butcher','Offering: +1/+1 and Drain.','He carves the sermon into the congregation.',PK({play:(g,pi,u)=>{if(sacrifice(g,pi,u)){buff(u,1,1);if(!u.k.includes('drain'))u.k.push('drain')}}}));
-U('c18','Wombspawn','c',3,2,2,'','U','womb','When it dies, summon two 1/1 Spawnlings.','It is always pregnant with something worse.',PK({death:(g,pi)=>{summon(g,pi,'tC');summon(g,pi,'tC')}}));
-S('c19','Rite of Many Hands','c',4,'U','hands','Summon three 1/1 Spawnlings.','Every hand you cut off grows back. Somewhere.',PK({cast:(g,pi)=>{for(let i=0;i<3;i++)summon(g,pi,'tC')}}));
-U('c20','Choir of Teeth','c',5,4,5,'drain','R','teethchoir','End of your turn: deal 1 damage to all enemy units.','Their hymn is a grinding. It never ends.',PK({end:(g,pi,u)=>{for(const q of E(g,pi).board)hurtU(g,q,1,u)}}));
+U('c14','Flayed Penitent','c',1,2,2,'drain','C','penitent','','She offered her skin first. It was only the beginning.',PK());
+U('c15','Maggot Brood','c',2,2,1,'blight swift','C','maggot','','They will eat whatever the Communion leaves. Which is nothing.',PK());
+U('c16','Weeping Sister','c',3,3,4,'','C','sister','When it arrives, restore 3 Sanity.','She weeps for you. Her tears are red.',PK({play:(g,pi)=>healH(g,pi,3)}));
+U('c17','Butcher-Deacon','c',4,4,5,'offering','U','butcher','Offering: +1/+1 and Drain.','He carves the sermon into the congregation.',PK({play:(g,pi,u)=>{if(sacrifice(g,pi,u)){buff(u,1,1);if(!u.k.includes('drain'))u.k.push('drain')}}}));
+U('c18','Wombspawn','c',3,2,3,'','U','womb','When it dies, summon two 1/1 Spawnlings.','It is always pregnant with something worse.',PK({death:(g,pi)=>{summon(g,pi,'tC');summon(g,pi,'tC')}}));
+S('c19','Rite of Many Hands','c',3,'U','hands','Summon three 1/1 Spawnlings.','Every hand you cut off grows back. Somewhere.',PK({cast:(g,pi)=>{for(let i=0;i<3;i++)summon(g,pi,'tC')}}));
+U('c20','Choir of Teeth','c',5,4,6,'drain','R','teethchoir','End of your turn: deal 1 damage to all enemy units.','Their hymn is a grinding. It never ends.',PK({end:(g,pi,u)=>{for(const q of E(g,pi).board)hurtU(g,q,1,u)}}));
 S('c21','Skin-Bound Gospel','c',2,'C','gospel','Give a friendly unit +2/+2 and Drain.','Bound in the skin of the first reader.',PK({tg:'friendlyUnit',cast:(g,pi,T)=>{buff(T.u,2,2);if(!T.u.k.includes('drain'))T.u.k.push('drain');fx(g,{k:'buff',id:'u'+T.u.uid})}}));
 U('c22','Mother of Wounds','c',8,7,7,'drain','L','mother','Start of your turn: summon a 1/1 Spawnling and restore 2 Sanity.','Every wound in the galaxy is one of her children.',PK({start:(g,pi)=>{summon(g,pi,'tC');healH(g,pi,2)}}));
 S('c23',"Martyr's Pyre",'c',4,'R','pyre','Destroy all your units. For each, deal 2 damage to a random enemy unit (or the enemy).','They burned singing. The smoke sang longer.',PK({cast:(g,pi)=>{const b=g.p[pi].board.filter(x=>x.h>0);for(const q of b)destroy(g,q);for(const q of b)hitRnd(g,pi,2,null)}}));
@@ -679,7 +695,8 @@ const SPEC={v1:'spawn@void',v2:'eye@debris',v3:'eyes@flesh',v4:'leech@void',v5:'
  m1:'drone@hull',m2:'shield,drone@hull',m3:'swarm@debris',m4:'cross,drone@hull',m5:'ship@debris',m6:'lantern,drone@hull',m7:'human@hull',m8:'turret@debris',m9:'ark@planet',m10:'circuit,beam@hull',m11:'beam@void',m12:'vent@hull',m13:'circuit@hull',
  c1:'robed@altar',c2:'robed,blood@altar',c3:'flesh@flesh',c4:'spores@flesh',c5:'knife,robed@altar',c6:'golem@flesh',c7:'spores,robed@altar',c8:'flesh,maw@flesh',c9:'mouths,eyes@flesh',c10:'knife,blood@altar',c11:'blood,eyes@flesh',c12:'crowd,blood@altar',c13:'star,robed@altar',
  n1:'beacon@planet',n2:'human@debris',n3:'human@hull',n4:'warden@hull',n5:'beacon@debris',n6:'ship@void',tD:'drone@hull',tS:'human@hull'};
-const ART={},ARTV='hs5';
+const ART={},ARTV='hs6';
+try{for(let i=localStorage.length-1;i>=0;i--){const k=localStorage.key(i);if(/^hs\d+:/.test(k)&&!k.startsWith(ARTV+':'))localStorage.removeItem(k)}}catch(e){}
 const mkc=(W,H)=>{const c=document.createElement('canvas');c.width=W;c.height=H;return c};
 function paint(key,f,spec,W=336,H=252){if(ART[key])return ART[key];try{const s=localStorage.getItem(ARTV+':'+key);if(s)return ART[key]=s}catch(e){}
  const R=rng(hash(key)),P=PAL[f],[subs,sc]=spec.split('@'),out=mkc(W,H),x=out.getContext('2d');
@@ -706,6 +723,15 @@ function paint(key,f,spec,W=336,H=252){if(ART[key])return ART[key];try{const s=l
  const u=out.toDataURL('image/jpeg',.8);try{localStorage.setItem(ARTV+':'+key,u)}catch(e){}return ART[key]=u}
 const artURL=id=>{const d=C[id];return paint(id,d.f,SPEC[id]||d.art+'@void')};
 const heroArt=f=>paint('hero-'+f,f,HSPEC[f],200,200);
+/* ---- painted art: art/<id>.webp layered over the procedural art (fallback while loading / offline) ---- */
+const ARTDIR='art/',ART_IDS=new Set();
+const realArt=k=>`${ARTDIR}${k}.webp?${ARTV}`;
+const artBG=id=>`url(${realArt(id)}),url(${artURL(id)})`;
+const heroBG=f=>`url(${realArt('h'+f)}),url(${heroArt(f)})`;
+const PRE={st:{},q:[],act:0,max:6};
+function artPre(keys,hi){keys=[...new Set(keys)].filter(k=>!PRE.st[k]);if(hi)PRE.q.unshift(...keys);else PRE.q.push(...keys);keys.forEach(k=>PRE.st[k]='q');preRun()}
+function preRun(){while(PRE.act<PRE.max&&PRE.q.length){const k=PRE.q.shift();if(PRE.st[k]!=='q')continue;PRE.st[k]='l';PRE.act++;const im=new Image();im.decoding='async';try{im.fetchPriority='high'}catch(e){}
+ im.onload=()=>{PRE.st[k]='ok';PRE.act--;preRun()};im.onerror=()=>{PRE.st[k]='err';PRE.act--;preRun()};im.src=realArt(k)}}
 /* ---- faction frame textures ---- */
 const FRAME={};
 function frameURL(f){if(FRAME[f])return FRAME[f];const W=300,H=420,cv=document.createElement('canvas');cv.width=W;cv.height=H;const x=cv.getContext('2d'),R=rng(hash('frame'+f)),P=PAL[f];
@@ -1380,18 +1406,31 @@ const FAC_SVG='<svg class="fac" viewBox="0 0 40 46"><path d="M20 1L38 12 31 15.5
 const costHTML=c=>`<div class="cost"><div class="cr"></div>${FAC_SVG}<b>${c}</b></div>`;
 const sigHTML=f=>`<svg class="sig" viewBox="0 0 24 24"><path fill-rule="evenodd" d="${SIG[f]}" fill="url(#gsig)" stroke="#000" stroke-width=".8" filter="url(#ds)"/></svg>`;
 const setHTML=r=>`<svg class="set" viewBox="0 0 24 24"><path fill-rule="evenodd" d="M12 .8l3.1 7.9 7.9 3.3-7.9 3.3L12 23.2l-3.1-7.9L1 12l7.9-3.3zM12 8.6a3.4 3.4 0 1 0 .01 0z" fill="url(#gr-${r})" stroke="#000" stroke-width="1" filter="url(#ds)"/><path d="M12 .8l3.1 7.9L12 8.6 8.9 8.7z" fill="#fff" opacity=".45"/></svg>`;
-const lgHTML=id=>C[id].r==='L'?`<div class="lg"><i class="lp" style="background-image:url(${artURL(id)})"></i><i class="lm"></i><i class="lgw"></i><i class="lf"></i></div>`:'';
+const lgHTML=id=>C[id].r==='L'?`<div class="lg" data-id="${id}"><i class="lp" style="background-image:${artBG(id)}"></i><i class="lm"></i><i class="lgw"></i><i class="lf"></i></div>`:'';
 /* legendary animation driver: one rAF loop, ~30fps, only visible cards, paused when hidden / reduced motion */
 const LG={vis:new Set(),t0:0,rm:matchMedia('(prefers-reduced-motion: reduce)'),frames:0};
 LG.io=new IntersectionObserver(es=>{for(const e of es)e.isIntersecting?LG.vis.add(e.target):LG.vis.delete(e.target)});
 function lgReg(root){const l=root.querySelector('.lg');if(l){l._ph=Math.random()*10;LG.io.observe(l)}}
 function lgTick(t){requestAnimationFrame(lgTick);if(document.hidden||LG.rm.matches||t-LG.t0<33)return;LG.t0=t;LG.frames++;
  for(const el of LG.vis){if(!el.isConnected){LG.vis.delete(el);LG.io.unobserve(el);continue}const s=t/1000+el._ph,[p,m,g,f]=el.children;
-  p.style.transform=`translate(${(Math.sin(s*.45)*2.2).toFixed(2)}%,${(Math.cos(s*.37)*1.6).toFixed(2)}%) scale(${(1.02+Math.sin(s*.3)*.015).toFixed(3)})`;
+  if(el.classList.contains('vid'))p.style.transform='none';else p.style.transform=`translate(${(Math.sin(s*.45)*2.2).toFixed(2)}%,${(Math.cos(s*.37)*1.6).toFixed(2)}%) scale(${(1.02+Math.sin(s*.3)*.015).toFixed(3)})`;
   m.style.transform=`translate(${(-Math.sin(s*.45)*3.5).toFixed(2)}%,${(-(s*3.2%25)).toFixed(2)}%)`;
   g.style.opacity=(.28+.3*(.5+.5*Math.sin(s*1.9))).toFixed(3);g.style.transform=`scale(${(1+.08*Math.sin(s*1.9)).toFixed(3)})`;
   const ph=(s%5.5)/5.5;f.style.transform=`translateX(${(-110+ph*480).toFixed(1)}%) skewX(-12deg)`}}
 requestAnimationFrame(lgTick);
+/* legendary video loops: art/anim/<id>.mp4, only a few at once (zoom > hand > board), paused offscreen/hidden, off for reduced motion; still image underneath is the fallback */
+const VID={max:3,on:new Set(),bad:{},plays:0};
+const vRank=el=>el.closest('#zoom')?0:el.closest('#hand')?1:el.closest('.unit')?2:el.closest('#pk,.pslot')?1:3;
+function vidStop(el,free){const v=el.querySelector('video');if(v){if(!v.paused)v.pause();if(free){v.removeAttribute('src');v.load();v.remove();el.classList.remove('vid')}}VID.on.delete(el)}
+function vidPlay(el){const id=el.dataset.id;if(VID.bad[id])return;let v=el.querySelector('video');
+ if(!v){v=document.createElement('video');v.className='lv';v.muted=true;v.defaultMuted=true;v.loop=true;v.playsInline=true;v.autoplay=true;for(const a of['muted','loop','playsinline','autoplay'])v.setAttribute(a,'');v.preload='auto';v.disablePictureInPicture=true;
+  v.onplaying=()=>{el.classList.add('vid');VID.plays++};v.onerror=()=>{VID.bad[id]=1;vidStop(el,1)};v.src=`${ARTDIR}anim/${id}.mp4?${ARTV}`;el.querySelector('.lp').appendChild(v)}
+ if(v.paused)v.play().catch(()=>{});VID.on.add(el)}
+function vidSync(){for(const el of[...VID.on])if(!el.isConnected)vidStop(el,1);
+ if(LG.rm.matches||document.hidden){for(const el of[...VID.on])vidStop(el);return}
+ const want=new Set([...LG.vis].filter(el=>el.isConnected&&el.dataset.id&&!VID.bad[el.dataset.id]).sort((a,b)=>vRank(a)-vRank(b)).slice(0,VID.max));
+ for(const el of[...VID.on])if(!want.has(el))vidStop(el);for(const el of want)vidPlay(el)}
+setInterval(vidSync,350);document.addEventListener('visibilitychange',vidSync);
 (function kit(){const rs=document.documentElement.style;
  const cx=50,cy=79,r=38,pts=['50% 0%'];for(let a=-28.8;a<=208.8;a+=6){const t=a*Math.PI/180;pts.push(`${(cx+Math.cos(t)*r).toFixed(1)}% ${((cy+Math.sin(t)*r)/1.2).toFixed(1)}%`)}rs.setProperty('--drop',`polygon(${pts.join(',')})`);
  for(const f of'vmcn')rs.setProperty('--fr-'+f,`url(${frameURL(f)})`);rs.setProperty('--lane',`url(${laneURL()})`);$('#grain').style.backgroundImage=`url(${grainURL()})`;
@@ -1416,8 +1455,8 @@ function layout(){const W=innerWidth,H=innerHeight,land=W>H*1.15;document.body.c
  $('#bgrid').style.setProperty('--bw',Math.max(92,Math.min(130,(land?W*.62:W)/3.6))+'px');bgInit();teSize();if(G&&cur==='match')renderMatch()}
 addEventListener('resize',()=>{clearTimeout(UI.rt);UI.rt=setTimeout(layout,120)});
 function toast(m,ms=1600){const t=$('#toast');t.textContent=m;t.classList.add('on');clearTimeout(t._t);t._t=setTimeout(()=>t.classList.remove('on'),ms)}
-function cardEl(id){const d=C[id],e=document.createElement('div');e.className=`card f-${d.f} r-${d.r}${d.t==='s'?' spell':''}${cardText(d).replace(/<[^>]+>/g,'').length>46?' long':''}`;e.dataset.cid=id;
- e.innerHTML=`<div class="art" style="background-image:url(${artURL(id)})">${lgHTML(id)}</div>${costHTML(d.c)}<div class="nm"><span>${d.n}</span></div><div class="ty">${sigHTML(d.f)}<span>${d.t==='u'?FAC[d.f].s:'Rite'}</span>${setHTML(d.r)}</div><div class="tx"><div class="rt">${cardText(d)}</div>${d.fl?`<div class="fl">${d.fl}</div>`:''}</div>${d.t==='u'?'<i class="plq l"></i><i class="plq r"></i>'+atkHTML(d.f,d.a)+hpHTML(d.h):''}`;lgReg(e);return e}
+function cardEl(id){const d=C[id],e=document.createElement('div');e.className=`card f-${d.f} r-${d.r}${d.r==='L'?' full':''}${d.t==='s'?' spell':''}${cardText(d).replace(/<[^>]+>/g,'').length>46?' long':''}`;e.dataset.cid=id;
+ e.innerHTML=`<div class="art" style="background-image:${artBG(id)}">${lgHTML(id)}</div>${costHTML(d.c)}<div class="nm"><span>${d.n}</span></div><div class="ty">${sigHTML(d.f)}<span>${d.t==='u'?FAC[d.f].s:'Rite'}</span>${setHTML(d.r)}</div><div class="tx"><div class="rt">${cardText(d)}</div>${d.fl?`<div class="fl">${d.fl}</div>`:''}</div>${d.t==='u'?'<i class="plq l"></i><i class="plq r"></i>'+atkHTML(d.f,d.a)+hpHTML(d.h):''}`;lgReg(e);return e}
 /* ---- pick ---- */
 const SH={win:60,loss:25,pack:100,dup:{C:5,U:15,R:40,L:150},free:3};
 const maxC=id=>C[id].r==='L'?1:2;
@@ -1428,20 +1467,20 @@ function loadCustom(){try{const o=JSON.parse(localStorage.getItem('hsDeck')||'nu
 function customDeck(){const o=loadCustom();if(!o)return null;const cnt={};for(const id of o.cards){const f=C[id].f;if(f!=='n')cnt[f]=(cnt[f]||0)+1}const fac=Object.keys(cnt).sort((a,b)=>cnt[b]-cnt[a])[0]||'v';return{fac,name:'Your Custom Deck',cards:o.cards.slice()}}
 function renderPick(){const box=$('#decks');box.innerHTML='';const opts=['v','m','c'];if(loadCustom())opts.push('custom');if(!opts.includes(UI.deck))UI.deck='v';
  for(const k of opts){const f=k==='custom'?customDeck().fac:k,b=document.createElement('button');b.className=`tile f-${f}${UI.deck===k?' on':''}`;b.dataset.deck=k;
-  b.style.setProperty('--fr',`var(--fr-${f})`);b.innerHTML=`<div class="ta" style="background-image:url(${heroArt(f)})"></div><div><b>${k==='custom'?'Custom Deck':FAC[f].n}</b><small>${k==='custom'?'Your saved 30-card deck (mostly '+FAC[f].n+').':FAC[f].d}</small></div>`;b.onclick=()=>{sfx('click');UI.deck=k;renderPick()};box.appendChild(b)}
+  b.style.setProperty('--fr',`var(--fr-${f})`);b.innerHTML=`<div class="ta" style="background-image:${heroBG(f)}"></div><div><b>${k==='custom'?'Custom Deck':FAC[f].n}</b><small>${k==='custom'?'Your saved 30-card deck (mostly '+FAC[f].n+').':FAC[f].d}</small></div>`;b.onclick=()=>{sfx('click');UI.deck=k;renderPick()};box.appendChild(b)}
  const op=$('#opps');op.innerHTML='';for(const[k,n]of[['r','Random'],['v','Abyss'],['m','Derelict'],['c','Communion']]){const b=document.createElement('button');b.textContent=n;b.dataset.opp=k;b.className=UI.opp===k?'on':'';b.onclick=()=>{sfx('click');UI.opp=k;renderPick()};op.appendChild(b)}}
 $('#bStart').onclick=()=>{auInit();sfx('click');const mine=UI.deck==='custom'?customDeck():prebuilt(UI.deck);const of=UI.opp==='r'?pick(['v','m','c']):UI.opp;startMatch(mine,of)};
 /* ================= MATCH ================= */
 let G=null,LAST=null;
 function startMatch(mine,of,o={}){LAST={mine,of};G=newGame(mine,prebuilt(of),{ai:[UI.auto?1:0,1],first:o.first});UI.sel=null;UI.busy=false;UI.aiRun=false;
  for(const id of['#opb','#myb','#hand'])$(id).innerHTML='';$('#over').classList.remove('on');show('match');
- for(const pi of[0,1]){const el=$(pi?'#oph':'#myh'),p=G.p[pi];el.className=`hero f-${p.fac}`;el.querySelector('.av').style.backgroundImage=`url(${heroArt(p.fac)})`;el.querySelector('.hn').textContent=pi?p.name:(UI.auto?'Autopilot — ':'You — ')+FAC[p.fac].n;el.querySelector('.md').innerHTML='<i></i>'.repeat(10)+'<span>MADNESS</span>';el.querySelector('.fx').innerHTML='<i></i>'.repeat(10);el.querySelector('.san').textContent=''}
+ for(const pi of[0,1]){const el=$(pi?'#oph':'#myh'),p=G.p[pi];el.className=`hero f-${p.fac}`;el.querySelector('.av').style.backgroundImage=heroBG(p.fac);el.querySelector('.hn').textContent=pi?p.name:(UI.auto?'Autopilot — ':'You — ')+FAC[p.fac].n;el.querySelector('.md').innerHTML='<i></i>'.repeat(10)+'<span>MADNESS</span>';el.querySelector('.fx').innerHTML='<i></i>'.repeat(10);el.querySelector('.san').textContent=''}
  renderMatch();flushFx();if(G.p[G.cur].ai)runAI()}
 function heroBox(pi){return $(pi?'#oph':'#myh')}
 function renderHero(pi){const p=G.p[pi],el=heroBox(pi);const s=el.querySelector('.san');s.textContent=Math.max(0,p.san);s.classList.toggle('low',p.san<=7);
  el.querySelectorAll('.md i').forEach((e,i)=>{e.classList.toggle('on',i<p.mad);e.classList.toggle('hi',i<p.mad&&p.mad>=7)});el.querySelector('.fv').textContent=`${p.flux}/${p.max} FLUX`;el.querySelectorAll('.fx i').forEach((e,i)=>{e.className=i<p.flux?'on':i<p.max?'sp':'lk'});
  el.querySelector('.cts').innerHTML=`✋ ${p.hand.length}<br>▤ ${p.deck.length}`;el.classList.toggle('act',G.cur===pi&&!G.over)}
-function unitEl(u){const d=C[u.id],e=document.createElement('div');e.className=`unit f-${d.f}`;e.dataset.u=u.uid;e.dataset.cid=u.id;e.innerHTML=`<div class="art" style="background-image:url(${artURL(u.id)})">${lgHTML(u.id)}</div><div class="kws"></div>${atkHTML(d.f,u.a)}${hpHTML(u.h)}`;e._h=u.h;lgReg(e);return e}
+function unitEl(u){const d=C[u.id],e=document.createElement('div');e.className=`unit f-${d.f}`;e.dataset.u=u.uid;e.dataset.cid=u.id;e.innerHTML=`<div class="art" style="background-image:${artBG(u.id)}">${lgHTML(u.id)}</div><div class="kws"></div>${atkHTML(d.f,u.a)}${hpHTML(u.h)}`;e._h=u.h;lgReg(e);return e}
 function syncBoard(box,list){const ex=new Map();for(const el of box.children)if(!el.classList.contains('dying'))ex.set(+el.dataset.u,el);const keep=new Set();let curEl=box.firstElementChild;
  for(const u of list){let el=ex.get(u.uid);if(!el){el=unitEl(u);el.classList.add('enter');setTimeout(()=>el.classList.remove('enter'),520)}keep.add(el);
   while(curEl&&curEl.classList.contains('dying')&&curEl!==el)curEl=curEl.nextElementSibling;if(el!==curEl)box.insertBefore(el,curEl);else curEl=curEl.nextElementSibling;updUnit(el,u)}
@@ -1461,7 +1500,7 @@ function selTargets(){const s=UI.sel;if(!s||!G)return[];if(s.k==='h'){const c=G.
 function hint(){if(!G)return'';if(G.over)return'';if(G.p[G.cur].ai)return G.cur===1?'The enemy stirs…':'Autopilot is thinking…';const s=UI.sel;
  if(s?.k==='h'){const c=G.p[0].hand.find(x=>x.uid===s.uid),d=c&&C[c.id];if(d)return d.tg?'Choose a target for '+d.n:'Tap again or drag up to play '+d.n}
  if(s?.k==='u')return'Choose what to attack';if(legal(G,0).length)return'Your turn: drag or tap cards, tap units to attack';return'No moves left. End your turn.'}
-function renderMatch(){if(!G)return;renderHero(0);renderHero(1);syncBoard($('#opb'),G.p[1].board);syncBoard($('#myb'),G.p[0].board);syncHand();
+function renderMatch(){if(!G)return;artPre([...G.p[0].hand.map(c=>c.id),...G.p[0].board.map(u=>u.id),...G.p[1].board.map(u=>u.id),'h'+G.p[0].fac,'h'+G.p[1].fac],1);renderHero(0);renderHero(1);syncBoard($('#opb'),G.p[1].board);syncBoard($('#myb'),G.p[0].board);syncHand();
  $$('.tgt').forEach(e=>e.classList.remove('tgt','ftgt'));for(const t of selTargets()){const el=tEl(t,1);if(el){el.classList.add('tgt');if(t[0]==='u'&&findU(G,+t.slice(1))?.o===0)el.classList.add('ftgt')}}
  $('#hint').textContent=hint();const my=G.cur===0&&!G.p[0].ai&&!G.over;const eb=$('#endt');eb.disabled=!my||UI.busy;eb.querySelector('span').textContent=my?'End Turn':'Enemy Turn';eb.classList.toggle('glow',my&&!UI.busy&&!legal(G,0).length)}
 function tEl(t,box){if(t[0]==='h')return box?heroBox(+t[1]):heroBox(+t[1]).querySelector('.av');return document.querySelector(`.unit[data-u="${t.slice(1)}"]`)}
@@ -1611,8 +1650,9 @@ $('#howtx').innerHTML=`<p>You are a mind adrift in the dark between stars. Break
 <p><b>Reading a card:</b></p><div class="demo">${costHTML(3)}<span>Flux cost</span>${atkHTML('v',4)}${atkHTML('m',2)}${atkHTML('c',3)}${atkHTML('n',1)}<span>Attack (icon per faction)</span>${hpHTML(2,40)}<span>Health: the blood drains as it is wounded</span></div><p><b>Rarity gems:</b> grey Common, blue Uncommon, gold Rare, prismatic Legendary. Custom decks hold up to 2 copies of a card (1 of a Legendary).</p>`;
 /* ================= BOOT / HOOKS ================= */
 layout();requestAnimationFrame(bgFrame);
+artPre(['hv','hm','hc','hn'],1);setTimeout(()=>artPre([...COL,'tD','tS','tC']),1500);
 (function precache(){const q=['hero-v','hero-m','hero-c',...COL,'tD','tS','tC'];const step=()=>{const t=performance.now();while(q.length&&performance.now()-t<14){const k=q.shift();k.startsWith('hero-')?heroArt(k[5]):artURL(k)}if(q.length)setTimeout(step,40)};setTimeout(step,700)})();
-window.__hs={LG,PO,gameOver,get COLL(){return COLL},set COLL(v){COLL=v},saveColl,rollPack,grant,openPack,owned,SH,BASE,PACK,renderColl,renderPacks,startOpen,flip,C,COL,FAC,KW,prebuilt,simulate,newGame,legal,act,aiChoose,evalS,startMatch,show,get G(){return G},get UI(){return UI},renderMatch,
+window.__hs={zoom:showZoom,LG,PO,PRE,VID,ARTV,realArt,artPre,gameOver,get COLL(){return COLL},set COLL(v){COLL=v},saveColl,rollPack,grant,openPack,owned,SH,BASE,PACK,renderColl,renderPacks,startOpen,flip,C,COL,FAC,KW,prebuilt,simulate,newGame,legal,act,aiChoose,evalS,startMatch,show,get G(){return G},get UI(){return UI},renderMatch,
  sheet(ids){let s=$('#sheet');if(!s){s=document.createElement('div');s.id='sheet';document.body.appendChild(s)}s.innerHTML='';for(const id of ids)s.appendChild(cardEl(id))},
  demo(){startMatch(prebuilt('v'),'c',{first:0});UI.busy=false;const g=G,mk=(pi,id)=>{const u=mkUnit(g,pi,id);u.ready=true;return u};g.p[0].board=['v5','v4','v2','n3'].map(id=>mk(0,id));g.p[1].board=['c6','c2','c7','c3','c1'].map(id=>mk(1,id));g.p[1].board[1].h=1;g.p[0].board[3].a=5;
   g.p[0].board[1].h=1;g.p[1].board[3].h=1;
