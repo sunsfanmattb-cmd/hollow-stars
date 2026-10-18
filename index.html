@@ -3,7 +3,11 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no">
 <meta name="theme-color" content="#05030a">
 <title>Hollow Stars — a card game of cosmic dread</title>
-<style>:root{--uw:58px;--uh:78px;--hw:100px;--hh:140px;--side:180px;--serif:"Palatino Linotype",Palatino,"Book Antiqua",Georgia,serif;--bone:#d8ccb0;--bronze:#7a6040;--ink:#e8e0d4}
+<style>
+/* Hollow Stars. RENDERING RULES: read /RENDERING_RULES.md before changing card visuals, animations, video or art.
+   (transform/opacity only, no blend modes or animated filters, no class toggling mid-animation or DOM rebuilds, video rules,
+   layer budget, image sizes, text auto-fit; new cards must pass tests/cardcheck.py, tests/paintprobe.py and tests/flicker.py) */
+:root{--uw:58px;--uh:78px;--hw:100px;--hh:140px;--side:180px;--serif:"Palatino Linotype",Palatino,"Book Antiqua",Georgia,serif;--bone:#d8ccb0;--bronze:#7a6040;--ink:#e8e0d4}
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
 html,body{width:100%;height:100%;overflow:hidden;background:#010102;color:var(--ink);font-family:system-ui,"Segoe UI",Roboto,sans-serif;user-select:none;-webkit-user-select:none;touch-action:none;overscroll-behavior:none}
 #bg{position:fixed;inset:0;width:100%;height:100%;z-index:0}
@@ -284,24 +288,12 @@ body.land #bdeck{height:auto;width:min(38%,300px);box-shadow:-1px 0 0 #3a3028}
 .san.low{background:radial-gradient(ellipse 30% 18% at 38% 24%,#ffffffa0,transparent),radial-gradient(circle at 35% 30%,#ff6a6a,#6a0a14 40%,#1a0204 75%)}
 .btn{box-shadow:0 0 0 1px #000,inset 0 1px 0 #ffffff30,inset 0 -2px 0 #0009,0 0 0 2px #5a3a2a,0 0 0 3px #000,0 6px 14px #000c}
 /* legendary living art */
-.lg{position:absolute;inset:0;overflow:hidden;border-radius:inherit;pointer-events:none;z-index:1}
-.lg i{position:absolute;display:block;will-change:transform}
-.lg .lp{inset:-7%;background-size:cover;background-position:center}
-.lg .lm{left:-10%;right:-10%;top:0;height:200%;background:var(--mote-v) 0 0/auto 25% repeat;mix-blend-mode:screen;opacity:.85}
-.f-m .lg .lm{background-image:var(--mote-m)}.f-c .lg .lm{background-image:var(--mote-c)}
-.lg .lgw{left:20%;right:20%;top:15%;bottom:15%;border-radius:50%;background:radial-gradient(closest-side,var(--glow),transparent);mix-blend-mode:screen;opacity:.4}
-.lg .lf{top:-10%;bottom:-10%;left:0;width:34%;background:linear-gradient(90deg,transparent,#ffd0f022 25%,#ffffff55 48%,#a0f0ff33 60%,transparent);mix-blend-mode:screen;transform:translateX(-120%)}
 .card.r-L::before{content:"";position:absolute;inset:0;border-radius:inherit;pointer-events:none;z-index:5;box-shadow:inset 0 0 0 .14em #ffd07055,0 0 .9em #c040e066}
-@media (prefers-reduced-motion:reduce){.lg .lm,.lg .lf{display:none}}
 /* ---- v6: painted art + full-art legendaries ---- */
 .card .art,.unit .art,.hero .av,.tile .ta{background-size:cover;background-position:center}
-.lg .lv{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block;opacity:0;transition:opacity .5s}
-.lg.vid .lv{opacity:1}.lg.vid .lm{opacity:.35}.lg.vid .lgw{opacity:.18!important}
-.lg .lm{opacity:.5}
 .card.full{background:#050405}
 .card.full .art{left:0;right:0;top:0;height:100%;border-radius:inherit;clip-path:none!important;z-index:0;box-shadow:inset 0 0 0 .16em #000,inset 0 0 0 .3em #ffd07030,inset 0 0 2.4em #000c}
 .card.full .art::after{background:linear-gradient(180deg,#000a,transparent 16%,transparent 42%,#000a 66%,#000e);border-radius:inherit;z-index:2}
-.card.full .lg .lp{inset:-3%}
 .card.full .nm{top:50.5%;background:linear-gradient(90deg,transparent,#060308c8 14%,#060308c8 86%,transparent)!important;box-shadow:none;clip-path:none}
 .card.full .nm span{font-size:1.2em;text-shadow:0 0 .6em var(--glow),0 0 .25em #000,0 .08em 0 #000}
 .card.full .ty{top:59.4%;background:#05030699!important;box-shadow:0 0 0 1px #ffd07022}
@@ -548,10 +540,6 @@ body.q-low .foil::after{display:none!important}
 body.q-low .r-L .set,body.q-low .flux .fx i.on{animation:none}
 
 /* ===== v7.2 lighter tiers ===== */
-.lg i{will-change:auto}
-body.q-high .lg .lp,body.q-high .lg .lm{will-change:transform}
-body.q-medium .lg .lm,body.q-medium .lg .lgw,body.q-medium .unit .lg .lf{display:none}
-body.q-low .lg .lm,body.q-low .lg .lgw,body.q-low .lg .lf{display:none}
 body.q-medium #fog i,body.q-low #fog i{animation:none;width:110%}
 /* medium/low: no always-on per-card animations (each one forced its own GPU layer plus every card overlapping it) */
 body:not(.q-high) .cost::before,body:not(.q-high) .cost .cr::before,body:not(.q-high) .r-L .gem,body:not(.q-high) .r-L .set,body:not(.q-high) .flux .fx i.on{animation:none}
@@ -579,15 +567,10 @@ body.land #quit,body.land #mset{position:static;margin:0}body.land #hint{flex:0 
 .card.r-L .foil::after{background:linear-gradient(90deg,transparent,#ffd8f438 30%,#ffffff55 50%,#d8fff038 70%,transparent)}
 #hand .card.r-L .foil::after,#zoom .r-L .foil::after,.pfront .r-L .foil::after{animation-duration:5.2s}
 @keyframes fsw{0%,58%{transform:translateX(-150%) skewX(-18deg)}100%{transform:translateX(325%) skewX(-18deg)}}
-.lg .lm{mix-blend-mode:normal;opacity:.42}.lg .lgw{mix-blend-mode:normal;opacity:.2}.lg .lf{mix-blend-mode:normal}
-.lg.vid .lm{opacity:.22}.lg.vid .lgw{opacity:.1!important}
 #zoom .glare{mix-blend-mode:normal}#zoom .foil .fsh{opacity:.55}
 /* video: invisible until a real frame is presented, then a slow crossfade over the still; .99 max opacity = never an overlay plane */
-.lg .lv{opacity:0;transition:opacity .8s var(--ezio);background:transparent;pointer-events:none}
-.lg.vid .lv{opacity:.99}
 #cin .cpan video{opacity:0;transition:opacity .5s var(--ezio)}#cin .cpan.vid video{opacity:.99}
 /* 3D/backface: tilt layers keep a flat backface so rotated cards don't z-fight with their own foil */
-.card,.card .art,.card .foil{backface-visibility:hidden}
 /* buttons: press feedback everywhere, hover only on real pointers (sticky :hover on phones looked like a stuck flash) */
 .btn{transition:transform .14s var(--ez),opacity .25s,filter .2s;-webkit-tap-highlight-color:transparent}
 .btn:hover{filter:none}@media (hover:hover){.btn:not([disabled]):hover{filter:brightness(1.18)}}
@@ -648,6 +631,124 @@ body.fxlow #hand.cue .card.can,body.q-low #hand.cue .card.can{animation:none}
 body.land #endt{padding-left:2.4em!important;padding-right:1em!important}
 /* readability: lighter film grain over the match (it sat on top of every card's text) */
 body[data-scr=match] #grain{opacity:.3}
+
+/* ===== v7.4 rendering pass: the rules behind every line here are in RENDERING_RULES.md (read it before touching card CSS) ===== */
+/* layer budget: backface-visibility on every card promoted each card (and everything overlapping it) to its own GPU layer:
+   384 layers in the collection. Only the tilting zoom card and the pack flip faces need it. */
+#zoom .card,#zoom .card .art,#zoom .card .foil{backface-visibility:hidden}
+/* finished entrance animations must not linger: fill both/forwards keeps an "active" animation, i.e. a permanent full-screen layer */
+.screen.on{animation-fill-mode:backwards}
+#banner.show{animation-fill-mode:none}
+/* --- Legendary living art: still + Ken Burns + two pooled mote layers + glow + sheen, all transform/opacity keyframes.
+   Every duration (alternate counts double) divides LGP=240 s; --lgd is the per-card negative delay from d.js so re-created
+   cards resume mid-motion. Nothing here repaints: the textures are rasterised once and only moved. --- */
+.lg{position:absolute;inset:0;overflow:hidden;border-radius:inherit;pointer-events:none;z-index:1}
+.lg i{position:absolute;display:block;animation-delay:var(--lgd,0s);animation-iteration-count:infinite}
+.lg .lp{inset:-6%;background-size:cover;background-position:center;animation-name:lgkb;animation-duration:24s;animation-direction:alternate;animation-timing-function:var(--ezio)}
+.card.full .lg .lp{inset:-3.5%}
+@keyframes lgkb{0%{transform:translate3d(-1.4%,1%,0) scale(1)}50%{transform:translate3d(.3%,-.5%,0) scale(1.03)}100%{transform:translate3d(1.4%,-1%,0) scale(1.055)}}
+.lg .lm{left:0;right:0;top:0;height:200%;background:var(--mote-v) 0 0/auto 25% repeat;opacity:.5;animation-name:lgmote;animation-duration:20s;animation-timing-function:linear;transition:opacity .8s var(--ezio)}
+.lg .lm.m2{background-size:auto 16.6667%;opacity:.28;animation-name:lgmote2;animation-duration:30s}
+.f-m .lg .lm{background-image:var(--mote-m)}.f-c .lg .lm{background-image:var(--mote-c)}.f-n .lg .lm{background-image:var(--mote-n)}
+@keyframes lgmote{from{transform:translate3d(0,0,0)}to{transform:translate3d(0,-50%,0)}}
+@keyframes lgmote2{from{transform:scaleX(-1) translate3d(0,0,0)}to{transform:scaleX(-1) translate3d(0,-50%,0)}}
+.lg .lgw{left:14%;right:14%;top:12%;bottom:22%;border-radius:50%;background:radial-gradient(closest-side,var(--glow),transparent);opacity:.14;animation-name:lgglow;animation-duration:6s;animation-direction:alternate;animation-timing-function:ease-in-out;transition:opacity .8s}
+@keyframes lgglow{from{opacity:.07;transform:scale(.92)}to{opacity:.22;transform:scale(1.06)}}
+.lg .lf{top:-10%;bottom:-10%;left:0;width:30%;background:linear-gradient(90deg,transparent,#ffe6f414 25%,#ffffff38 50%,#d8fff418 70%,transparent);animation-name:lgsheen;animation-duration:8s;animation-timing-function:var(--ezio)}
+@keyframes lgsheen{0%,60%{transform:translateX(-140%) skewX(-12deg)}100%{transform:translateX(440%) skewX(-12deg)}}
+/* video sits inside .lp: Ken Burns pauses where it is while the video shows, so still<->video crossfades line up exactly */
+.lg .lv{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block;opacity:0;transition:opacity .9s var(--ezio);background:transparent;pointer-events:none}
+.lg.vid .lv{opacity:.99}
+.lg.vid .lp{animation-play-state:paused}
+.lg.vid .lm{opacity:.26}.lg.vid .lm.m2{opacity:.14}.lg.vid .lgw{opacity:.08}
+/* gilded frame edge: breathing gold ring + two glints running along the top and bottom edges */
+.lge{position:absolute;inset:0;border-radius:inherit;pointer-events:none;z-index:6}
+.lge::before{content:"";position:absolute;inset:0;border-radius:inherit;box-shadow:inset 0 0 0 .12em #ffe2a2c0,inset 0 0 0 .26em #b0308a40,inset 0 0 .9em #ffb84a40,0 0 .9em #d060ff80;opacity:.4;animation:lgedge 6s ease-in-out var(--lgd,0s) infinite alternate}
+@keyframes lgedge{to{opacity:1}}
+.lge b{position:absolute;left:4%;top:0;width:36%;height:.17em;border-radius:1em;background:linear-gradient(90deg,transparent,#ffe7b0 35%,#fff 50%,#ffe7b0 65%,transparent);box-shadow:0 0 .45em #ffcf6aaa;opacity:0;animation:lgglint 8s var(--ezio) var(--lgd,0s) infinite}
+.lge b+b{top:auto;bottom:0;animation-direction:reverse;animation-delay:calc(var(--lgd,0s) - 4s)}
+@keyframes lgglint{0%,52%{transform:translateX(0);opacity:0}60%,88%{opacity:.95}100%{transform:translateX(158%);opacity:0}}
+.unit .lge{border-radius:6%}.unit .lge b{display:none}
+.unit .lge::before{box-shadow:inset 0 0 0 1.5px #ffe2a2b0,0 0 9px #d060ff90}
+/* animated gem on the Legendary set symbol: soft halo pulse + a four-point star glint */
+.r-L .set{animation:none}
+.card .ty .lgem{position:absolute;right:.5em;top:50%;width:1.6em;height:1.6em;margin-top:-.8em;pointer-events:none}
+.lgem::before{content:"";position:absolute;inset:-40%;border-radius:50%;background:radial-gradient(closest-side,#ffb0f2a0,#c040e040 55%,transparent);animation:gemglow 3s ease-in-out infinite alternate}
+@keyframes gemglow{from{opacity:.3;transform:scale(.8)}to{opacity:.95;transform:scale(1.1)}}
+.lgem b{position:absolute;left:38%;top:-12%;width:80%;height:80%;background:radial-gradient(ellipse 50% 6% at 50% 50%,#fff,#fff0),radial-gradient(ellipse 6% 50% at 50% 50%,#fff,#fff0),radial-gradient(closest-side,#fff 0,#ffe0f8a0 18%,transparent 40%);opacity:0;animation:gemspark 4s var(--ezio) infinite}
+@keyframes gemspark{0%,64%{transform:scale(.1) rotate(0);opacity:0}76%{transform:scale(1) rotate(40deg);opacity:1}100%{transform:scale(.1) rotate(90deg);opacity:0}}
+/* refined Legendary foil: faint diagonal prism plus a prismatic rim at the edges, static (tilt in zoom moves it) */
+.card.r-L .foil{opacity:1;background:linear-gradient(90deg,#ff9af036,transparent 7%,transparent 93%,#86fff036),linear-gradient(180deg,#fff0a83a,transparent 5%,transparent 95%,#a8bcff3a),linear-gradient(115deg,transparent 24%,#d4a8ff20 33%,#86fff020 41%,#fff0a820 48%,#ffa0c820 55%,#a8bcff20 62%,transparent 70%) calc(50% + var(--ox,0)*60%) calc(50% + var(--oy,0)*60%)/240% 240% no-repeat}
+#hand .card.r-L:not(.held) .foil::after{display:none}
+/* full-art text panel: dark glass with a gilded rule and a small diamond */
+.card.full .nm{box-shadow:0 -.08em 0 #ffd07040,0 .08em 0 #ffd07040}
+.card.full .tx{background:linear-gradient(180deg,#1a1020e8,#0a060ef4 40%,#050307f8)!important;box-shadow:0 0 0 1px #000,0 0 0 .1em #ffd07048,inset 0 .08em 0 #ffffff12,inset 0 0 1.2em #000b!important}
+.card.full .tx::before{content:"";position:absolute;left:14%;right:14%;top:0;height:.09em;background:linear-gradient(90deg,transparent,#c9a24a 20%,#fff1c0 50%,#c9a24a 80%,transparent);pointer-events:none}
+/* locked silhouettes are filtered: nothing may animate inside a filter (it re-renders the filter every frame) */
+.card.locked .lg,.card.locked .lge,.card.locked .lgem{display:none}
+/* Legendary units: no filter on art that holds video/animation (sleep tint is a sibling overlay instead), rectangular clip (no mask layer) */
+.unit .art.lgart,.unit.sleep .art.lgart{filter:none;border-radius:0}
+.unit .lsl{position:absolute;inset:0;z-index:3;background:#0a0610;opacity:0;transition:opacity .4s;pointer-events:none}
+.unit.sleep .lsl{opacity:.45}
+/* tiers: medium drops the second mote layer and per-unit extras; low has no Legendary motion at all */
+body.q-medium .lg .lm.m2,body.q-medium .unit .lg .lgw{display:none}
+/* no sheen sweep on small board units (a bright band crossing a 60 px art reads as a flash; caught by tests/flicker.py on High) */
+.unit .lg .lf{display:none}
+body.q-low .lg .lm,body.q-low .lg .lgw,body.q-low .lg .lf,body.q-low .lge b{display:none}
+body.q-low .lg i,body.q-low .lge::before,body.q-low .lgem::before{animation:none}
+body.q-low .lgem b{display:none}
+@media (prefers-reduced-motion:reduce){.lg i,.lge::before,.lge b,.lgem::before,.lgem b{animation:none!important}.lg .lm,.lg .lf,.lge b,.lgem b{display:none}}
+
+/* ===== v7.4 custom decks: deck list, hero picker, dialog ===== */
+.dsub{color:#a89c8c;font-size:12.5px;margin:-4px 0 10px;letter-spacing:.06em}
+#dlist{gap:10px}
+.drow{opacity:1;align-items:flex-start;cursor:default}
+.drow .ta{position:relative;width:64px;height:64px}
+.drow .emb{position:absolute;right:-6px;bottom:-6px;width:28px;height:28px;border-radius:50%;display:grid;place-items:center;background:radial-gradient(circle at 40% 35%,#2a2228,#060406);box-shadow:0 0 0 1.5px #000,0 0 0 3px var(--f3)}
+.drow .emb svg{width:19px;height:19px;filter:none}
+.dmeta{flex:1;min-width:0}
+.dmeta b{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.dv.ok{color:#a8f090}.dv.no{color:#ffb070}
+.tile.drow.bad{opacity:1;filter:none;box-shadow:0 0 0 1px #000 inset,0 0 0 2px #5a3a28 inset,0 6px 14px #000c}
+.dact{display:flex;flex-wrap:wrap;gap:5px;margin-top:8px}
+.dact .btn{font-size:11.5px;padding:.4em .75em}
+.btn.danger{color:#ffb0a8;box-shadow:0 0 0 1px #000,0 0 0 2px #8a2a2a inset}
+.btn.danger:not(.ghost){background:linear-gradient(180deg,#5a1414,#2a0606)}
+.dk0{text-align:center;font-size:13px;padding:18px 6px}
+.tile.mine small em{color:#ffb070;font-style:normal}
+.tile.bad{opacity:.45;filter:saturate(.5)}
+#bname{cursor:pointer}#bname i{font-style:normal;font-size:.8em;opacity:.65}
+.hpick{display:flex;align-items:center;gap:4px}
+.hpick span{font-family:var(--serif);font-size:12px;letter-spacing:.14em;color:#c8b8a0;text-transform:uppercase;margin-right:2px}
+.hpick button{display:flex;align-items:center;gap:3px;padding:2px 6px 2px 3px;border-radius:2px;background:#0a0809;box-shadow:0 0 0 1px #3a3028 inset;color:#a89a88;font-size:11px}
+.hpick button svg{width:18px;height:18px;filter:none}
+.hpick button em{font-style:normal}
+.hpick button.on{background:#2a0a10;color:#f4e4cc;box-shadow:0 0 0 1px #c8a070 inset,0 0 10px var(--glow)}
+@media (max-width:400px){.hpick button em{display:none}.hpick button{padding:3px 5px}}
+body.land .hpick button em{display:none}
+#dlg{position:fixed;inset:0;z-index:150;display:none;align-items:center;justify-content:center;background:#000a;padding:16px}
+#dlg.on{display:flex}
+#dlg .dbox{width:min(92vw,360px);padding:18px 16px 14px;border-radius:4px;background:linear-gradient(180deg,#120c0ef4,#060405f8),var(--panel) center/cover;box-shadow:0 0 0 1px #000,0 0 0 2px #6a5440 inset,0 12px 40px #000;text-align:center}
+#dlg b{display:block;font-family:var(--serif);font-weight:400;letter-spacing:.14em;font-size:17px;color:#f0e4d0;text-shadow:0 0 12px #a0102a}
+#dlg p{color:#b8aa96;font-size:13px;margin:10px 0 0}
+#dlg input{width:100%;margin-top:12px;padding:.55em .7em;font:inherit;font-size:16px;color:#f4e8d4;background:#050304;border:0;border-radius:2px;box-shadow:0 0 0 1px #000,0 0 0 2px #4a3e30 inset;outline:none}
+#dlg input:focus{box-shadow:0 0 0 1px #000,0 0 0 2px #c8a070 inset}
+#dlg .rowb{margin-top:14px}
+body.land #mydecks #dlist{grid-template-columns:1fr 1fr;width:min(100%,900px)}
+body.land .tile.drow{flex-direction:row;text-align:left;padding:8px}
+body.land #mydecks .scroll{padding-top:max(8px,env(safe-area-inset-top))}body.land #mydecks h2{margin:4px 0}
+
+/* ===== v7.4 text auto-fit (d.js fitEl, RENDERING_RULES.md §9): base size x --fit, set once per text+box size ===== */
+.card .nm span{font-size:calc(1.12em*var(--fit,1))}
+.card.full .nm span{font-size:calc(1.2em*var(--fit,1))}
+.card .nm span.fit2{white-space:normal;line-height:.94;text-align:center;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;text-overflow:clip;letter-spacing:0}
+.card .ty span{font-size:calc(1em*var(--fit,1))}
+.tile b[data-fit],.dmeta b{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-size:calc(16px*var(--fit,1))}
+.tile .tmeta{min-width:0;flex:1}
+#bname{display:flex;align-items:center;justify-content:center;gap:.3em;min-width:0}
+#bname span{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:calc(1em*var(--fit,1))}
+#bname i{flex:none}
+#bname span.fit2,.tile b.fit2,.dmeta b.fit2{white-space:normal;line-height:1.02;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;text-overflow:clip}
 </style></head><body>
 <div id="pbg"><i class="pl"></i><i class="pg"></i><i class="pd"></i></div><canvas id="bg"></canvas><div id="fog"><i class="f1"></i><i class="f2"></i></div><div id="vig"></div><div id="grain"></div>
 <button id="mute" aria-label="Toggle sound"></button>
@@ -655,7 +756,7 @@ body[data-scr=match] #grain{opacity:.3}
  <div class="tbox"><h1>HOLLOW<span>STARS</span></h1><div class="orn"></div><p class="sub">a card game of cosmic dread</p>
  <div class="menu"><button class="btn" id="bPlay">Play vs. the Void</button><button class="btn ghost" id="bPacks">Packs</button><button class="btn ghost" id="bBuild">Deck Builder</button><button class="btn ghost" id="bColl">Collection</button><button class="btn ghost" id="bHow">How to Play</button><button class="btn ghost" id="bSet">Settings</button></div></div>
 </section>
-<section id="pick" class="screen"><div class="scroll"><h2>CHOOSE YOUR DECK</h2><div class="orn"></div><div id="decks" class="tiles"></div><h3>OPPONENT</h3><div id="opps" class="seg"></div><div class="rowb"><button class="btn ghost" data-back>Back</button><button class="btn" id="bStart">Descend</button></div></div></section>
+<section id="pick" class="screen"><div class="scroll"><h2>CHOOSE YOUR DECK</h2><div class="orn"></div><div id="decks" class="tiles"></div><h3>OPPONENT</h3><div id="opps" class="seg"></div><div class="rowb"><button class="btn ghost" data-back>Back</button><button class="btn ghost" id="pDecks">My Decks</button><button class="btn" id="bStart">Descend</button></div></div></section>
 <section id="packs" class="screen"><div class="scroll"><h2>BOOSTER PACKS</h2><div class="orn"></div>
  <div class="pinfo"><span>◆ <b id="pshards">0</b> Shards</span><span>Sealed packs: <b id="pcount">0</b></span></div>
  <div id="psealed" class="pack mini" role="button" aria-label="Open a pack"><i class="psig"></i><b>HOLLOW STARS</b><small>5 cards · 1 rare or better</small></div>
@@ -665,9 +766,10 @@ body[data-scr=match] #grain{opacity:.3}
 <div id="pstage"><div class="prays"></div><div id="pwrap" class="pack"><i class="psig"></i><b>HOLLOW STARS</b><small>Tap to tear open</small><i class="pseam"></i></div><div class="pburst"></div>
  <div id="prow"></div><div class="pbar"><button class="btn ghost sm" id="pall">Reveal all</button><button class="btn sm" id="pdone">Done</button></div></div>
 <section id="howto" class="screen"><div class="scroll"><h2>HOW TO PLAY</h2><div class="orn"></div><div class="how" id="howtx"></div><div class="rowb"><button class="btn" data-back>Back</button></div></div></section>
-<section id="builder" class="screen"><div class="bhead"><button class="btn sm ghost" data-back>‹ Back</button><b>DECK BUILDER</b><span id="bcount">0/30</span><button class="btn sm" id="bSave">Save</button></div>
+<section id="mydecks" class="screen"><div class="scroll"><h2>MY DECKS</h2><div class="orn"></div><p class="dsub">Up to 5 named decks · <span id="dcount">0/5</span></p><div id="dlist" class="tiles"></div><div class="rowb"><button class="btn ghost" data-back>Back</button><button class="btn" id="dNew">＋ New Deck</button></div></div></section>
+<section id="builder" class="screen"><div class="bhead"><button class="btn sm ghost" id="bBack">‹ Decks</button><b id="bname" role="button" title="Rename">DECK BUILDER</b><span id="bcount">0/30</span><button class="btn sm" id="bSave">Done</button></div>
  <div class="bfil" id="bfil"></div>
- <div class="bbody"><div id="bgrid"></div><div id="bdeck"><div class="bdh"><span>Custom deck</span><div id="curve"></div></div><div id="blist"></div><div class="brow"><button class="btn sm ghost" id="bClear">Clear</button><button class="btn sm ghost" data-tpl="v">Abyss</button><button class="btn sm ghost" data-tpl="m">Derelict</button><button class="btn sm ghost" data-tpl="c">Communion</button></div></div></div>
+ <div class="bbody"><div id="bgrid"></div><div id="bdeck"><div class="bdh"><div id="bhero" class="hpick"></div><div id="curve"></div></div><div id="blist"></div><div class="brow"><button class="btn sm ghost" id="bClear">Clear</button><button class="btn sm ghost" data-tpl="v">Abyss</button><button class="btn sm ghost" data-tpl="m">Derelict</button><button class="btn sm ghost" data-tpl="c">Communion</button></div></div></div>
 </section>
 <section id="match" class="screen"><div id="madv"></div>
  <div class="hero" id="oph" data-hero="1"><div class="av"></div><div class="hn"></div><div class="md"></div><div class="st"><div class="flux"><span class="fv"></span><div class="fx"></div></div><div class="cts"></div><div class="san"></div></div></div>
@@ -680,8 +782,11 @@ body[data-scr=match] #grain{opacity:.3}
 <svg id="arrow"><defs><marker id="ah" markerWidth="8" markerHeight="8" refX="4" refY="4" orient="auto"><path d="M0 .6L7.4 4L0 7.4L1.6 4z" fill="#ff5a66"/></marker></defs><path class="arg" id="arg"/><path id="arl" stroke-linecap="round" marker-end="url(#ah)"/></svg>
 <div id="hflash"></div><div id="cin"><div class="crays"></div><div class="cpan"><video muted playsinline loop preload="auto"></video></div><div class="cname"><small></small><b></b></div><div class="cskip">TAP TO SKIP</div></div>
 <div id="settings"><div class="sbox"><h2>SETTINGS</h2><div class="orn"></div><label>Volume <input type="range" id="sVol" min="0" max="100" value="80"></label><label>Mute sound <input type="checkbox" id="sMute"></label><label><span>Quality<small id="sQn"></small></span><select id="sQ"><option value="auto">Auto</option><option value="high">High</option><option value="medium">Medium</option><option value="low">Low (reduce effects)</option></select></label><div class="rowb"><button class="btn" id="sClose">Close</button></div></div></div>
-<div id="banner"></div><div id="preview"></div><div id="zoom"></div><div id="kwtip"></div><div id="toast"></div>
+<div id="banner"></div><div id="preview"></div><div id="zoom"></div><div id="kwtip"></div><div id="toast"></div><div id="dlg" role="dialog" aria-modal="true"><div class="dbox"><b id="dlgT"></b><p id="dlgX"></p><input id="dlgI" maxlength="24" autocomplete="off" enterkeyhint="done" spellcheck="false"><div class="rowb"><button class="btn sm ghost" id="dlgNo">Cancel</button><button class="btn sm" id="dlgOk">OK</button></div></div></div>
 <div id="over"><div class="ovbg"></div><div class="ovbox"><div class="ovsig"></div><h2 id="ovt"></h2><p id="ovp"></p><div id="ovrw"></div><button class="btn" id="ovk" hidden><span>Open a Pack</span></button><div class="rowb"><button class="btn ghost" id="ovm">Menu</button><button class="btn ghost" id="ovr">Play again</button></div></div></div>
+/* Hollow Stars. RENDERING RULES: read /RENDERING_RULES.md before changing card visuals, animations, video or art.
+   (transform/opacity only, no blend modes or animated filters, no class toggling mid-animation or DOM rebuilds, video rules,
+   layer budget, image sizes, text auto-fit; new cards must pass tests/cardcheck.py, tests/paintprobe.py and tests/flicker.py) */
 <script>
 'use strict';
 const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)];
@@ -848,6 +953,9 @@ function aiChoose(g,pi){const A=legal(g,pi);if(!A.length)return null;const sr=rn
  for(const a of A){const c=cloneG(g);act(c,pi,a);const v=evalS(c,pi)+(a.t==='atk'&&a.tg[0]==='h'?.02:0);if(v>bv){bv=v;best=a}}rnd=sr;return best}
 function aiTurnSync(g){const pi=g.cur;for(let n=0;n<40&&!g.over;n++){const a=aiChoose(g,pi);if(!a)break;act(g,pi,a)}if(!g.over)endTurn(g)}
 function simulate(f0,f1,first){const g=newGame(typeof f0==='string'?prebuilt(f0):f0,typeof f1==='string'?prebuilt(f1):f1,{ai:[1,1],sim:1,first});for(let n=0;n<300&&!g.over;n++)aiTurnSync(g);return{winner:g.winner,turns:g.turn,reason:g.reason,san:g.p.map(p=>p.san),mad:g.p.map(p=>p.mad),over:g.over}}
+/* Hollow Stars. RENDERING RULES: read /RENDERING_RULES.md before changing card visuals, animations, video or art.
+   (transform/opacity only, no blend modes or animated filters, no class toggling mid-animation or DOM rebuilds, video rules,
+   layer budget, image sizes, text auto-fit; new cards must pass tests/cardcheck.py, tests/paintprobe.py and tests/flicker.py) */
 /* ================= ART ================= */
 function hash(s){let h=2166136261;for(let i=0;i<s.length;i++)h=Math.imul(h^s.charCodeAt(i),16777619);return h>>>0}
 function rng(seed){return()=>{seed=seed+0x6D2B79F5|0;let t=Math.imul(seed^seed>>>15,1|seed);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296}}
@@ -1008,13 +1116,20 @@ const realArt=k=>`${ARTDIR}${k}.webp?${ARTV}`;
 /* v7.1: the procedural painter is now only a fallback for art that failed to load (it used to run for every card on
    the main thread at startup = long jank on phones). While a webp loads, a cheap dark gradient shows instead. */
 const ARTPH='linear-gradient(160deg,#16101c,#060408)';
-const artBG=id=>PRE.st[id]==='err'?`url(${artURL(id)})`:`url(${realArt(id)}),${ARTPH}`;
+/* v7.4: full-art Legendaries (600x840) also ship art/s/<id>.webp at 360x504. Hand, board, grids and packs use the small one
+   (a 600x840 decode is 2 MB of GPU texture per card; on phones that memory pressure evicts tiles = flicker). Zoom and the
+   cinematic layer the full size over the small one (artBG(id,1)), so there is never an empty frame while it loads. */
+const hasS=k=>!!(C[k]&&C[k].r==='L');
+const realArtS=k=>hasS(k)?`${ARTDIR}s/${k}.webp?${ARTV}`:realArt(k);
+const artBG=(id,big)=>PRE.st[id]==='err'?`url(${artURL(id)})`:(big&&hasS(id)?`url(${realArt(id)}),`:'')+`url(${realArtS(id)}),${ARTPH}`;
 const heroBG=f=>PRE.st['h'+f]==='err'?`url(${heroArt(f)})`:`url(${realArt('h'+f)}),${ARTPH}`;
 function artFail(k){const u=`/${k}.webp`;requestAnimationFrame(()=>{for(const e of document.querySelectorAll('.art,.av,.ta,.cpan'))if(e.style.backgroundImage.includes(u))e.style.backgroundImage=k[0]==='h'&&k.length===2?heroBG(k[1]):artBG(k)})}
-const PRE={st:{},q:[],act:0,max:6};
+const PRE={st:{},q:[],act:0,max:6,img:{}};
 function artPre(keys,hi){keys=[...new Set(keys)].filter(k=>!PRE.st[k]);if(hi)PRE.q.unshift(...keys);else PRE.q.push(...keys);keys.forEach(k=>PRE.st[k]='q');preRun()}
 function preRun(){while(PRE.act<PRE.max&&PRE.q.length){const k=PRE.q.shift();if(PRE.st[k]!=='q')continue;PRE.st[k]='l';PRE.act++;const im=new Image();im.decoding='async';try{im.fetchPriority='high'}catch(e){}
- im.onload=()=>{PRE.st[k]='ok';PRE.act--;preRun()};im.onerror=()=>{PRE.st[k]='err';PRE.act--;artFail(k);preRun()};im.src=realArt(k)}}
+ im.onload=()=>{PRE.st[k]='ok';PRE.act--;PRE.img[k]=im;if(im.decode)im.decode().catch(()=>{});preRun()};im.onerror=()=>{PRE.st[k]='err';PRE.act--;artFail(k);preRun()};im.src=realArtS(k)}}
+/* v7.4: references to the preloaded (and decoded) images are kept in PRE.img so the browser keeps them warm: a card
+   entering the hand/board paints from a decoded image instead of popping in a frame later. */
 /* ---- faction frame textures ---- */
 const FRAME={};
 function frameURL(f){if(FRAME[f])return FRAME[f];const W=300,H=420,cv=document.createElement('canvas');cv.width=W;cv.height=H;const x=cv.getContext('2d'),R=rng(hash('frame'+f)),P=PAL[f];
@@ -1047,7 +1162,11 @@ function laneURL(){const W=640,H=120,cv=document.createElement('canvas');cv.widt
 
 function parchURL(){const S=256,cv=mkc(S,S),x=cv.getContext('2d'),R=rng(4242);x.fillStyle='#120d0a';x.fillRect(0,0,S,S);for(let i=0;i<14;i++)glow(x,R()*S,R()*S,30+R()*60,R()<.5?'#2a1c12':'#000000',.35);
  for(let i=0;i<900;i++){x.strokeStyle=`rgba(${R()<.5?'90,64,40':'0,0,0'},${.05+R()*.12})`;x.lineWidth=.5+R();const px=R()*S,py=R()*S,a=(R()-.5)*.6;x.beginPath();x.moveTo(px,py);x.lineTo(px+Math.cos(a)*(4+R()*16),py+Math.sin(a)*(2+R()*6));x.stroke()}return cv.toDataURL('image/jpeg',.8)}
-function moteURL(f){const S=128,cv=mkc(S,S),x=cv.getContext('2d'),R=rng(hash('mote'+f)),P=PAL[f];for(let i=0;i<12;i++){const px=R()*S,py=R()*S,r=1.2+R()*2.8;glow(x,px,py,r*3.5,R()<.6?P.a:P.g,.55);x.fillStyle='rgba(255,250,235,.85)';x.beginPath();x.arc(px,py,r*.45,0,7);x.fill()}return cv.toDataURL()}
+function moteURL(f){const S=128,cv=mkc(S,S),x=cv.getContext('2d'),R=rng(hash('mote'+f)),P=PAL[f];/* v7.4: wraps at the edges so the drifting tile is seamless; a few warm embers among the faction motes */
+ for(let i=0;i<12;i++){const px=R()*S,py=R()*S,r=1.2+R()*2.8,col=R()<.25?'#ffb060':R()<.6?P.a:P.g;for(const dx of[-S,0,S])for(const dy of[-S,0,S]){const X=px+dx,Y=py+dy;if(X<-r*4||X>S+r*4||Y<-r*4||Y>S+r*4)continue;glow(x,X,Y,r*3.5,col,.55);x.fillStyle='rgba(255,250,235,.85)';x.beginPath();x.arc(X,Y,r*.45,0,7);x.fill()}}return cv.toDataURL()}
+/* Hollow Stars. RENDERING RULES: read /RENDERING_RULES.md before changing card visuals, animations, video or art.
+   (transform/opacity only, no blend modes or animated filters, no class toggling mid-animation or DOM rebuilds, video rules,
+   layer budget, image sizes, text auto-fit; new cards must pass tests/cardcheck.py, tests/paintprobe.py and tests/flicker.py) */
 /* ===== ART v5: detailed horror portraits ===== */
 const LT={m8:[.75,-.05,1.3],v18:[.6,.1,1.6],v16:[.85,0,1.5],v8:[.8,-.1,1.25],c18:[.3,0,1.2],n6:[.9,-.1,1.3],m23:[.9,-.1,1.2]};// painter -> [lightX, lightY, exposure]
 const lerp=(a,b,t)=>a+(b-a)*t;
@@ -1617,6 +1736,9 @@ function cardBackURL(){const W=200,H=280,cv=mkc(W,H),x=cv.getContext('2d'),R=rng
  x.save();x.translate(W/2,H/2);for(let i=0;i<16;i++){x.rotate(TAU/16);x.strokeStyle='rgba(180,140,230,.12)';x.lineWidth=1;x.beginPath();x.moveTo(0,20);x.lineTo(0,H*.6);x.stroke()}x.restore();
  x.strokeStyle='#5a4a3a';x.lineWidth=5;x.strokeRect(6,6,W-12,H-12);x.strokeStyle='#000';x.lineWidth=2;x.strokeRect(12,12,W-24,H-24);x.strokeStyle='rgba(200,170,120,.45)';x.lineWidth=1;x.strokeRect(16,16,W-32,H-32);
  for(const[cx,cy]of[[16,16],[W-16,16],[16,H-16],[W-16,H-16]]){x.fillStyle='#c8a070';x.save();x.translate(cx,cy);x.rotate(Math.PI/4);x.fillRect(-4,-4,8,8);x.restore()}return cv.toDataURL('image/jpeg',.85)}
+/* Hollow Stars. RENDERING RULES: read /RENDERING_RULES.md before changing card visuals, animations, video or art.
+   (transform/opacity only, no blend modes or animated filters, no class toggling mid-animation or DOM rebuilds, video rules,
+   layer budget, image sizes, text auto-fit; new cards must pass tests/cardcheck.py, tests/paintprobe.py and tests/flicker.py) */
 /* ================= AUDIO ================= */
 const AU={c:null,m:null,rv:null,nb:null,mute:localStorage.getItem('hsMute')==='1',vol:Math.max(0,Math.min(1,+(localStorage.getItem('hsVol')??.8))),last:{},ambLvl:.74/* v7.3: drone +35% (was .55) */};
 function auInit(){if(AU.c){if(AU.c.state==='suspended')AU.c.resume();return}const AC=window.AudioContext||window.webkitAudioContext;if(!AC)return;let c;try{c=new AC()}catch(e){return}AU.c=c;
@@ -1723,22 +1845,24 @@ const FAC_SVG='<svg class="fac" viewBox="0 0 40 46"><path d="M20 1L38 12 31 15.5
 const costHTML=c=>`<div class="cost"><div class="cr"></div>${FAC_SVG}<b>${c}</b></div>`;
 const sigHTML=f=>`<svg class="sig" viewBox="0 0 24 24"><path fill-rule="evenodd" d="${SIG[f]}" fill="url(#gsig)" stroke="#000" stroke-width=".8" filter="url(#ds)"/></svg>`;
 const setHTML=r=>`<svg class="set" viewBox="0 0 24 24"><path fill-rule="evenodd" d="M12 .8l3.1 7.9 7.9 3.3-7.9 3.3L12 23.2l-3.1-7.9L1 12l7.9-3.3zM12 8.6a3.4 3.4 0 1 0 .01 0z" fill="url(#gr-${r})" stroke="#000" stroke-width="1" filter="url(#ds)"/><path d="M12 .8l3.1 7.9L12 8.6 8.9 8.7z" fill="#fff" opacity=".45"/></svg>`;
-const lgHTML=id=>C[id].r==='L'?`<div class="lg" data-id="${id}"><i class="lp" style="background-image:${artBG(id)}"></i><i class="lm"></i><i class="lgw"></i><i class="lf"></i></div>`:'';
-/* legendary animation driver: one rAF loop, ~30fps, only visible cards, paused when hidden / reduced motion */
-const LG={vis:new Set(),t0:0,rm:matchMedia('(prefers-reduced-motion: reduce)'),frames:0};
+/* ===== Legendary living art (v7.4) — see RENDERING_RULES.md =====
+   All motion is CSS keyframes on transform/opacity (compositor-only, zero repaints). No per-frame JS writes any more: the v7.3
+   rAF driver rewrote inline transforms 30x/s and that re-rasterised .lp/.lf every frame (caught by tests/paintprobe.py).
+   Every loop duration divides LGP, and each card gets animation-delay = -(global clock + per-card phase) mod LGP, so a card
+   that is re-created (zoom, re-render, pack reveal) continues mid-motion instead of snapping back to frame 0. */
+const LGP=240,lgPh=id=>{let h=0;for(const c of id)h=(h*31+c.charCodeAt(0))>>>0;return(h%997)/997*LGP},
+ lgDelay=id=>-((performance.now()/1000+lgPh(id))%LGP);
+const lgHTML=(id,big)=>C[id].r==='L'?`<div class="lg" data-id="${id}" style="--lgd:${lgDelay(id).toFixed(2)}s"><i class="lp" style="background-image:${artBG(id,big)}"></i><i class="lm"></i><i class="lm m2"></i><i class="lgw"></i><i class="lf"></i></div>`:'';
+/* card-level Legendary trim: gilded frame edge that breathes + two glints running along it, and the animated set gem */
+const lgTrim=id=>C[id].r==='L'?`<i class="lge" style="--lgd:${lgDelay(id).toFixed(2)}s"><b></b><b></b></i>`:'';
+const LG={vis:new Set(),rm:matchMedia('(prefers-reduced-motion: reduce)')};
 LG.io=new IntersectionObserver(es=>{for(const e of es)e.isIntersecting?LG.vis.add(e.target):LG.vis.delete(e.target)});
-function lgReg(root){const l=root.querySelector('.lg');if(l){l._ph=Math.random()*10;LG.io.observe(l)}}
-function lgTick(t){requestAnimationFrame(lgTick);const q=QL?QL.q:'high';if(document.hidden||LG.rm.matches||q!=='high'||t-LG.t0<(q==='high'?33:66))return;LG.t0=t;LG.frames++;const med=q==='medium';
- for(const el of LG.vis){if(!el.isConnected){LG.vis.delete(el);LG.io.unobserve(el);continue}if(el._u===undefined)el._u=!!el.closest('.unit');if(med&&el._u)continue;const s=t/1000+el._ph,[p,m,g,f]=el.children;
-  if(med)continue;
-  p.style.transform=`translate(${(Math.sin(s*.45)*2.2).toFixed(2)}%,${(Math.cos(s*.37)*1.6).toFixed(2)}%) scale(${(1.02+Math.sin(s*.3)*.015).toFixed(3)})`;
-  m.style.transform=`translate(${(-Math.sin(s*.45)*3.5).toFixed(2)}%,${(-(s*3.2%25)).toFixed(2)}%)`;
-  g.style.opacity=(.28+.3*(.5+.5*Math.sin(s*1.9))).toFixed(3);g.style.transform=`scale(${(1+.08*Math.sin(s*1.9)).toFixed(3)})`;
-  const ph=(s%5.5)/5.5;f.style.transform=`translateX(${(-110+ph*480).toFixed(1)}%) skewX(-12deg)`}}
-requestAnimationFrame(lgTick);
+function lgReg(root){const l=root.querySelector('.lg');if(l)LG.io.observe(l)}
 /* legendary video loops: art/anim/<id>.mp4, only a few at once (zoom > hand > board), paused offscreen/hidden, off for reduced motion; still image underneath is the fallback */
 const VID={max:3,on:new Set(),bad:{},plays:0,miss:new Map()};
-const vRank=el=>el.closest('#zoom')?0:el.closest('#hand')?1:el.closest('.unit')?2:el.closest('#pk,.pslot')?1:3;
+/* v7.4: video only where the card is big or the moment is focused: zoom, cinematic (e.js), Legendary units on the board, pack
+   reveal, test sheet. Hand cards and collection/builder grids never get a <video>; they run the CSS Ken Burns + motes over the still. */
+const vRank=el=>el.closest('#zoom')?0:el.closest('#pk,.pslot')?1:el.closest('.unit')?2:el.closest('#sheet')?3:-1;
 /* v7.3 flicker-free video: the <video> is created once per card and never removed while the card lives, never display-toggled.
    It stays at opacity 0 over the still WebP until a decoded frame is actually presented (requestVideoFrameCallback, or 'playing' + 2 rAF
    as a fallback), then crossfades in. Pausing (offscreen / over the cap) keeps the last frame on screen. Max opacity .99 keeps Android
@@ -1746,15 +1870,15 @@ const vRank=el=>el.closest('#zoom')?0:el.closest('#hand')?1:el.closest('.unit')?
 function vidReady(v,fn){let done=0;const go=()=>{if(done)return;done=1;fn()};
  if(v.requestVideoFrameCallback)v.requestVideoFrameCallback(()=>requestAnimationFrame(go));
  v.addEventListener('playing',()=>requestAnimationFrame(()=>requestAnimationFrame(()=>setTimeout(go,v.requestVideoFrameCallback?250:0))),{once:true})}
-function vidStop(el,free){const v=el.querySelector('video');if(v){if(!v.paused)v.pause();if(free){v.removeAttribute('src');v.load();v.remove();el.classList.remove('vid')}}VID.on.delete(el);VID.miss.delete(el)}
+function vidStop(el,free){const v=el.querySelector('video');if(v){if(!v.paused)v.pause();if(free){el.classList.remove('vid');const gone=()=>{v.removeAttribute('src');v.load();v.remove()};if(el.isConnected)setTimeout(gone,900);else gone()}}VID.on.delete(el);VID.miss.delete(el)}
 function vidPlay(el){const id=el.dataset.id;if(VID.bad[id])return;let v=el.querySelector('video');VID.miss.delete(el);
  if(!v){v=document.createElement('video');v.className='lv';v.muted=true;v.defaultMuted=true;v.loop=true;v.playsInline=true;v.autoplay=true;for(const a of['muted','loop','playsinline','autoplay'])v.setAttribute(a,'');v.preload='auto';v.disablePictureInPicture=true;v.setAttribute('disableremoteplayback','');
   vidReady(v,()=>{el.classList.add('vid');VID.plays++});v.onerror=()=>{VID.bad[id]=1;vidStop(el,1)};v.src=`${ARTDIR}anim/${id}.mp4?${VIDV}`;el.querySelector('.lp').appendChild(v)}
  if(v.paused)v.play().catch(()=>{});VID.on.add(el)}
-function vidSync(){for(const el of[...VID.on])if(!el.isConnected)vidStop(el,1);
+function vidSync(){for(const el of[...VID.on])if(!el.isConnected)vidStop(el,1);for(const el of LG.vis)if(!el.isConnected){LG.vis.delete(el);LG.io.unobserve(el)}
  if(LG.rm.matches||document.hidden){for(const el of[...VID.on])vidStop(el);return}
  // sticky choice: ties keep whatever is already playing, so two equal Legendaries never trade play/pause back and forth
- const want=new Set([...LG.vis].filter(el=>el.isConnected&&el.dataset.id&&!VID.bad[el.dataset.id]).sort((a,b)=>vRank(a)-vRank(b)||(VID.on.has(b)-VID.on.has(a))).slice(0,VID.max));
+ const want=new Set([...LG.vis].filter(el=>el.isConnected&&el.dataset.id&&!VID.bad[el.dataset.id]&&vRank(el)>=0&&!el.closest('.locked')).sort((a,b)=>vRank(a)-vRank(b)||(VID.on.has(b)-VID.on.has(a))).slice(0,VID.max));
  // hysteresis: only pause after ~0.7 s of not being wanted (cards sliding through the edge of the viewport don't pop)
  for(const el of[...VID.on])if(!want.has(el)){const n=(VID.miss.get(el)||0)+1;if(n>=2||VID.max===0)vidStop(el);else VID.miss.set(el,n)}
  for(const el of want)vidPlay(el)}
@@ -1773,9 +1897,9 @@ setInterval(vidSync,350);document.addEventListener('visibilitychange',vidSync);
 
 /* ================= SCREENS ================= */
 let cur='title';
-function show(id){cur=id;if(id!=='match'){document.body.classList.remove('mzhi');cinSkip()}setTimeout(auMood,0);$$('.screen').forEach(s=>s.classList.toggle('on',s.id===id));hideZoom();scene();if(id==='pick')renderPick();if(id==='builder')renderBuilder();if(id==='packs')renderPacks();if(id==='coll')renderColl()}
+function show(id){cur=id;if(id!=='match'){document.body.classList.remove('mzhi');cinSkip()}setTimeout(auMood,0);$$('.screen').forEach(s=>s.classList.toggle('on',s.id===id));hideZoom();scene();if(id==='pick')renderPick();if(id==='builder')renderBuilder(1);if(id==='mydecks')renderDecks();if(id==='packs')renderPacks();if(id==='coll')renderColl()}
 $$('[data-back]').forEach(b=>b.addEventListener('click',()=>{sfx('click');show('title')}));
-$('#bPlay').onclick=()=>{sfx('click');show('pick')};$('#bBuild').onclick=()=>{sfx('click');show('builder')};$('#bHow').onclick=()=>{sfx('click');show('howto')};$('#bPacks').onclick=()=>{sfx('click');show('packs')};$('#bColl').onclick=()=>{sfx('click');show('coll')};
+$('#bPlay').onclick=()=>{sfx('click');show('pick')};$('#bBuild').onclick=()=>{sfx('click');show('mydecks')};$('#bHow').onclick=()=>{sfx('click');show('howto')};$('#bPacks').onclick=()=>{sfx('click');show('packs')};$('#bColl').onclick=()=>{sfx('click');show('coll')};
 const UI={sel:null,busy:false,auto:/[?&]auto=1/.test(location.search),speed:/[?&]fast=1/.test(location.search)?.12:1,hw:100,hh:140,deck:'v',opp:'r'};
 function layout(){const W=innerWidth,H=innerHeight,land=W>H*1.15;document.body.classList.toggle('land',land);let uw,hw,side=0;
  if(!land){uw=Math.min((W-16)/6.2,100,H*.1);hw=Math.min(W/3.7,150,H*.17)}else{side=Math.round(Math.max(176,Math.min(260,W*.22)));uw=Math.min((H-50)/4.6,(W-side-60)/6.4,130);hw=uw*1.2}
@@ -1783,21 +1907,70 @@ function layout(){const W=innerWidth,H=innerHeight,land=W>H*1.15;document.body.c
  $('#bgrid').style.setProperty('--bw',Math.max(92,Math.min(130,(land?W*.62:W)/3.6))+'px');bgInit();teSize();if(SC.key)scene();if(G&&cur==='match')renderMatch()}
 addEventListener('resize',()=>{clearTimeout(UI.rt);UI.rt=setTimeout(layout,120)});
 function toast(m,ms=1600){const t=$('#toast');t.textContent=m;t.classList.add('on');clearTimeout(t._t);t._t=setTimeout(()=>t.classList.remove('on'),ms)}
-function cardEl(id){const d=C[id],e=document.createElement('div');e.className=`card f-${d.f} r-${d.r}${d.r==='L'?' full':''}${d.t==='s'?' spell':''}${cardText(d).replace(/<[^>]+>/g,'').length>46?' long':''}`;e.dataset.cid=id;
- e.innerHTML=`<div class="art" style="background-image:${artBG(id)}">${lgHTML(id)}</div>${costHTML(d.c)}<div class="nm"><span>${d.n}</span></div><div class="ty">${sigHTML(d.f)}<span>${d.t==='u'?FAC[d.f].s:'Rite'}</span>${setHTML(d.r)}</div><div class="tx"><div class="rt">${cardText(d)}</div>${d.fl?`<div class="fl">${d.fl}</div>`:''}</div>${d.t==='u'?'<i class="plq l"></i><i class="plq r"></i>'+atkHTML(d.f,d.a)+hpHTML(d.h):''}${d.r==='R'||d.r==='L'?'<i class="foil"></i>':''}`;lgReg(e);return e}
+/* ===== v7.4 text auto-fit (RENDERING_RULES.md §9): card names, type lines and deck names always fit their box =====
+   Elements carry data-fit="nm" (card name: shrink to one line, min .7, then two tighter lines), "ty" (type line) or "dk" (deck name).
+   The CSS multiplies their base font-size by --fit. A ResizeObserver on each text box fires only when that box changes size
+   (first layout, orientation change, zoom, a different card size), before paint, so there is no per-frame layout and no visible
+   jump. Results are cached by text + box width + font size, so a card size is measured once and every copy reuses it. */
+const FIT={c:new Map(),n:0,min:{nm:.7,ty:.72,dk:.66}};
+function fitEl(e){const m=e.dataset.fit,p=e.parentElement;if(!p||!e.isConnected)return;const box=m==='nm'?p.clientWidth*.92:e.clientWidth;if(box<4)return;
+ const k=m+'|'+e.textContent+'|'+Math.round(box)+'|'+getComputedStyle(p).fontSize;let r=FIT.c.get(k);
+ if(!r){if(e.style.getPropertyValue('--fit'))e.style.removeProperty('--fit');e.classList.remove('fit2');FIT.n++;const nat=e.scrollWidth,s=nat>0?box/nat:1,mn=FIT.min[m];
+  r=s>=.995?{f:1}:s>=mn?{f:Math.floor(s*50)/50}:m!=='ty'?{f:Math.max(.56,Math.min(m==='nm'?.84:.8,Math.floor(1.6*s*50)/50)),two:1}:{f:mn};FIT.c.set(k,r)}
+ const fv=r.f===1?'':String(r.f);if(e.style.getPropertyValue('--fit')!==fv){if(fv)e.style.setProperty('--fit',fv);else e.style.removeProperty('--fit')}e.classList.toggle('fit2',!!r.two);e._fitk=k}
+FIT.ro=new ResizeObserver(es=>{for(const en of es){const b=en.target;if(!b.isConnected){FIT.ro.unobserve(b);continue}for(const e of b._fit||[])fitEl(e)}});
+function fitScan(root){for(const e of root.querySelectorAll('[data-fit]')){if(e._fw)continue;e._fw=1;const b=e.parentElement;(b._fit||(b._fit=[])).push(e);FIT.ro.observe(b)}}
+function fitRefresh(root=document){for(const e of root.querySelectorAll('[data-fit]'))if(e._fw)fitEl(e)}
+function cardEl(id,big){const d=C[id],e=document.createElement('div');e.className=`card f-${d.f} r-${d.r}${d.r==='L'?' full':''}${d.t==='s'?' spell':''}${cardText(d).replace(/<[^>]+>/g,'').length>46?' long':''}`;e.dataset.cid=id;
+ e.innerHTML=`<div class="art" style="background-image:${artBG(id,big)}">${lgHTML(id,big)}</div>${costHTML(d.c)}<div class="nm"><span data-fit="nm">${d.n}</span></div><div class="ty">${sigHTML(d.f)}<span data-fit="ty">${d.t==='u'?FAC[d.f].s:'Rite'}</span>${setHTML(d.r)}${d.r==='L'?'<i class="lgem"><b></b></i>':''}</div><div class="tx"><div class="rt">${cardText(d)}</div>${d.fl?`<div class="fl">${d.fl}</div>`:''}</div>${d.t==='u'?'<i class="plq l"></i><i class="plq r"></i>'+atkHTML(d.f,d.a)+hpHTML(d.h):''}${d.r==='R'||d.r==='L'?'<i class="foil"></i>':''}${lgTrim(id)}`;lgReg(e);fitScan(e);return e}
 /* ---- pick ---- */
 const SH={win:60,loss:25,pack:100,dup:{C:5,U:15,R:40,L:150},free:3};
 const maxC=id=>C[id].r==='L'?1:2;
 let COLL=(()=>{try{const o=JSON.parse(localStorage.getItem('hsCol')||'null');if(o&&o.v===1&&o.own)return o}catch(e){}return{v:1,own:{},shards:0,packs:SH.free,opened:0}})();
 function saveColl(){try{localStorage.setItem('hsCol',JSON.stringify(COLL))}catch(e){}}
 const owned=id=>C[id].pk?(COLL.own[id]||0):maxC(id);
-function loadCustom(){try{const o=JSON.parse(localStorage.getItem('hsDeck')||'null');if(o&&Array.isArray(o.cards)&&o.cards.length===30&&o.cards.every(id=>C[id]&&C[id].r!=='T')&&o.cards.every(id=>o.cards.filter(x=>x===id).length<=Math.min(maxC(id),owned(id))))return o}catch(e){}return null}
-function customDeck(){const o=loadCustom();if(!o)return null;const cnt={};for(const id of o.cards){const f=C[id].f;if(f!=='n')cnt[f]=(cnt[f]||0)+1}const fac=Object.keys(cnt).sort((a,b)=>cnt[b]-cnt[a])[0]||'v';return{fac,name:'Your Custom Deck',cards:o.cards.slice()}}
-function renderPick(){const box=$('#decks');box.innerHTML='';const opts=['v','m','c'];if(loadCustom())opts.push('custom');if(!opts.includes(UI.deck))UI.deck='v';
- for(const k of opts){const f=k==='custom'?customDeck().fac:k,b=document.createElement('button');b.className=`tile f-${f}${UI.deck===k?' on':''}`;b.dataset.deck=k;
-  b.style.setProperty('--fr',`var(--fr-${f})`);b.innerHTML=`<div class="ta" style="background-image:${heroBG(f)}"></div><div><b>${k==='custom'?'Custom Deck':FAC[f].n}</b><small>${k==='custom'?'Your saved 30-card deck (mostly '+FAC[f].n+').':FAC[f].d}</small></div>`;b.onclick=()=>{sfx('click');UI.deck=k;renderPick()};box.appendChild(b)}
+/* ================= CUSTOM DECKS (v7.4): up to 5 named decks in localStorage.hsDecks = {v:1,decks:[{id,name,fac,cards}]} =================
+   The single v7.x deck (localStorage.hsDeck) is migrated into slot 1 on first load. A deck can be saved at any size; only valid ones
+   (30 cards, copy limits, owned) can be picked for a match. */
+const DKMAX=5,DKNAME=24,dkId=()=>'u'+Date.now().toString(36)+Math.floor(Math.random()*1296).toString(36);
+const dkClean=cards=>(Array.isArray(cards)?cards:[]).filter(id=>C[id]&&C[id].r!=='T').slice(0,30);
+const majFac=cards=>{const n={};for(const id of cards){const f=C[id].f;if(f!=='n')n[f]=(n[f]||0)+1}return Object.keys(n).sort((a,b)=>n[b]-n[a])[0]||'v'};
+function saveDecks(){try{localStorage.setItem('hsDecks',JSON.stringify(DK))}catch(e){}}
+let DK=(()=>{try{const o=JSON.parse(localStorage.getItem('hsDecks')||'null');if(o&&o.v===1&&Array.isArray(o.decks))return{v:1,decks:o.decks.filter(d=>d&&typeof d==='object').slice(0,DKMAX).map((d,i)=>({id:/^u[0-9a-z]+$/.test(d.id)?d.id:dkId()+i,name:String(d.name||'Deck '+(i+1)).slice(0,DKNAME),fac:['v','m','c'].includes(d.fac)?d.fac:'v',cards:dkClean(d.cards)}))}}catch(e){}
+ const o={v:1,decks:[]};try{const old=JSON.parse(localStorage.getItem('hsDeck')||'null');if(old&&Array.isArray(old.cards)){const cards=dkClean(old.cards);if(cards.length)o.decks.push({id:dkId(),name:'My Deck',fac:majFac(cards),cards})}}catch(e){}
+ try{localStorage.setItem('hsDecks',JSON.stringify(o))}catch(e){}return o})();
+const dkGet=id=>DK.decks.find(d=>d.id===id);
+function dkCheck(d){const n=d.cards.length;if(n!==30)return{ok:false,why:n+'/30 cards'};for(const id of new Set(d.cards)){const c=d.cards.filter(x=>x===id).length;if(c>Math.min(maxC(id),owned(id)))return{ok:false,why:owned(id)<c?'needs cards you don’t own':'too many copies'}}return{ok:true,why:'Ready'}}
+const dkDeck=d=>({fac:d.fac,name:d.name,cards:d.cards.slice()});
+function renderPick(){const box=$('#decks');box.innerHTML='';const opts=['v','m','c',...DK.decks.map(d=>d.id)];const okk=k=>!dkGet(k)||dkCheck(dkGet(k)).ok;if(!opts.includes(UI.deck)||!okk(UI.deck))UI.deck='v';
+ for(const k of opts){const d=dkGet(k),f=d?d.fac:k,ck=d?dkCheck(d):null,b=document.createElement('button');b.className=`tile f-${f}${UI.deck===k?' on':''}${d?' mine':''}${ck&&!ck.ok?' bad':''}`;b.dataset.deck=k;if(ck&&!ck.ok)b.setAttribute('aria-disabled','true');
+  b.style.setProperty('--fr',`var(--fr-${f})`);b.innerHTML=`<div class="ta" style="background-image:${heroBG(f)}"></div><div class="tmeta"><b${d?' data-fit="dk"':''}>${d?esc(d.name):FAC[f].n}</b><small>${d?`Your deck · ${FAC[f].n} hero · ${ck.ok?'30 cards':'<em>'+ck.why+'</em>'}`:FAC[f].d}</small></div>`;
+  b.onclick=()=>{if(ck&&!ck.ok){sfx('err');toast(`“${d.name}” isn’t ready: ${ck.why}`);return}sfx('click');UI.deck=k;renderPick()};box.appendChild(b)}fitScan(box);
  const op=$('#opps');op.innerHTML='';for(const[k,n]of[['r','Random'],['v','Abyss'],['m','Derelict'],['c','Communion']]){const b=document.createElement('button');b.textContent=n;b.dataset.opp=k;b.className=UI.opp===k?'on':'';b.onclick=()=>{sfx('click');UI.opp=k;renderPick()};op.appendChild(b)}}
-$('#bStart').onclick=()=>{auInit();sfx('click');const mine=UI.deck==='custom'?customDeck():prebuilt(UI.deck);const of=UI.opp==='r'?pick(['v','m','c']):UI.opp;startMatch(mine,of)};
+const esc=t=>String(t).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+$('#pDecks').onclick=()=>{sfx('click');show('mydecks')};
+$('#bStart').onclick=()=>{auInit();sfx('click');const d=dkGet(UI.deck);const mine=d&&dkCheck(d).ok?dkDeck(d):prebuilt(['v','m','c'].includes(UI.deck)?UI.deck:'v');const of=UI.opp==='r'?pick(['v','m','c']):UI.opp;startMatch(mine,of)};
+/* in-game dialog (WebView prompt()/confirm() are unreliable): dlg({t,x,val,ok,danger}) -> Promise<string|true|null> */
+function dlg(o){return new Promise(res=>{const w=$('#dlg'),inp=$('#dlgI');$('#dlgT').textContent=o.t;$('#dlgX').textContent=o.x||'';$('#dlgX').style.display=o.x?'':'none';
+ inp.style.display=o.val!==undefined?'':'none';inp.value=o.val||'';const ok=$('#dlgOk');ok.textContent=o.ok||'OK';ok.classList.toggle('danger',!!o.danger);w.classList.add('on');
+ const done=v=>{w.classList.remove('on');ok.onclick=$('#dlgNo').onclick=w.onclick=inp.onkeydown=null;res(v)};
+ ok.onclick=()=>{if(o.val!==undefined){const v=inp.value.replace(/\s+/g,' ').trim().slice(0,DKNAME);if(!v){sfx('err');inp.focus();return}sfx('click');done(v)}else{sfx('click');done(true)}};
+ $('#dlgNo').onclick=()=>{sfx('click');done(null)};w.onclick=e=>{if(e.target===w)done(null)};inp.onkeydown=e=>{if(e.key==='Enter')ok.onclick();if(e.key==='Escape')done(null)};
+ if(o.val!==undefined)setTimeout(()=>{try{inp.focus();inp.select()}catch(e){}},60)})}
+/* deck list screen */
+const dkFreeName=()=>{for(let i=1;;i++){const n='Deck '+i;if(!DK.decks.some(d=>d.name===n))return n}};
+function renderDecks(){const L=$('#dlist');L.innerHTML='';$('#dcount').textContent=DK.decks.length+'/'+DKMAX;$('#dNew').disabled=DK.decks.length>=DKMAX;
+ if(!DK.decks.length)L.innerHTML='<p class="empty dk0">No custom decks yet. Tap “New Deck” to build one (up to 5).</p>';
+ DK.decks.forEach((d,i)=>{const ck=dkCheck(d),r=document.createElement('div');r.className=`tile drow f-${d.fac} on${ck.ok?'':' bad'}`;r.dataset.slot=d.id;r.style.setProperty('--fr',`var(--fr-${d.fac})`);
+  r.innerHTML=`<div class="ta" style="background-image:${heroBG(d.fac)}"><span class="emb">${sigHTML(d.fac)}</span></div><div class="dmeta"><b data-fit="dk">${esc(d.name)}</b><small>${FAC[d.fac].n} hero · <span class="dn">${d.cards.length}/30</span> · <span class="dv ${ck.ok?'ok':'no'}">${ck.ok?'✓ Ready':'✗ '+ck.why}</span></small>
+   <div class="dact"><button class="btn sm" data-dk="edit">Edit</button><button class="btn sm ghost" data-dk="ren">Rename</button><button class="btn sm ghost" data-dk="dup"${DK.decks.length>=DKMAX?' disabled':''}>Duplicate</button><button class="btn sm ghost danger" data-dk="del">Delete</button></div></div>`;L.appendChild(r)});fitScan(L)}
+$('#dlist').addEventListener('click',async e=>{const b=e.target.closest('[data-dk]');if(!b)return;const d=dkGet(b.closest('[data-slot]').dataset.slot);if(!d)return;const a=b.dataset.dk;
+ if(a==='edit'){sfx('click');bdOpen(d.id);return}
+ if(a==='ren'){const v=await dlg({t:'Rename deck',val:d.name,ok:'Save'});if(v){d.name=v;saveDecks();renderDecks()}return}
+ if(a==='dup'){if(DK.decks.length>=DKMAX){sfx('err');toast('5 decks max: delete one first');return}const c={id:dkId(),name:(d.name+' copy').slice(0,DKNAME),fac:d.fac,cards:d.cards.slice()};DK.decks.splice(DK.decks.indexOf(d)+1,0,c);saveDecks();sfx('click');renderDecks();toast(`Duplicated “${d.name}”`);return}
+ if(a==='del'){const v=await dlg({t:'Delete deck?',x:`“${d.name}” will be gone for good.`,ok:'Delete',danger:1});if(v){DK.decks=DK.decks.filter(x=>x!==d);if(UI.deck===d.id)UI.deck='v';saveDecks();sfx('click');renderDecks()}}});
+$('#dNew').onclick=async()=>{if(DK.decks.length>=DKMAX){sfx('err');toast('5 decks max: delete one first');return}sfx('click');const v=await dlg({t:'Name your new deck',val:dkFreeName(),ok:'Create'});if(!v)return;
+ const d={id:dkId(),name:v,fac:'v',cards:[]};DK.decks.push(d);saveDecks();bdOpen(d.id)};
 /* ================= MATCH ================= */
 let G=null,LAST=null;
 function startMatch(mine,of,o={}){LAST={mine,of};G=newGame(mine,prebuilt(of),{ai:[UI.auto?1:0,1],first:o.first});UI.sel=null;UI.busy=false;UI.aiRun=false;UI.overShown=0;UI.cin=null;$('#cin').className='';MZ.me=MZ.op=-1;LB.drips=[];LB.pools=[];BG.rip=[];$$('.whisp').forEach(w=>w.remove());{const l=isLand()?'':'_p';scPre(['victory'+l,'defeat'+l])}
@@ -1808,7 +1981,7 @@ function heroBox(pi){return $(pi?'#oph':'#myh')}
 function renderHero(pi){const p=G.p[pi],el=heroBox(pi);const s=el.querySelector('.san');s.textContent=Math.max(0,p.san);s.classList.toggle('low',p.san<=7);
  el.querySelectorAll('.md i').forEach((e,i)=>{e.classList.toggle('on',i<p.mad);e.classList.toggle('hi',i<p.mad&&p.mad>=7)});el.querySelector('.fv').textContent=`${p.flux}/${p.max} FLUX`;el.querySelectorAll('.fx i').forEach((e,i)=>{const c=i<p.flux?'on':i<p.max?'sp':'lk';if(e.className!==c)e.className=c});
  {const s=`✋ ${p.hand.length}<br>▤ ${p.deck.length}`;if(el._cts!==s){el._cts=s;el.querySelector('.cts').innerHTML=s}}el.classList.toggle('act',G.cur===pi&&!G.over)}
-function unitEl(u){const d=C[u.id],e=document.createElement('div');e.className=`unit f-${d.f}`;e.dataset.u=u.uid;e.dataset.cid=u.id;e.innerHTML=`<div class="art" style="background-image:${artBG(u.id)}">${lgHTML(u.id)}</div><div class="kws"></div>${atkHTML(d.f,u.a)}${hpHTML(u.h)}`;e._h=u.h;lgReg(e);return e}
+function unitEl(u){const d=C[u.id],e=document.createElement('div');e.className=`unit f-${d.f}`;e.dataset.u=u.uid;e.dataset.cid=u.id;e.innerHTML=`<div class="art${d.r==='L'?' lgart':''}" style="background-image:${artBG(u.id)}">${lgHTML(u.id)}${d.r==='L'?'<i class="lsl"></i>':''}</div>${lgTrim(u.id)}<div class="kws"></div>${atkHTML(d.f,u.a)}${hpHTML(u.h)}`;e._h=u.h;lgReg(e);return e}
 function syncBoard(box,list){const ex=new Map();for(const el of box.children)if(!el.classList.contains('dying'))ex.set(+el.dataset.u,el);const keep=new Set();let curEl=box.firstElementChild;
  for(const u of list){let el=ex.get(u.uid);if(!el){el=unitEl(u);el.classList.add('enter');setTimeout(()=>el.classList.remove('enter'),520)}keep.add(el);
   while(curEl&&curEl.classList.contains('dying')&&curEl!==el)curEl=curEl.nextElementSibling;if(el!==curEl)box.insertBefore(el,curEl);else curEl=curEl.nextElementSibling;updUnit(el,u)}
@@ -1927,7 +2100,7 @@ function tap(t){if(!G)return;if(!myTurn()){if(G.p[G.cur].ai&&!G.over&&t.closest(
  if(hero&&s&&s.k==='u'){sfx('err');toast('You must attack a Guard first');return}
  if(s)setSel(null)}
 /* ---- zoom ---- */
-function showZoom(el,modal){const id=el.dataset.cid;if(!id||!C[id])return;const z=$('#zoom'),d=C[id];z.innerHTML='';const zc=cardEl(id);zc.insertAdjacentHTML('beforeend','<i class="gw"><i class="glare"></i></i>');z.appendChild(zc);
+function showZoom(el,modal){const id=el.dataset.cid;if(!id||!C[id])return;const z=$('#zoom'),d=C[id];z.innerHTML='';const zc=cardEl(id,1);zc.insertAdjacentHTML('beforeend','<i class="gw"><i class="glare"></i></i>');z.appendChild(zc);
  const u=el.dataset.u&&G?findU(G,+el.dataset.u):null;let h='';if(u&&(u.a!==d.a||u.h!==d.h))h+=`<p><b>Currently ${u.a}/${u.h}</b></p>`;for(const k of new Set(u?u.k:d.k))if(KW[k])h+=`<p><b>${KW[k][0]}${k==='dread'?' '+d.dread:''}:</b> ${KW[k][1]}</p>`;
  if(d.fl)h+=`<p class="fl">“${d.fl}”</p>`;h+=`<p><i>${FAC[d.f].n} · ${{C:'Common',U:'Uncommon',R:'Rare',L:'Legendary',T:'Token'}[d.r]}</i></p>`;const k=document.createElement('div');k.className='kd';k.innerHTML=h;z.appendChild(k);
  z.className='on'+(modal?' modal':'');if(modal)ztOpen(zc);if(!modal){const r=el.getBoundingClientRect(),zw=Math.min(250,innerWidth*.62),left=r.left+r.width/2>innerWidth/2?Math.max(8,r.left-zw-16):Math.min(innerWidth-zw-8,r.right+16);z.style.left=left+'px';z.style.top=Math.max(8,Math.min(innerHeight-z.offsetHeight-8,r.top+r.height/2-z.offsetHeight/2))+'px'}else{z.style.left=z.style.top=''}}
@@ -1937,20 +2110,33 @@ document.addEventListener('pointermove',e=>{if($('#zoom').classList.contains('on
 function hideZoom(){const z=$('#zoom');ztClose();z.className='';z.innerHTML=''}
 document.addEventListener('pointerover',e=>{if(e.pointerType!=='mouse')return;const el=e.target.closest('[data-cid]');clearTimeout(UI.hz);if(el&&!el.closest('#zoom')&&!el.closest('#preview')&&!P?.drag)UI.hz=setTimeout(()=>showZoom(el,false),380);else if(!$('#zoom').classList.contains('modal'))hideZoom()});
 /* ================= BUILDER ================= */
-const BD={cards:[],f:'all'};
-(function(){const o=loadCustom()||JSON.parse(localStorage.getItem('hsDraft')||'null');if(o&&Array.isArray(o.cards))BD.cards=o.cards.filter(id=>C[id]&&C[id].r!=='T'&&owned(id)).slice(0,30)})();
+/* the builder edits one deck slot; every change autosaves into that slot (no lost work on Back). The card grid is built once per
+   filter/ownership change and then only updated in place: rebuilding ~80 cards on every tap restarted animations and flashed. */
+const BD={cards:[],f:'all',slot:null,key:''};
 const lim=id=>Math.min(maxC(id),owned(id)),cntOf=id=>BD.cards.filter(x=>x===id).length;
-function renderBuilder(){const fb=$('#bfil');fb.innerHTML='';for(const[k,n]of[['all','All'],['v','Abyss'],['m','Derelict'],['c','Communion'],['n','Wanderers']]){const b=document.createElement('button');b.textContent=n;b.className=BD.f===k?'on':'';b.onclick=()=>{sfx('click');BD.f=k;renderBuilder()};fb.appendChild(b)}
- const gr=$('#bgrid'),st=gr.scrollTop;gr.innerHTML='';const fo={v:0,m:1,c:2,n:3};for(const id of COL.slice().sort((a,b)=>fo[C[a].f]-fo[C[b].f]||C[a].c-C[b].c)){if(BD.f!=='all'&&C[id].f!==BD.f)continue;const e=cardEl(id),n=cntOf(id),L=lim(id);e.dataset.add=id;if(!L){e.classList.add('locked');e.insertAdjacentHTML('beforeend','<div class="lock">PACK<br>CARD</div>')}else{if(n>=L)e.classList.add('dim');e.insertAdjacentHTML('beforeend',`<div class="cnt${n>=L?' full':''}">${n}/${L}</div>`)}gr.appendChild(e)}gr.scrollTop=st;renderDeckList()}
-function renderDeckList(){const n=BD.cards.length,bc=$('#bcount');bc.textContent=n+'/30';bc.classList.toggle('ok',n===30);$('#bSave').disabled=n!==30;
+function bdOpen(id){const d=dkGet(id);if(!d)return;BD.slot=id;BD.cards=d.cards.filter(c=>C[c]&&owned(c)).slice(0,30);show('builder')}
+function bdSave(){const d=dkGet(BD.slot);if(!d)return;d.cards=BD.cards.slice();saveDecks()}
+function renderBuilder(full){const d=dkGet(BD.slot);if(!d){if(DK.decks.length)BD.slot=DK.decks[0].id;else{const n={id:dkId(),name:dkFreeName(),fac:'v',cards:[]};DK.decks.push(n);saveDecks();BD.slot=n.id}return bdOpen(BD.slot)}
+ if(full){const fb=$('#bfil');fb.innerHTML='';for(const[k,n]of[['all','All'],['v','Abyss'],['m','Derelict'],['c','Communion'],['n','Wanderers']]){const b=document.createElement('button');b.textContent=n;b.className=BD.f===k?'on':'';b.onclick=()=>{sfx('click');BD.f=k;renderBuilder(1)};fb.appendChild(b)}
+  const hp=$('#bhero');hp.innerHTML='<span>Hero</span>'+['v','m','c'].map(f=>`<button class="f-${f}${d.fac===f?' on':''}" data-hero-f="${f}" aria-label="${FAC[f].n} hero">${sigHTML(f)}<em>${FAC[f].n}</em></button>`).join('')}
+ {const bn=$('#bname'),t=`<span data-fit="dk">${esc(d.name)}</span><i aria-hidden="true">✎</i>`;if(bn.innerHTML!==t){bn.innerHTML=t;fitScan(bn)}}
+ const gr=$('#bgrid'),key=BD.f+'|'+COL.map(lim).join('');
+ if(full||BD.key!==key||!gr.firstElementChild){BD.key=key;const st=gr.scrollTop;gr.innerHTML='';const fo={v:0,m:1,c:2,n:3};
+  for(const id of COL.slice().sort((a,b)=>fo[C[a].f]-fo[C[b].f]||C[a].c-C[b].c)){if(BD.f!=='all'&&C[id].f!==BD.f)continue;const e=cardEl(id),L=lim(id);e.dataset.add=id;if(!L){e.classList.add('locked');e.insertAdjacentHTML('beforeend','<div class="lock">PACK<br>CARD</div>')}else e.insertAdjacentHTML('beforeend','<div class="cnt"></div>');gr.appendChild(e)}gr.scrollTop=st}
+ for(const e of gr.children){const id=e.dataset.add,L=lim(id);if(!L)continue;const n=cntOf(id),c=e.querySelector('.cnt'),t=`${n}/${L}`;if(c.textContent!==t)c.textContent=t;c.classList.toggle('full',n>=L);e.classList.toggle('dim',n>=L)}
+ renderDeckList()}
+function renderDeckList(){const n=BD.cards.length,bc=$('#bcount');bc.textContent=n+'/30';bc.classList.toggle('ok',n===30);
  const cv=[0,0,0,0,0,0,0,0];for(const id of BD.cards)cv[Math.min(7,C[id].c)]++;const mx=Math.max(1,...cv);$('#curve').innerHTML=cv.map((v,i)=>`<i title="${i}${i===7?'+':''}" style="height:${2+v/mx*24}px"></i>`).join('');
  const L=$('#blist'),u=[...new Set(BD.cards)].sort((a,b)=>C[a].c-C[b].c||C[a].n.localeCompare(C[b].n));L.innerHTML=u.length?'':'<p class="empty">Tap cards to add them (max 2 copies, Legendaries 1). Tap here to remove.</p>';
- for(const id of u){const d=document.createElement('div');d.className='f-'+C[id].f;d.dataset.rm=id;d.innerHTML=`<b>${C[id].c}</b><span>${C[id].n}</span>×${cntOf(id)}`;L.appendChild(d)}localStorage.setItem('hsDraft',JSON.stringify({cards:BD.cards}))}
+ for(const id of u){const d=document.createElement('div');d.className='f-'+C[id].f;d.dataset.rm=id;d.innerHTML=`<b>${C[id].c}</b><span>${C[id].n}</span>×${cntOf(id)}`;L.appendChild(d)}bdSave()}
 $('#bgrid').addEventListener('click',e=>{if(lpJust){lpJust=0;return}const el=e.target.closest('[data-add]');if(!el)return;const id=el.dataset.add;if(BD.cards.length>=30){sfx('err');toast('Deck is full (30 cards)');return}if(!lim(id)){sfx('err');toast('Not owned yet: pull it from a pack');return}if(cntOf(id)>=lim(id)){sfx('err');toast(lim(id)<maxC(id)?'You only own '+lim(id):C[id].r==='L'?'Only 1 copy of a Legendary':'Max 2 copies');return}BD.cards.push(id);sfx('draw');renderBuilder()});
 $('#blist').addEventListener('click',e=>{const el=e.target.closest('[data-rm]');if(!el)return;BD.cards.splice(BD.cards.lastIndexOf(el.dataset.rm),1);sfx('click');renderBuilder()});
-$('#bClear').onclick=()=>{BD.cards=[];renderBuilder()};
-$$('[data-tpl]').forEach(b=>b.onclick=()=>{BD.cards=prebuilt(b.dataset.tpl).cards.slice();sfx('click');renderBuilder()});
-$('#bSave').onclick=()=>{if(BD.cards.length!==30)return;localStorage.setItem('hsDeck',JSON.stringify({cards:BD.cards}));UI.deck='custom';sfx('heal');toast('Deck saved. Pick “Custom Deck” when you play')};
+$('#bhero').addEventListener('click',e=>{const b=e.target.closest('[data-hero-f]');const d=dkGet(BD.slot);if(!b||!d)return;d.fac=b.dataset.heroF;saveDecks();sfx('click');$$('#bhero button').forEach(x=>x.classList.toggle('on',x===b))});
+$('#bname').onclick=async()=>{const d=dkGet(BD.slot);if(!d)return;const v=await dlg({t:'Rename deck',val:d.name,ok:'Save'});if(v){d.name=v;saveDecks();renderBuilder()}};
+$('#bClear').onclick=async()=>{if(BD.cards.length&&!await dlg({t:'Clear this deck?',x:'All '+BD.cards.length+' cards will be removed.',ok:'Clear',danger:1}))return;BD.cards=[];renderBuilder()};
+$$('[data-tpl]').forEach(b=>b.onclick=()=>{BD.cards=prebuilt(b.dataset.tpl).cards.filter(id=>owned(id)).slice(0,30);const d=dkGet(BD.slot);if(d&&!d.cards.length)d.fac=b.dataset.tpl;sfx('click');renderBuilder(1)});
+$('#bSave').onclick=()=>{bdSave();const d=dkGet(BD.slot),ck=d&&dkCheck(d);if(ck&&ck.ok)UI.deck=d.id;sfx(ck&&ck.ok?'heal':'click');toast(ck&&ck.ok?`“${d.name}” saved and ready`:`Saved. ${ck?ck.why:''}: it needs 30 cards to play`);show('mydecks')};
+$('#bBack').onclick=()=>{bdSave();sfx('click');show('mydecks')};
 document.addEventListener('click',e=>{if(lpJust&&!e.target.closest('#bgrid'))lpJust=0},true);
 /* ================= COLLECTION & PACKS ================= */
 function rollPack(r=Math.random){const by=k=>PACK.filter(id=>C[id].r===k),pk=a=>a[Math.floor(r()*a.length)];
@@ -1994,11 +2180,14 @@ $('#howtx').innerHTML=`<p>You are a mind adrift in the dark between stars. Break
 {const rs=document.documentElement.style;rs.setProperty('--panel',`url(${uiArt('panel')})`);rs.setProperty('--plaque',`url(${uiArt('plaque')})`)}
 layout();scene();requestAnimationFrame(bgFrame);setTimeout(()=>{const l=isLand()?'':'_p';scPre(['board_v'+l,'board_m'+l,'board_c'+l])},2500);
 artPre(['hv','hm','hc','hn'],1);setTimeout(()=>artPre([...COL,'tD','tS','tC']),1500);
-window.__hs={SC,scene,uiArt,overCheck,zoom:showZoom,LG,PO,PRE,VID,ARTV,realArt,artPre,gameOver,get COLL(){return COLL},set COLL(v){COLL=v},saveColl,rollPack,grant,openPack,owned,SH,BASE,PACK,renderColl,renderPacks,startOpen,flip,C,COL,FAC,KW,prebuilt,simulate,newGame,legal,act,aiChoose,evalS,startMatch,show,get G(){return G},get UI(){return UI},renderMatch,
+window.__hs={FIT,fitRefresh,get DK(){return DK},set DK(v){DK=v},saveDecks,dkGet,dkCheck,bdOpen,renderDecks,BD,dlg,lgDelay,LGP,SC,scene,uiArt,overCheck,zoom:showZoom,LG,PO,PRE,VID,ARTV,realArt,realArtS,hasS,artPre,gameOver,get COLL(){return COLL},set COLL(v){COLL=v},saveColl,rollPack,grant,openPack,owned,SH,BASE,PACK,renderColl,renderPacks,startOpen,flip,C,COL,FAC,KW,prebuilt,simulate,newGame,legal,act,aiChoose,evalS,startMatch,show,get G(){return G},get UI(){return UI},renderMatch,
  sheet(ids){let s=$('#sheet');if(!s){s=document.createElement('div');s.id='sheet';document.body.appendChild(s)}s.innerHTML='';for(const id of ids)s.appendChild(cardEl(id))},
  demo(){startMatch(prebuilt('v'),'c',{first:0});UI.busy=false;const g=G,mk=(pi,id)=>{const u=mkUnit(g,pi,id);u.ready=true;return u};g.p[0].board=['v5','v4','v2','n3'].map(id=>mk(0,id));g.p[1].board=['c6','c2','c7','c3','c1'].map(id=>mk(1,id));g.p[1].board[1].h=1;g.p[0].board[3].a=5;
   g.p[0].board[1].h=1;g.p[1].board[3].h=1;
   g.p[0].hand=['v11','v6','v9','v10','v13','v7'].map(id=>({uid:g.uid++,id}));g.p[0].san=14;g.p[1].san=11;g.p[0].mad=2;g.p[1].mad=6;g.p[0].max=g.p[0].flux=6;g.p[1].max=6;g.cur=0;g.turn=11;g.fx=[];renderMatch()}};
+/* Hollow Stars. RENDERING RULES: read /RENDERING_RULES.md before changing card visuals, animations, video or art.
+   (transform/opacity only, no blend modes or animated filters, no class toggling mid-animation or DOM rebuilds, video rules,
+   layer budget, image sizes, text auto-fit; new cards must pass tests/cardcheck.py, tests/paintprobe.py and tests/flicker.py) */
 /* ================= v7 FX ENGINE: combat juice, deaths, madness, cinematics, tilt/foil, living board ================= */
 /* ---------- v7.1 quality tiers: high / medium / low, auto-scaled by measured frame rate ---------- */
 var QL;QL={rm:matchMedia('(prefers-reduced-motion: reduce)'),mobile:/Android|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent)||matchMedia('(pointer:coarse)').matches,
@@ -2083,7 +2272,7 @@ function enterFx(uid){const el=tEl('u'+uid);if(!el)return;const u=findU(G,uid),f
  if(f==='v')for(let i=0;i<nq(10);i++){const p=sp('fl',x+rr(-r.width,r.width),r.bottom+rr(-10,6),0,rr(-30,-8),rr(.6,1.1),rr(8,16),'#4affc0');if(p){p.add=1;p.a=.5}}
  if(BG)BG.rip&&BG.rip.push({x,y:r.bottom,t:performance.now(),f})}
 /* ---------- deaths: crack -> shatter into art fragments -> faction dissolve ---------- */
-function artImg(id){let im=FX.img[id];if(!im){im=new Image();im.src=realArt(id);FX.img[id]=im}return im}
+function artImg(id){let im=FX.img[id];if(!im){im=new Image();im.src=realArtS(id);FX.img[id]=im}return im}
 function crackLines(r){const cx=r.left+r.width*rr(.35,.65),cy=r.top+r.height*rr(.3,.6),L=[];for(let i=0;i<7;i++){let a=i/7*6.28+rr(-.3,.3),x=cx,y=cy;const l=[x,y];for(let k=0;k<5;k++){a+=rr(-.5,.5);const s=Math.max(r.width,r.height)*rr(.08,.16);x+=Math.cos(a)*s;y+=Math.sin(a)*s;l.push(x,y)}L.push(l)}return{L,cx,cy}}
 function deathFx(f){const el=document.querySelector(`.unit.dying[data-u="${f.id.slice(1)}"]`)||tEl(f.id);const id=f.cid||(el&&el.dataset.cid);if(!el||!id)return;
  const d=C[id],fac=d.f,tok=d.r==='T',r=el.getBoundingClientRect();sfx('die'+fac);
@@ -2129,7 +2318,7 @@ function whisper(side){if(MZ.wn>=3)return;MZ.wn++;const w=document.createElement
 const CIN={el:null,done:null,skip:null,shown:0};
 function lgCinema(id,uid){if(!$('#match').classList.contains('on'))return null;CIN.shown++;const d=C[id],box=$('#cin'),low=fxLow(),full=!low,hq=QL.q==='high',dur=D(full?(hq?1250:1050):650);
  box.className='on f-'+d.f+(low?' low':'');box.querySelector('.cname b').textContent=d.n;box.querySelector('.cname small').textContent='LEGENDARY · '+FAC[d.f].n.toUpperCase();
- const pan=box.querySelector('.cpan');pan.style.backgroundImage=`url(${realArt(id)})`;pan.style.transform='';pan.style.opacity='';const v=pan.querySelector('video');
+ const pan=box.querySelector('.cpan');pan.style.backgroundImage=`url(${realArt(id)}),url(${realArtS(id)})`;pan.style.transform='';pan.style.opacity='';const v=pan.querySelector('video');
  pan.classList.remove('vid');const tok=pan._tok=(pan._tok||0)+1;if(full&&hq&&!LG.rm.matches&&!VID.bad[id]){v.src=`${ARTDIR}anim/${id}.mp4?${VIDV}`;v.currentTime=0;vidReady(v,()=>{if(pan._tok===tok)pan.classList.add('vid')});v.play().catch(()=>{})}else{v.removeAttribute('src');v.load()}
  sfx('sting');if(full){setTimeout(()=>{shake(document.body,5,300);const r=pan.getBoundingClientRect(),cx=r.left+r.width/2,cy=r.top+r.height/2;
   const fl=sp('fl',cx,cy,0,0,.6,Math.max(innerWidth,innerHeight)*.36,{v:'#a050ff',m:'#40e0f0',c:'#ff2030',n:'#ffd070'}[d.f]);if(fl){fl.add=1;fl.a=.5}
