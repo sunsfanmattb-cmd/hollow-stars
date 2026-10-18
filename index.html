@@ -570,6 +570,84 @@ body.q-medium #hand .card.r-L:not(.held) .foil::after{display:none}
 #zoom .r-L .foil .fsh{background:linear-gradient(115deg,transparent 26%,#8a2ac0 34%,#0a8a7a 42%,#9a7a10 50%,#9a0a3a 58%,#2a4aa0 64%,transparent 72%)}
 body.land #mid{flex-direction:row;flex-wrap:wrap;align-content:center;justify-content:center;gap:5px 10px;padding:2px 6px;min-height:0;overflow:hidden}
 body.land #quit,body.land #mset{position:static;margin:0}body.land #hint{flex:0 0 100%;font-size:10.5px;line-height:1.25;max-height:2.6em;overflow:hidden}body.land #endt{margin:0;padding:.55em 1.1em}
+/* ===== v7.3: flicker fixes + polish (transform/opacity only) ===== */
+:root{--ez:cubic-bezier(.2,.8,.2,1);--ezo:cubic-bezier(.16,1,.3,1);--ezio:cubic-bezier(.45,0,.25,1)}
+/* no blend modes on any card layer: color-dodge/screen over animated or video content re-rasterises the whole card group and flickers on Android GPUs */
+.card .foil{mix-blend-mode:normal;opacity:.1;background:linear-gradient(115deg,transparent 26%,#c8a0ff 36%,#7af0e0 44%,#ffe490 51%,#ff98c0 58%,transparent 68%) 50% 50%/260% 260% no-repeat}
+.card.r-L .foil{opacity:.13;background:linear-gradient(115deg,transparent 24%,#d4a8ff 33%,#86fff0 41%,#fff0a8 48%,#ffa0c8 55%,#a8bcff 62%,transparent 70%) 50% 50%/240% 240% no-repeat}
+.card .foil::after{background:linear-gradient(90deg,transparent,#e8d8ff2a 35%,#ffffff40 50%,#d0fff42a 65%,transparent);animation-timing-function:var(--ezio)!important}
+.card.r-L .foil::after{background:linear-gradient(90deg,transparent,#ffd8f438 30%,#ffffff55 50%,#d8fff038 70%,transparent)}
+#hand .card.r-L .foil::after,#zoom .r-L .foil::after,.pfront .r-L .foil::after{animation-duration:5.2s}
+@keyframes fsw{0%,58%{transform:translateX(-150%) skewX(-18deg)}100%{transform:translateX(325%) skewX(-18deg)}}
+.lg .lm{mix-blend-mode:normal;opacity:.42}.lg .lgw{mix-blend-mode:normal;opacity:.2}.lg .lf{mix-blend-mode:normal}
+.lg.vid .lm{opacity:.22}.lg.vid .lgw{opacity:.1!important}
+#zoom .glare{mix-blend-mode:normal}#zoom .foil .fsh{opacity:.55}
+/* video: invisible until a real frame is presented, then a slow crossfade over the still; .99 max opacity = never an overlay plane */
+.lg .lv{opacity:0;transition:opacity .8s var(--ezio);background:transparent;pointer-events:none}
+.lg.vid .lv{opacity:.99}
+#cin .cpan video{opacity:0;transition:opacity .5s var(--ezio)}#cin .cpan.vid video{opacity:.99}
+/* 3D/backface: tilt layers keep a flat backface so rotated cards don't z-fight with their own foil */
+.card,.card .art,.card .foil{backface-visibility:hidden}
+/* buttons: press feedback everywhere, hover only on real pointers (sticky :hover on phones looked like a stuck flash) */
+.btn{transition:transform .14s var(--ez),opacity .25s,filter .2s;-webkit-tap-highlight-color:transparent}
+.btn:hover{filter:none}@media (hover:hover){.btn:not([disabled]):hover{filter:brightness(1.18)}}
+.btn:not([disabled]):active{transform:scale(.95);transition-duration:.06s}
+#quit,#mset,#mute{transition:transform .14s var(--ez)}#quit:active,#mset:active,#mute:active{transform:scale(.9)}
+/* End Turn: soft "busy" state during animations instead of the grey disabled flash; full disabled look only on the enemy's turn */
+#endt.wait[disabled]{opacity:.72;filter:saturate(.7)}
+#endt[disabled]:not(.wait){opacity:.45}
+#endt.glow:not([disabled])::after{animation:etp 2.4s var(--ezio) infinite}@keyframes etp{50%{opacity:.55}}
+/* screens: quick fade between screens */
+.screen.on{animation:scrIn .24s var(--ez) both}@keyframes scrIn{from{opacity:0}}
+#match.on{animation-duration:.32s}
+/* turn banner: clean fade + settle, no horizontal stretch */
+#banner{padding:10px 0;letter-spacing:.38em;background:linear-gradient(90deg,transparent,#000b 22%,#000b 78%,transparent)}
+#banner.show{animation:banner 1.35s var(--ez) forwards}
+@keyframes banner{0%{opacity:0;transform:translateY(-50%) scale(.96)}16%{opacity:1;transform:translateY(-50%) scale(1)}76%{opacity:1;transform:translateY(-50%) scale(1)}100%{opacity:0;transform:translateY(-50%) scale(1.03)}}
+/* your-turn cue: playable cards bob once, left to right */
+#hand.cue .card.can:not(.sel){animation:cue .62s var(--ez) calc(var(--i,0)*55ms) both}
+@keyframes cue{45%{transform:translateY(-9%)}}
+/* hand fan + draw/play arcs */
+#hand .card{transition:left .3s var(--ez),top .3s var(--ez),rotate .3s var(--ez),translate .2s var(--ez),scale .2s var(--ez),box-shadow .25s}
+#hand .card.drawn{animation:drawIn .62s var(--ezo)}
+@keyframes drawIn{0%{transform:translate(40vw,-26vh) scale(.3) rotate(22deg);opacity:0}45%{transform:translate(14vw,-16vh) scale(.78) rotate(8deg);opacity:1}100%{transform:none}}
+.unit.enter{animation:enter .5s var(--ezo)}
+@keyframes enter{0%{transform:translateY(46%) scale(1.22);opacity:0}55%{transform:translateY(-5%) scale(.98);opacity:1}100%{transform:none}}
+.unit.land{animation:land .42s var(--ezo)}@keyframes land{0%{transform:scale(1.18)}55%{transform:scale(.97)}100%{transform:none}}
+/* targeting: pulse via transform/opacity on a ring (outline-offset animation repainted every frame) */
+.tgt{animation:none;outline:2px dashed #ff5a66;outline-offset:3px}
+.unit.tgt::before,.hero.tgt::before{content:"";position:absolute;inset:-5px;border-radius:inherit;box-shadow:0 0 0 2px #ff6a7a,0 0 14px #ff2a4a99;pointer-events:none;z-index:5;animation:tgr 1.1s var(--ezio) infinite}
+.unit.ftgt::before{box-shadow:0 0 0 2px #8affb0,0 0 14px #3aff8a99}
+@keyframes tgr{50%{opacity:.35;transform:scale(1.035)}}
+#arrow .arg{fill:none;stroke:#ff2a3a;stroke-opacity:.22;stroke-width:12;stroke-linecap:round}
+#arrow #arl{fill:none;stroke:#ff4a5a;stroke-width:4.5;stroke-dasharray:1 9;animation:arf .5s linear infinite}
+#arrow.hot #arl{stroke:#ffd0b0}#arrow.hot .arg{stroke:#ffb080;stroke-opacity:.35}
+@keyframes arf{to{stroke-dashoffset:-10}}
+/* readability: card text */
+.card .tx{text-shadow:0 1px 0 #000a;letter-spacing:.005em}
+/* keyword tooltip */
+#kwtip{position:fixed;z-index:98;max-width:220px;padding:7px 11px;border-radius:3px;background:#0a0608f2;box-shadow:0 0 0 1px #000,0 0 0 2px #6a5640,0 8px 20px #000c;color:#e8dcc8;font-size:12px;line-height:1.35;pointer-events:none;opacity:0;transform:translate(-50%,-100%) translateY(4px);transition:opacity .18s,transform .22s var(--ez)}
+#kwtip.on{opacity:1;transform:translate(-50%,-100%) translateY(-6px)}#kwtip b{color:#ffd8a0}
+/* end screen: staged reveal */
+#over.on .ovbox>*{animation:ovIn .55s var(--ezo) both}
+#over.on .ovbox>*:nth-child(2){animation-delay:.08s}#over.on .ovbox>*:nth-child(3){animation-delay:.16s}#over.on .ovbox>*:nth-child(4){animation-delay:.24s}#over.on .ovbox>*:nth-child(5){animation-delay:.32s}#over.on .ovbox>*:nth-child(n+6){animation-delay:.4s}
+@keyframes ovIn{from{opacity:0;transform:translateY(10px)}}
+/* legendary entrance: rise + settle instead of a 2.6x slam */
+#cin.on{animation:fade .28s var(--ez)}
+#cin .cpan{animation:lgRise .62s var(--ezo) both}
+@keyframes lgRise{0%{transform:translateY(5%) scale(.82);opacity:0}60%{opacity:1}100%{transform:none}}
+#cin .cname{animation:cname2 .7s var(--ezo) .28s both}@keyframes cname2{from{opacity:0;transform:translateY(8px) scale(.97)}}
+#cin .crays{animation-duration:14s}
+#cin.out{transition:background .35s var(--ez)}
+body.fxlow #hand.cue .card.can,body.q-low #hand.cue .card.can{animation:none}
+@media (prefers-reduced-motion:reduce){#hand.cue .card.can,.screen.on,#over.on .ovbox>*{animation:none}}
+/* Phase: a slow, shallow ghost shimmer instead of a 50% opacity throb (read as flicker on phones) */
+.unit.phase .art{animation:phase 4.2s var(--ezio) infinite}@keyframes phase{50%{opacity:.8}}
+/* End Turn: icon sits in its own gutter (it overlapped the "E") */
+#endt{padding-left:2.5em!important;padding-right:1.25em!important}#endt svg{left:13px!important;width:13px;height:13px}
+body.land #endt{padding-left:2.4em!important;padding-right:1em!important}
+/* readability: lighter film grain over the match (it sat on top of every card's text) */
+body[data-scr=match] #grain{opacity:.3}
 </style></head><body>
 <div id="pbg"><i class="pl"></i><i class="pg"></i><i class="pd"></i></div><canvas id="bg"></canvas><div id="fog"><i class="f1"></i><i class="f2"></i></div><div id="vig"></div><div id="grain"></div>
 <button id="mute" aria-label="Toggle sound"></button>
@@ -599,10 +677,10 @@ body.land #quit,body.land #mset{position:static;margin:0}body.land #hint{flex:0 
  <div class="hero" id="myh" data-hero="0"><div class="av"></div><div class="hn"></div><div class="md"></div><div class="st"><div class="flux"><span class="fv"></span><div class="fx"></div></div><div class="cts"></div><div class="san"></div></div></div>
  <div id="hand"></div>
 </section>
-<svg id="arrow"><defs><marker id="ah" markerWidth="8" markerHeight="8" refX="4" refY="4" orient="auto"><path d="M0 0L8 4L0 8z" fill="#c81a2a"/></marker></defs><line id="arl" stroke="#c81a2a" stroke-width="5" stroke-linecap="round" stroke-dasharray="2 10" marker-end="url(#ah)"/></svg>
+<svg id="arrow"><defs><marker id="ah" markerWidth="8" markerHeight="8" refX="4" refY="4" orient="auto"><path d="M0 .6L7.4 4L0 7.4L1.6 4z" fill="#ff5a66"/></marker></defs><path class="arg" id="arg"/><path id="arl" stroke-linecap="round" marker-end="url(#ah)"/></svg>
 <div id="hflash"></div><div id="cin"><div class="crays"></div><div class="cpan"><video muted playsinline loop preload="auto"></video></div><div class="cname"><small></small><b></b></div><div class="cskip">TAP TO SKIP</div></div>
 <div id="settings"><div class="sbox"><h2>SETTINGS</h2><div class="orn"></div><label>Volume <input type="range" id="sVol" min="0" max="100" value="80"></label><label>Mute sound <input type="checkbox" id="sMute"></label><label><span>Quality<small id="sQn"></small></span><select id="sQ"><option value="auto">Auto</option><option value="high">High</option><option value="medium">Medium</option><option value="low">Low (reduce effects)</option></select></label><div class="rowb"><button class="btn" id="sClose">Close</button></div></div></div>
-<div id="banner"></div><div id="preview"></div><div id="zoom"></div><div id="toast"></div>
+<div id="banner"></div><div id="preview"></div><div id="zoom"></div><div id="kwtip"></div><div id="toast"></div>
 <div id="over"><div class="ovbg"></div><div class="ovbox"><div class="ovsig"></div><h2 id="ovt"></h2><p id="ovp"></p><div id="ovrw"></div><button class="btn" id="ovk" hidden><span>Open a Pack</span></button><div class="rowb"><button class="btn ghost" id="ovm">Menu</button><button class="btn ghost" id="ovr">Play again</button></div></div></div>
 <script>
 'use strict';
@@ -619,7 +697,7 @@ const ICO={guard:'M12 2l8 3v6c0 5-3.5 9-8 11-4.5-2-8-6-8-11V5z',swift:'M13 2L4 1
 blight:'M12 2a4 4 0 1 1 0 8 4 4 0 1 1 0-8zM5.5 12a4 4 0 1 1 0 8 4 4 0 1 1 0-8zM18.5 12a4 4 0 1 1 0 8 4 4 0 1 1 0-8z',dread:'M12 5C6 5 2 12 2 12s4 7 10 7 10-7 10-7-4-7-10-7zm0 3a4 4 0 1 0 0 8 4 4 0 1 0 0-8z',
 offering:'M11 1h2v13h4v2h-4v7h-2v-7H7v-2h4z',salvage:'M10 1h4l.6 3.2 2.3 1.3 3-1.2 2 3.4-2.4 2.1v2.4l2.4 2.1-2 3.4-3-1.2-2.3 1.3L14 23h-4l-.6-3.2-2.3-1.3-3 1.2-2-3.4 2.4-2.1v-2.4L2.1 8.7l2-3.4 3 1.2 2.3-1.3zM12 9a3 3 0 1 0 0 6 3 3 0 1 0 0-6z'};
 const KW={guard:['Guard','Enemies must attack Guard units first.'],swift:['Swift','Can attack the turn it arrives.'],phase:['Phase','Ignores Guard. Only Phase units can attack it.'],drain:['Drain','Damage this deals restores your Sanity.'],blight:['Blight','Any unit damaged by this is destroyed.'],dread:['Dread','When it arrives, the enemy gains that much Madness.'],offering:['Offering','When it arrives, sacrifice your weakest other unit to empower it.'],salvage:['Salvage','When destroyed, draw a card.']};
-const svgI=k=>`<svg viewBox="0 0 24 24"><path fill-rule="evenodd" d="${ICO[k]}"/></svg>`;
+const svgI=k=>`<svg viewBox="0 0 24 24" data-k="${k}"><title>${KW[k]?KW[k][0]+': '+KW[k][1]:k}</title><path fill-rule="evenodd" d="${ICO[k]}"/></svg>`;
 const C={},COL=[];
 function U(id,n,f,c,a,h,k,r,art,x,fl,o={}){const d=C[id]=Object.assign({id,n,f,t:'u',c,a,h,k:k?k.split(' '):[],r,art,x,fl},o);if(d.dread&&!d.k.includes('dread'))d.k.push('dread');if(r!=='T')COL.push(id)}
 function S(id,n,f,c,r,art,x,fl,o={}){C[id]=Object.assign({id,n,f,t:'s',c,k:[],r,art,x,fl},o);COL.push(id)}
@@ -896,7 +974,7 @@ const SPEC={v1:'spawn@void',v2:'eye@debris',v3:'eyes@flesh',v4:'leech@void',v5:'
  m1:'drone@hull',m2:'shield,drone@hull',m3:'swarm@debris',m4:'cross,drone@hull',m5:'ship@debris',m6:'lantern,drone@hull',m7:'human@hull',m8:'turret@debris',m9:'ark@planet',m10:'circuit,beam@hull',m11:'beam@void',m12:'vent@hull',m13:'circuit@hull',
  c1:'robed@altar',c2:'robed,blood@altar',c3:'flesh@flesh',c4:'spores@flesh',c5:'knife,robed@altar',c6:'golem@flesh',c7:'spores,robed@altar',c8:'flesh,maw@flesh',c9:'mouths,eyes@flesh',c10:'knife,blood@altar',c11:'blood,eyes@flesh',c12:'crowd,blood@altar',c13:'star,robed@altar',
  n1:'beacon@planet',n2:'human@debris',n3:'human@hull',n4:'warden@hull',n5:'beacon@debris',n6:'ship@void',tD:'drone@hull',tS:'human@hull'};
-const ART={},ARTV='hs7';
+const ART={},ARTV='hs7',VIDV='hs8';
 try{for(let i=localStorage.length-1;i>=0;i--){const k=localStorage.key(i);if(/^hs\d+:/.test(k))localStorage.removeItem(k)}}catch(e){}
 const mkc=(W,H)=>{const c=document.createElement('canvas');c.width=W;c.height=H;return c};
 function paint(key,f,spec,W=336,H=252){if(ART[key])return ART[key];
@@ -1540,14 +1618,14 @@ function cardBackURL(){const W=200,H=280,cv=mkc(W,H),x=cv.getContext('2d'),R=rng
  x.strokeStyle='#5a4a3a';x.lineWidth=5;x.strokeRect(6,6,W-12,H-12);x.strokeStyle='#000';x.lineWidth=2;x.strokeRect(12,12,W-24,H-24);x.strokeStyle='rgba(200,170,120,.45)';x.lineWidth=1;x.strokeRect(16,16,W-32,H-32);
  for(const[cx,cy]of[[16,16],[W-16,16],[16,H-16],[W-16,H-16]]){x.fillStyle='#c8a070';x.save();x.translate(cx,cy);x.rotate(Math.PI/4);x.fillRect(-4,-4,8,8);x.restore()}return cv.toDataURL('image/jpeg',.85)}
 /* ================= AUDIO ================= */
-const AU={c:null,m:null,rv:null,nb:null,mute:localStorage.getItem('hsMute')==='1',vol:Math.max(0,Math.min(1,+(localStorage.getItem('hsVol')??.8))),last:{}};
+const AU={c:null,m:null,rv:null,nb:null,mute:localStorage.getItem('hsMute')==='1',vol:Math.max(0,Math.min(1,+(localStorage.getItem('hsVol')??.8))),last:{},ambLvl:.74/* v7.3: drone +35% (was .55) */};
 function auInit(){if(AU.c){if(AU.c.state==='suspended')AU.c.resume();return}const AC=window.AudioContext||window.webkitAudioContext;if(!AC)return;let c;try{c=new AC()}catch(e){return}AU.c=c;
  AU.m=c.createGain();AU.m.gain.value=AU.mute?0:AU.vol*1.1;AU.m.connect(c.destination);
  const len=c.sampleRate*3|0,ib=c.createBuffer(2,len,c.sampleRate);for(let ch=0;ch<2;ch++){const d=ib.getChannelData(ch);for(let i=0;i<len;i++)d[i]=(Math.random()*2-1)*Math.pow(1-i/len,2.6)}
  AU.rv=c.createConvolver();AU.rv.buffer=ib;const rg=c.createGain();rg.gain.value=.55;AU.rv.connect(rg);rg.connect(AU.m);
  AU.nb=c.createBuffer(1,c.sampleRate*2,c.sampleRate);const nd=AU.nb.getChannelData(0);for(let i=0;i<nd.length;i++)nd[i]=Math.random()*2-1;ambient()}
 const MOOD={menu:{f:[43.65,43.95,65.4,87.6,130.2],lp:240,nf:520,ng:.06,th:0},v:{f:[41.2,41.5,61.7,82.4,123.5],lp:190,nf:360,ng:.09,th:0},m:{f:[55,55.4,110,165,220],lp:330,nf:1500,ng:.05,th:.6},c:{f:[49,49.4,73.4,98,146.8],lp:260,nf:700,ng:.05,th:0}};
-function ambient(){const c=AU.c,t=c.currentTime,out=c.createGain();out.gain.setValueAtTime(0,t);out.gain.linearRampToValueAtTime(.55,t+5);out.connect(AU.m);out.connect(AU.rv);AU.amb=out;
+function ambient(){const c=AU.c,t=c.currentTime,out=c.createGain();out.gain.setValueAtTime(0,t);out.gain.linearRampToValueAtTime(AU.ambLvl,t+5);out.connect(AU.m);out.connect(AU.rv);AU.amb=out;
  const lp=c.createBiquadFilter();lp.type='lowpass';lp.frequency.value=240;lp.Q.value=5;lp.connect(out);AU.lp=lp;const pg=c.createGain();pg.gain.value=1;pg.connect(lp);
  const lfo=c.createOscillator(),lg=c.createGain();lfo.frequency.value=.045;lg.gain.value=150;lfo.connect(lg);lg.connect(lp.frequency);lfo.start();
  const tl=c.createOscillator(),tlg=c.createGain();tl.frequency.value=1.3;tlg.gain.value=0;tl.connect(tlg);tlg.connect(pg.gain);tl.start();AU.tlg=tlg;
@@ -1568,6 +1646,8 @@ const SFX={click:()=>tone(880,620,.07,'sine',.05),draw:()=>noise(.2,1800,1,.07,'
  hit:()=>{tone(150,38,.28,'square',.08);noise(.14,1200,1,.22,'lowpass',180)},
  die:()=>{tone(330,28,.9,'sawtooth',.06,1);noise(.8,1600,3,.12,'bandpass',90)},
  turn:()=>{tone(392,392,1.8,'sine',.1,1);tone(587,587,1.5,'sine',.06,1,.03);tone(98,98,1.2,'triangle',.08,1)},
+ turnE:()=>{tone(294,294,1.3,'sine',.042,1);tone(73.4,73.4,1,'sine',.04,1)},
+ endt:()=>{tone(523,392,.16,'sine',.019);noise(.12,700,1,.02,'lowpass',260)},
  mad:()=>{for(const f of[220,233,311])tone(f,f*.66,1.4,'triangle',.04,1)},
  heal:()=>[440,554,659].forEach((f,i)=>tone(f,f*1.02,.6,'sine',.06,1,i*.07)),
  win:()=>[262,330,392,523,659].forEach((f,i)=>tone(f,f,1.4,'triangle',.08,1,i*.16)),
@@ -1651,23 +1731,33 @@ function lgReg(root){const l=root.querySelector('.lg');if(l){l._ph=Math.random()
 function lgTick(t){requestAnimationFrame(lgTick);const q=QL?QL.q:'high';if(document.hidden||LG.rm.matches||q!=='high'||t-LG.t0<(q==='high'?33:66))return;LG.t0=t;LG.frames++;const med=q==='medium';
  for(const el of LG.vis){if(!el.isConnected){LG.vis.delete(el);LG.io.unobserve(el);continue}if(el._u===undefined)el._u=!!el.closest('.unit');if(med&&el._u)continue;const s=t/1000+el._ph,[p,m,g,f]=el.children;
   if(med)continue;
-  if(el.classList.contains('vid'))p.style.transform='none';else p.style.transform=`translate(${(Math.sin(s*.45)*2.2).toFixed(2)}%,${(Math.cos(s*.37)*1.6).toFixed(2)}%) scale(${(1.02+Math.sin(s*.3)*.015).toFixed(3)})`;
+  p.style.transform=`translate(${(Math.sin(s*.45)*2.2).toFixed(2)}%,${(Math.cos(s*.37)*1.6).toFixed(2)}%) scale(${(1.02+Math.sin(s*.3)*.015).toFixed(3)})`;
   m.style.transform=`translate(${(-Math.sin(s*.45)*3.5).toFixed(2)}%,${(-(s*3.2%25)).toFixed(2)}%)`;
   g.style.opacity=(.28+.3*(.5+.5*Math.sin(s*1.9))).toFixed(3);g.style.transform=`scale(${(1+.08*Math.sin(s*1.9)).toFixed(3)})`;
   const ph=(s%5.5)/5.5;f.style.transform=`translateX(${(-110+ph*480).toFixed(1)}%) skewX(-12deg)`}}
 requestAnimationFrame(lgTick);
 /* legendary video loops: art/anim/<id>.mp4, only a few at once (zoom > hand > board), paused offscreen/hidden, off for reduced motion; still image underneath is the fallback */
-const VID={max:3,on:new Set(),bad:{},plays:0};
+const VID={max:3,on:new Set(),bad:{},plays:0,miss:new Map()};
 const vRank=el=>el.closest('#zoom')?0:el.closest('#hand')?1:el.closest('.unit')?2:el.closest('#pk,.pslot')?1:3;
-function vidStop(el,free){const v=el.querySelector('video');if(v){if(!v.paused)v.pause();if(free){v.removeAttribute('src');v.load();v.remove();el.classList.remove('vid')}}VID.on.delete(el)}
-function vidPlay(el){const id=el.dataset.id;if(VID.bad[id])return;let v=el.querySelector('video');
- if(!v){v=document.createElement('video');v.className='lv';v.muted=true;v.defaultMuted=true;v.loop=true;v.playsInline=true;v.autoplay=true;for(const a of['muted','loop','playsinline','autoplay'])v.setAttribute(a,'');v.preload='auto';v.disablePictureInPicture=true;
-  v.onplaying=()=>{el.classList.add('vid');VID.plays++};v.onerror=()=>{VID.bad[id]=1;vidStop(el,1)};v.src=`${ARTDIR}anim/${id}.mp4?${ARTV}`;el.querySelector('.lp').appendChild(v)}
+/* v7.3 flicker-free video: the <video> is created once per card and never removed while the card lives, never display-toggled.
+   It stays at opacity 0 over the still WebP until a decoded frame is actually presented (requestVideoFrameCallback, or 'playing' + 2 rAF
+   as a fallback), then crossfades in. Pausing (offscreen / over the cap) keeps the last frame on screen. Max opacity .99 keeps Android
+   Chrome/WebView from promoting it to a hardware overlay plane (overlay promotion is what produces black flashes on start/loop/pause). */
+function vidReady(v,fn){let done=0;const go=()=>{if(done)return;done=1;fn()};
+ if(v.requestVideoFrameCallback)v.requestVideoFrameCallback(()=>requestAnimationFrame(go));
+ v.addEventListener('playing',()=>requestAnimationFrame(()=>requestAnimationFrame(()=>setTimeout(go,v.requestVideoFrameCallback?250:0))),{once:true})}
+function vidStop(el,free){const v=el.querySelector('video');if(v){if(!v.paused)v.pause();if(free){v.removeAttribute('src');v.load();v.remove();el.classList.remove('vid')}}VID.on.delete(el);VID.miss.delete(el)}
+function vidPlay(el){const id=el.dataset.id;if(VID.bad[id])return;let v=el.querySelector('video');VID.miss.delete(el);
+ if(!v){v=document.createElement('video');v.className='lv';v.muted=true;v.defaultMuted=true;v.loop=true;v.playsInline=true;v.autoplay=true;for(const a of['muted','loop','playsinline','autoplay'])v.setAttribute(a,'');v.preload='auto';v.disablePictureInPicture=true;v.setAttribute('disableremoteplayback','');
+  vidReady(v,()=>{el.classList.add('vid');VID.plays++});v.onerror=()=>{VID.bad[id]=1;vidStop(el,1)};v.src=`${ARTDIR}anim/${id}.mp4?${VIDV}`;el.querySelector('.lp').appendChild(v)}
  if(v.paused)v.play().catch(()=>{});VID.on.add(el)}
 function vidSync(){for(const el of[...VID.on])if(!el.isConnected)vidStop(el,1);
  if(LG.rm.matches||document.hidden){for(const el of[...VID.on])vidStop(el);return}
- const want=new Set([...LG.vis].filter(el=>el.isConnected&&el.dataset.id&&!VID.bad[el.dataset.id]).sort((a,b)=>vRank(a)-vRank(b)).slice(0,VID.max));
- for(const el of[...VID.on])if(!want.has(el))vidStop(el);for(const el of want)vidPlay(el)}
+ // sticky choice: ties keep whatever is already playing, so two equal Legendaries never trade play/pause back and forth
+ const want=new Set([...LG.vis].filter(el=>el.isConnected&&el.dataset.id&&!VID.bad[el.dataset.id]).sort((a,b)=>vRank(a)-vRank(b)||(VID.on.has(b)-VID.on.has(a))).slice(0,VID.max));
+ // hysteresis: only pause after ~0.7 s of not being wanted (cards sliding through the edge of the viewport don't pop)
+ for(const el of[...VID.on])if(!want.has(el)){const n=(VID.miss.get(el)||0)+1;if(n>=2||VID.max===0)vidStop(el);else VID.miss.set(el,n)}
+ for(const el of want)vidPlay(el)}
 setInterval(vidSync,350);document.addEventListener('visibilitychange',vidSync);
 (function kit(){const rs=document.documentElement.style;
  const cx=50,cy=79,r=38,pts=['50% 0%'];for(let a=-28.8;a<=208.8;a+=6){const t=a*Math.PI/180;pts.push(`${(cx+Math.cos(t)*r).toFixed(1)}% ${((cy+Math.sin(t)*r)/1.2).toFixed(1)}%`)}rs.setProperty('--drop',`polygon(${pts.join(',')})`);
@@ -1727,20 +1817,20 @@ function updUnit(e,u){const d=C[u.id],a=e.querySelector('.atk'),h=e.querySelecto
  const pct=u.h<=0?0:Math.max(8,Math.min(100,u.h/Math.max(1,u.mh)*100));h.style.setProperty('--p',pct.toFixed(1)+'%');h.dataset.p=pct.toFixed(1);if(e._h!==undefined&&u.h<e._h){restartCls(h,'drain');clearTimeout(h._t);h._t=setTimeout(()=>h.classList.remove('drain'),1100);if(u.h>0)dropFx(h)}else if(e._h!==undefined&&u.h>e._h)dropFx(h,1);e._h=u.h;
  const ks=u.k.join();if(e.dataset.k!==ks){e.dataset.k=ks;e.querySelector('.kws').innerHTML=u.k.filter(k=>ICO[k]&&k!=='guard').map(svgI).join('')}
  e.classList.toggle('guard',u.k.includes('guard'));e.classList.toggle('phase',u.k.includes('phase'));e.classList.toggle('sleep',u.o===G.cur&&!u.ready&&!G.over);
- e.classList.toggle('ready',u.o===0&&G.cur===0&&!G.p[0].ai&&!UI.busy&&canAtk(u));e.classList.toggle('sel',UI.sel?.k==='u'&&UI.sel.uid===u.uid)}
+ e.classList.toggle('ready',u.o===0&&G.cur===0&&!G.p[0].ai&&!G.over&&canAtk(u));e.classList.toggle('sel',UI.sel?.k==='u'&&UI.sel.uid===u.uid)}
 function syncHand(){const box=$('#hand'),hand=G.p[0].hand,ex=new Map();for(const el of box.children)ex.set(+el.dataset.h,el);const keep=new Set();
  const n=hand.length,W=box.clientWidth||innerWidth,hw=UI.hw,gap=n>1?Math.min(hw*1.04,(W-hw-28)/(n-1)):0,x0=(W-(hw+gap*(n-1)))/2;
  hand.forEach((c,i)=>{let el=ex.get(c.uid);if(!el){el=cardEl(c.id);el.dataset.h=c.uid;el.classList.add('drawn');box.appendChild(el);setTimeout(()=>el.classList.remove('drawn'),600)}keep.add(el);
-  const off=i-(n-1)/2;el.style.left=x0+i*gap+'px';el.style.top=4+Math.min(10,off*off*.45)+'px';el.style.rotate=(n>1?off*Math.min(3,14/n):0)+'deg';el.style.zIndex=i+1;
-  el.classList.toggle('can',G.cur===0&&!G.p[0].ai&&!UI.busy&&canPlay(G,0,c));el.classList.toggle('sel',UI.sel?.k==='h'&&UI.sel.uid===c.uid)});
+  const off=i-(n-1)/2;el.style.left=x0+i*gap+'px';el.style.top=(4+Math.min(12,off*off*.5)).toFixed(1)+'px';el.style.rotate=(n>1?off*Math.min(3.2,15/n):0).toFixed(2)+'deg';el.style.zIndex=i+1;el.style.setProperty('--i',i);
+  el.classList.toggle('can',G.cur===0&&!G.p[0].ai&&!G.over&&canPlay(G,0,c));el.classList.toggle('sel',UI.sel?.k==='h'&&UI.sel.uid===c.uid)});
  for(const[k,el]of ex)if(!keep.has(el))el.remove()}
 function selTargets(){const s=UI.sel;if(!s||!G)return[];if(s.k==='h'){const c=G.p[0].hand.find(x=>x.uid===s.uid);if(!c)return[];const d=C[c.id];return d.tg?spellTargets(G,0,d.tg):[]}const u=findU(G,s.uid);return u&&canAtk(u)?atkTargets(G,0,u):[]}
 function hint(){if(!G)return'';if(G.over)return'';if(G.p[G.cur].ai)return G.cur===1?'The enemy stirs…':'Autopilot is thinking…';const s=UI.sel;
  if(s?.k==='h'){const c=G.p[0].hand.find(x=>x.uid===s.uid),d=c&&C[c.id];if(d)return d.tg?'Choose a target for '+d.n:'Tap again or drag up to play '+d.n}
  if(s?.k==='u')return'Choose what to attack';if(legal(G,0).length)return'Your turn: drag or tap cards, tap units to attack';return'No moves left. End your turn.'}
 function renderMatch(){if(!G)return;overCheck();artPre([...G.p[0].hand.map(c=>c.id),...G.p[0].board.map(u=>u.id),...G.p[1].board.map(u=>u.id),'h'+G.p[0].fac,'h'+G.p[1].fac],1);renderHero(0);renderHero(1);syncBoard($('#opb'),G.p[1].board);syncBoard($('#myb'),G.p[0].board);syncHand();
- $$('.tgt').forEach(e=>e.classList.remove('tgt','ftgt'));for(const t of selTargets()){const el=tEl(t,1);if(el){el.classList.add('tgt');if(t[0]==='u'&&findU(G,+t.slice(1))?.o===0)el.classList.add('ftgt')}}
- madSet();$('#hint').textContent=hint();const my=G.cur===0&&!G.p[0].ai&&!G.over;const eb=$('#endt');eb.disabled=!my||UI.busy;eb.querySelector('span').textContent=my?'End Turn':'Enemy Turn';eb.classList.toggle('glow',my&&!UI.busy&&!legal(G,0).length)}
+ {const nt=new Map();for(const t of selTargets()){const el=tEl(t,1);if(el)nt.set(el,t[0]==='u'&&findU(G,+t.slice(1))?.o===0)}$$('.tgt').forEach(e=>{if(!nt.has(e))e.classList.remove('tgt','ftgt')});for(const[el,f]of nt){if(!el.classList.contains('tgt'))el.classList.add('tgt');el.classList.toggle('ftgt',f)}}
+ madSet();$('#hint').textContent=hint();const my=G.cur===0&&!G.p[0].ai&&!G.over;const eb=$('#endt');eb.disabled=!my||UI.busy;eb.querySelector('span').textContent=my?'End Turn':'Enemy Turn';eb.classList.toggle('glow',my&&!legal(G,0).length);eb.classList.toggle('wait',my&&!!UI.busy)}
 function tEl(t,box){if(t[0]==='h')return box?heroBox(+t[1]):heroBox(+t[1]).querySelector('.av');return document.querySelector(`.unit[data-u="${t.slice(1)}"]`)}
 function center(el){const r=el.getBoundingClientRect();return[r.left+r.width/2,r.top+r.height/2]}
 function floatAt(el,txt,col,cls=''){if(!el)return;const[x,y]=center(el),d=document.createElement('div');d.className='fnum '+cls;d.style.setProperty('--rx',(Math.random()*30-15).toFixed(0)+'px');d.textContent=txt;d.style.color=col;d.style.left=x+'px';d.style.top=y+'px';document.body.appendChild(d);setTimeout(()=>d.remove(),1150)}
@@ -1763,7 +1853,7 @@ function flushFx(){if(!G)return;BG.act=performance.now();const L=G.fx;G.fx=[];fo
  case'summon':enterFx(+f.id.slice(1));break;
  case'burn':toast((f.pi?'Enemy':'Your')+' hand is full: '+C[f.cid].n+' was burned');break;
  case'fatigue':toast((f.pi?'The enemy':'You')+' drew from an empty deck: the void gnaws ('+f.n+')');break;
- case'turn':banner(f.pi===0&&!UI.auto?'YOUR TURN':f.pi===0?'AUTOPILOT':'ENEMY TURN',f.pi===0?'#7a5cff':'#ff3050');sfx('turn');break}}}
+ case'turn':if(f.pi===0&&!UI.auto)setTimeout(()=>{const h=$('#hand');restartCls(h,'cue');clearTimeout(h._cue);h._cue=setTimeout(()=>h.classList.remove('cue'),1400)},D(380));banner(f.pi===0&&!UI.auto?'YOUR TURN':f.pi===0?'AUTOPILOT':'ENEMY TURN',f.pi===0?'#7a5cff':'#ff3050');sfx(f.pi===0?'turn':'turnE');break}}}
 function banner(t,c){const b=$('#banner');b.textContent=t;b.style.setProperty('--bc',c);restartCls(b,'show')}
 function apply(fn){const r=fn();renderMatch();flushFx();overCheck();return r}
 /* end-of-match: queued once per game object (G.ovq), so a new match after Menu always gets its own victory/defeat screen */
@@ -1781,7 +1871,7 @@ async function runAI(){if(UI.aiRun)return;UI.aiRun=true;UI.busy=true;renderMatch
 function setSel(s){UI.sel=s;renderMatch()}
 async function humanPlay(uid,tg){if(UI.busy||G.cur!==0)return;UI.sel=null;const ok=apply(()=>play(G,0,uid,tg));if(!ok){sfx('err');return}if(UI.cin){UI.busy=true;renderMatch();const g=G;await UI.cin;if(G===g){UI.busy=false;renderMatch()}}}
 async function humanAtk(uid,tg){if(UI.busy||G.cur!==0)return;UI.sel=null;UI.busy=true;renderMatch();await lunge(uid,tg,()=>attack(G,0,uid,tg));UI.busy=false;renderMatch()}
-$('#endt').onclick=()=>{if(!G||G.cur!==0||UI.busy||G.over||G.p[0].ai)return;sfx('click');UI.sel=null;apply(()=>endTurn(G));runAI()};
+$('#endt').onclick=()=>{if(!G||G.cur!==0||UI.busy||G.over||G.p[0].ai)return;sfx('endt');UI.sel=null;apply(()=>endTurn(G));runAI()};
 $('#quit').onclick=()=>{sfx('click');G=null;UI.aiRun=false;show('title')};
 function gameOver(){if(!G)return;cinSkip();const g=G,w=g.winner,me=w===0,ov=$('#over');g.ovq=1;UI.overShown=1;
  $('#ovt').textContent=w===-1?'STALEMATE':me?(UI.auto?'AUTOPILOT WINS':'VICTORY'):'DEFEAT';
@@ -1811,9 +1901,12 @@ document.addEventListener('pointercancel',()=>{tiltOff();if(P){clearTimeout(P.lp
 function startDrag(e){tiltOff();const el=P.el;if(!myTurn()||!el)return;
  if(el.dataset.h){const c=G.p[0].hand.find(x=>x.uid===+el.dataset.h);if(!c||!canPlay(G,0,c))return;P.drag='h';P.uid=c.uid;UI.sel={k:'h',uid:c.uid};renderMatch();
   const g=el.cloneNode(true);g.id='ghost';g.classList.remove('sel','can','drawn');g.style.cssText='';document.body.appendChild(g);el.classList.add('out');P.g=g;if(!C[c.id].tg)$('#myb').classList.add('drop')}
- else if(el.dataset.u){const u=findU(G,+el.dataset.u);if(!u||u.o!==0||!canAtk(u))return;P.drag='u';P.uid=u.uid;UI.sel={k:'u',uid:u.uid};renderMatch();const[a,b]=center(el);P.ax=a;P.ay=b;$('#arrow').style.display='block'}
+ else if(el.dataset.u){const u=findU(G,+el.dataset.u);if(!u||u.o!==0||!canAtk(u))return;P.drag='u';P.uid=u.uid;UI.sel={k:'u',uid:u.uid};renderMatch();const[a,b]=center(el);P.ax=a;P.ay=b;arrowTo(a,b,a,b);$('#arrow').style.display='block'}
  moveDrag(e)}
-function moveDrag(e){if(P.drag==='h'){P.g.style.left=e.clientX+'px';P.g.style.top=e.clientY+'px';if(!fxLow()){const v=Math.max(-1,Math.min(1,(e.clientX-P.lx)/14));P.vx=(P.vx||0)*.7+v*.3;P.lx=e.clientX;P.g.style.transform=`translate(-50%,-60%) scale(.95) perspective(700px) rotateY(${(P.vx*22).toFixed(1)}deg) rotate(${(-4+P.vx*8).toFixed(1)}deg)`;P.g.style.setProperty('--ox',P.vx.toFixed(2))}}else if(P.drag==='u'){const l=$('#arl');l.setAttribute('x1',P.ax);l.setAttribute('y1',P.ay);l.setAttribute('x2',e.clientX);l.setAttribute('y2',e.clientY)}}
+function moveDrag(e){if(P.drag==='h'){P.g.style.left=e.clientX+'px';P.g.style.top=e.clientY+'px';if(!fxLow()){const v=Math.max(-1,Math.min(1,(e.clientX-P.lx)/14));P.vx=(P.vx||0)*.7+v*.3;P.lx=e.clientX;P.g.style.transform=`translate(-50%,-60%) scale(.95) perspective(700px) rotateY(${(P.vx*22).toFixed(1)}deg) rotate(${(-4+P.vx*8).toFixed(1)}deg)`;P.g.style.setProperty('--ox',P.vx.toFixed(2))}}else if(P.drag==='u')arrowTo(P.ax,P.ay,e.clientX,e.clientY,e)}
+function arrowTo(ax,ay,x,y,e){const dx=x-ax,dy=y-ay,L=Math.hypot(dx,dy)||1,bend=Math.min(90,L*.28),cx=(ax+x)/2+dy/L*bend*(dx>0?-1:1)*.35,cy=(ay+y)/2-bend;
+ const d=`M${ax.toFixed(1)} ${ay.toFixed(1)}Q${cx.toFixed(1)} ${cy.toFixed(1)} ${x.toFixed(1)} ${y.toFixed(1)}`;$('#arl').setAttribute('d',d);$('#arg').setAttribute('d',d);
+ const h=e&&document.elementFromPoint(e.clientX,e.clientY),t=h&&h.closest('.tgt');$('#arrow').classList.toggle('hot',!!t)}
 function cancelDrag(p){if(p.g)p.g.remove();$('#arrow').style.display='none';$('#myb').classList.remove('drop');$$('#hand .out').forEach(x=>x.classList.remove('out'));UI.sel=null;if(G)renderMatch()}
 function dropTarget(x,y){const el=document.elementFromPoint(x,y);if(!el)return null;const u=el.closest('.unit[data-u]:not(.dying)'),h=el.closest('[data-hero]');return u?'u'+u.dataset.u:h?'h'+h.dataset.hero:null}
 function endDrag(p,e){const x=e.clientX,y=e.clientY;cancelDrag(p);const tg=dropTarget(x,y);
@@ -2034,18 +2127,18 @@ function whisper(side){if(MZ.wn>=3)return;MZ.wn++;const w=document.createElement
  w.style.left=rr(8,62)+'%';w.style.top=(side?rr(14,34):rr(38,76))+'%';w.style.setProperty('--r',rr(-8,8).toFixed(1)+'deg');$('#match').appendChild(w);if(!side)sfx('whisper');setTimeout(()=>{w.remove();MZ.wn--},3200)}
 /* ---------- legendary entrance cinematic ---------- */
 const CIN={el:null,done:null,skip:null,shown:0};
-function lgCinema(id,uid){if(!$('#match').classList.contains('on'))return null;CIN.shown++;const d=C[id],box=$('#cin'),low=fxLow(),full=!low,hq=QL.q==='high',dur=D(full?(hq?1150:950):600);
+function lgCinema(id,uid){if(!$('#match').classList.contains('on'))return null;CIN.shown++;const d=C[id],box=$('#cin'),low=fxLow(),full=!low,hq=QL.q==='high',dur=D(full?(hq?1250:1050):650);
  box.className='on f-'+d.f+(low?' low':'');box.querySelector('.cname b').textContent=d.n;box.querySelector('.cname small').textContent='LEGENDARY · '+FAC[d.f].n.toUpperCase();
  const pan=box.querySelector('.cpan');pan.style.backgroundImage=`url(${realArt(id)})`;pan.style.transform='';pan.style.opacity='';const v=pan.querySelector('video');
- if(full&&hq&&!LG.rm.matches&&!VID.bad[id]){v.src=`${ARTDIR}anim/${id}.mp4?${ARTV}`;v.currentTime=0;v.play().catch(()=>{})}else{v.removeAttribute('src');v.load()}
- sfx('sting');if(full){setTimeout(()=>{shake(document.body,10,360);const r=pan.getBoundingClientRect(),cx=r.left+r.width/2,cy=r.top+r.height/2;
+ pan.classList.remove('vid');const tok=pan._tok=(pan._tok||0)+1;if(full&&hq&&!LG.rm.matches&&!VID.bad[id]){v.src=`${ARTDIR}anim/${id}.mp4?${VIDV}`;v.currentTime=0;vidReady(v,()=>{if(pan._tok===tok)pan.classList.add('vid')});v.play().catch(()=>{})}else{v.removeAttribute('src');v.load()}
+ sfx('sting');if(full){setTimeout(()=>{shake(document.body,5,300);const r=pan.getBoundingClientRect(),cx=r.left+r.width/2,cy=r.top+r.height/2;
   const fl=sp('fl',cx,cy,0,0,.6,Math.max(innerWidth,innerHeight)*.36,{v:'#a050ff',m:'#40e0f0',c:'#ff2030',n:'#ffd070'}[d.f]);if(fl){fl.add=1;fl.a=.5}
-  for(let i=0;i<nq(30);i++){const a=rr(0,7),s=rr(300,900),p=sp('sp',cx,cy,Math.cos(a)*s,Math.sin(a)*s,rr(.3,.7),rr(1.5,3),'#fff0d0');if(p){p.add=1;p.dr=2.5}}},D(150))}
+  for(let i=0;i<nq(30);i++){const a=rr(0,7),s=rr(220,700),p=sp('sp',cx,cy,Math.cos(a)*s,Math.sin(a)*s,rr(.35,.8),rr(1.5,3),'#fff0d0');if(p){p.add=1;p.dr=2.5}}},D(260))}
  let fin;const p=new Promise(r=>fin=r);let ended=0,tm1,tm2;
  const end=()=>{if(ended)return;ended=1;clearTimeout(tm1);clearTimeout(tm2);const u=tEl('u'+uid),r=pan.getBoundingClientRect();let tr='scale(.2)';
   if(u){const q=u.getBoundingClientRect();tr=`translate(${(q.left+q.width/2-(r.left+r.width/2)).toFixed(0)}px,${(q.top+q.height/2-(r.top+r.height/2)).toFixed(0)}px) scale(${(q.width/r.width).toFixed(3)})`}
-  const fly=D(full?280:180);pan.animate([{transform:'none',opacity:1},{transform:tr,opacity:.9}],{duration:fly,easing:'cubic-bezier(.5,0,.8,.6)',fill:'forwards'});box.classList.add('out');
-  setTimeout(()=>{box.className='';v.pause();pan.getAnimations().forEach(a=>a.cancel());if(u){bump(u,'land');const[x,y]=center(u);shake($('#match'),6,260);impact(C[id].f,x,y,0,0,3,false);enterFx(uid)}CIN.done=null;UI.cin=null;fin()},fly)};
+  const fly=D(full?340:200);pan.animate([{transform:'none',opacity:1},{transform:`translateY(-2%) scale(1.03)`,opacity:1,offset:.18},{transform:tr,opacity:.85}],{duration:fly,easing:'cubic-bezier(.55,0,.3,1)',fill:'forwards'});box.classList.add('out');
+  setTimeout(()=>{box.className='';v.pause();pan.getAnimations().forEach(a=>a.cancel());if(u){bump(u,'land');const[x,y]=center(u);shake($('#match'),4,220);impact(C[id].f,x,y,0,0,3,false);enterFx(uid)}CIN.done=null;UI.cin=null;fin()},fly)};
  CIN.skip=()=>{clearTimeout(tm1);end()};tm1=setTimeout(end,dur-D(full?340:200));CIN.done=p;UI.cin=p;return p}
 function cinSkip(){if(UI.cin&&CIN.skip)CIN.skip()}
 /* ---------- tilt, parallax, foil ---------- */
@@ -2109,6 +2202,11 @@ $('#settings').addEventListener('click',e=>{if(e.target.id==='settings')$('#sett
 $('#sVol').addEventListener('input',e=>{auInit();AU.vol=+e.target.value/100;localStorage.setItem('hsVol',AU.vol.toFixed(2));auVol()});
 $('#sQ').addEventListener('change',e=>{sfx('click');setQuality(e.target.value)});$('#sMute').addEventListener('change',e=>{auInit();AU.mute=e.target.checked;localStorage.setItem('hsMute',AU.mute?'1':'0');updMute()});
 $('#cin').addEventListener('pointerdown',e=>{e.stopPropagation();cinSkip()},true);
-Object.assign(window.__hs,{ZT,ztOpen,ztClose,ztFinger,scrAngle,FX,FXQ,QL,qv,setQuality,qApply,fxLow,setFx,MZ,madSet,whisper,lgCinema,CIN,cinSkip,impact,deathFx,dropFx,tiltHeld,tiltOff,TL,orient,LB,AU,shake});
+Object.assign(window.__hs,{sfx,SFX,auVol,vidReady,ZT,ztOpen,ztClose,ztFinger,scrAngle,FX,FXQ,QL,qv,setQuality,qApply,fxLow,setFx,MZ,madSet,whisper,lgCinema,CIN,cinSkip,impact,deathFx,dropFx,tiltHeld,tiltOff,TL,orient,LB,AU,shake});
+/* v7.3 keyword tooltip: tap/hover a keyword icon on a unit (long-press still opens the full card) */
+(function(){const tip=$('#kwtip');let tt=0;function show(sv){const k=sv.dataset.k;if(!k||!KW[k])return;tip.innerHTML=`<b>${KW[k][0]}</b> · ${KW[k][1]}`;const r=sv.getBoundingClientRect();
+  tip.style.left=Math.max(118,Math.min(innerWidth-118,r.left+r.width/2))+'px';tip.style.top=Math.max(40,r.top)+'px';tip.classList.add('on');clearTimeout(tt);tt=setTimeout(()=>tip.classList.remove('on'),1800)}
+ document.addEventListener('pointerdown',e=>{const sv=e.target.closest&&e.target.closest('.kws svg[data-k]');if(sv)show(sv);else tip.classList.remove('on')},true);
+ document.addEventListener('pointerover',e=>{if(e.pointerType!=='mouse')return;const sv=e.target.closest&&e.target.closest('.kws svg[data-k]');if(sv)show(sv)})})();
 function ell(x,a,b,rx,ry,r,s,e){x.ellipse(a,b,rx>.01?rx:.01,ry>.01?ry:.01,r,s,e)}
 </script></body></html>
