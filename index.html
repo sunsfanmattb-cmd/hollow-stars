@@ -749,20 +749,152 @@ body.land #mydecks .scroll{padding-top:max(8px,env(safe-area-inset-top))}body.la
 #bname span{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:calc(1em*var(--fit,1))}
 #bname i{flex:none}
 #bname span.fit2,.tile b.fit2,.dmeta b.fit2{white-space:normal;line-height:1.02;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;text-overflow:clip}
+
+/* ===== v8: softer holo (user: "a little better", still a touch of Legendary flicker on the phone).
+   Foil, prismatic rim, frame glints and gem lit ~35% lower; sweeps wider-edged and slower. Durations still divide LGP=240 s.
+   Small cards (hand, board units, collection/builder grids) drop the drifting mote layers, the Ken Burns drift, the frame glints
+   and the gem star: on a 60-150 px card they are barely visible but each one is a composited layer that moves every frame.
+   Zoom, the pack reveal, the cinematic and full-size sheets keep everything. Keyframes are redefined under the same names. ===== */
+.card .foil{opacity:.065}
+.card.r-L .foil{opacity:.64}
+.card .foil::after{width:56%;background:linear-gradient(90deg,transparent,#e8d8ff16 30%,#ffffff26 50%,#d0fff416 70%,transparent)}
+.card.r-L .foil::after{background:linear-gradient(90deg,transparent,#ffd8f420 25%,#ffffff34 50%,#d8fff020 75%,transparent)}
+#hand .card.held .foil::after,#zoom .foil::after,.pfront .foil::after,#sheet .foil::after{animation-duration:9s}
+#hand .card.r-L .foil::after,#zoom .r-L .foil::after,.pfront .r-L .foil::after,#sheet .r-L .foil::after{animation-duration:8s}
+@keyframes fsw{0%,50%{transform:translateX(-150%) skewX(-18deg)}100%{transform:translateX(260%) skewX(-18deg)}}
+#zoom .foil .fsh{opacity:.55}
+.lg .lf{opacity:.62;animation-duration:12s}
+.lge::before{opacity:.26;animation-duration:8s}
+@keyframes lgedge{to{opacity:.64}}
+.lge b{animation-duration:12s;box-shadow:0 0 .4em #ffcf6a66}
+.lge b+b{animation-delay:calc(var(--lgd,0s) - 6s)}
+@keyframes lgglint{0%,50%{transform:translateX(0);opacity:0}62%,86%{opacity:.6}100%{transform:translateX(158%);opacity:0}}
+.lgem::before{animation-duration:4s}
+@keyframes gemglow{from{opacity:.2;transform:scale(.84)}to{opacity:.6;transform:scale(1.06)}}
+.lgem b{animation-duration:6s}
+@keyframes gemspark{0%,64%{transform:scale(.1) rotate(0);opacity:0}78%{transform:scale(.9) rotate(40deg);opacity:.65}100%{transform:scale(.1) rotate(90deg);opacity:0}}
+/* small sizes: static still + glow only */
+#hand .lg .lm,.unit .lg .lm,#cgrid .lg .lm,#bgrid .lg .lm,#hand .lge b,#cgrid .lge b,#bgrid .lge b,#hand .lgem b,.unit .lgem b,#cgrid .lgem b,#bgrid .lgem b{display:none}
+#hand .lg .lp,.unit .lg .lp,#cgrid .lg .lp,#bgrid .lg .lp{animation:none;transform:none}
+
+/* ===== v8 UI: hub, badges, campaign map, quests, stats, crafting bar, cosmetic frames. Static styling; only opacity/transform transitions ===== */
+.screen.on{animation-duration:.18s}
+.menu.hub{display:grid;grid-template-columns:1fr 1fr;gap:10px 10px;width:min(88vw,360px);margin-top:12px}
+.menu.hub .btn{padding:.85em .5em;font-size:12.5px;letter-spacing:.12em;white-space:nowrap}
+body.land .menu.hub{display:grid;grid-template-columns:repeat(4,1fr);width:min(92vw,700px);max-width:none;margin-top:4px}
+body.land .menu.hub .btn{padding:.7em .5em;font-size:12px}
+.hlink{margin-top:8px;color:#9a8c78;font-size:11.5px;letter-spacing:.18em;text-transform:uppercase;padding:6px 10px;font-family:var(--serif)}
+body.land .hlink{margin-top:2px}
+.bdg{position:absolute;top:-7px;right:-5px;min-width:19px;height:19px;padding:0 5px;border-radius:10px;background:#b8102a;color:#fff;font:700 11px/19px system-ui,sans-serif;letter-spacing:0;text-shadow:none;box-shadow:0 0 0 2px #000,0 0 8px #ff2040aa;opacity:0;transform:scale(.6);transition:opacity .2s,transform .2s var(--ezo);pointer-events:none;z-index:3}
+.bdg.on{opacity:1;transform:none}
+.seg.dif small{flex:0 0 100%;text-align:center;color:#8a7e6e;font-size:11.5px;margin-top:2px}
+/* campaign */
+#camp .scroll{gap:8px}
+.ctabs button{display:flex;flex-direction:column;align-items:center;gap:1px;max-width:31vw;white-space:normal;line-height:1.15;font-size:11.5px}
+.ctabs button em{font-style:normal;font-size:10px;color:#8a7e6e}
+.cwrap{display:flex;flex-direction:column;gap:10px;width:min(100%,560px);align-items:center}
+body.land .cwrap{flex-direction:row;align-items:flex-start;width:min(100%,900px)}
+.cside{display:flex;flex-direction:column;gap:8px;width:100%;align-items:center}
+body.land .cside{flex:1;min-width:0}
+.cmap{position:relative;width:min(100%,520px);aspect-ratio:1/.92;flex:none;border-radius:6px;overflow:hidden;
+ background:radial-gradient(ellipse at 50% 0%,var(--glow,#6030a044),transparent 60%),radial-gradient(1px 1px at 12% 22%,#fff6,transparent),radial-gradient(1px 1px at 62% 38%,#fff5,transparent),radial-gradient(1.5px 1.5px at 84% 72%,#fff4,transparent),radial-gradient(1px 1px at 32% 64%,#fff4,transparent),radial-gradient(1px 1px at 90% 18%,#fff5,transparent),linear-gradient(180deg,#07050a,#020103);
+ box-shadow:0 0 0 1px #000,0 0 0 2px #5a4632,0 0 0 3px #120c08,inset 0 0 50px #000}
+body.land .cmap{width:min(46vw,360px)}
+.cmap.f-v{--glow:#7040c060}.cmap.f-m{--glow:#20a0c050}.cmap.f-c{--glow:#c0183460}
+.cmap svg{position:absolute;inset:0;width:100%;height:100%}
+.cpath{fill:none;stroke:#8a6a44;stroke-width:.6;stroke-dasharray:1.6 1.4;vector-effect:non-scaling-stroke;stroke-width:1.5px}
+.cdesc{position:absolute;left:8px;right:8px;bottom:6px;margin:0;font-size:11px;color:#8a7e6e;font-style:italic;text-align:right;line-height:1.3;max-width:62%;margin-left:auto}
+.cnode{position:absolute;width:46px;height:46px;margin:-23px 0 0 -23px;border-radius:50%;background:radial-gradient(circle at 50% 40%,#2a1218,#0a0406);box-shadow:0 0 0 2px #000,0 0 0 3px #8a6a44,0 0 14px #000;display:flex;align-items:center;justify-content:center;transition:transform .15s var(--ezo)}
+.cnode i{font-style:normal;font-family:var(--serif);font-size:17px;color:#f0e2cc}
+.cnode b{position:absolute;top:100%;margin-top:5px;left:50%;width:96px;margin-left:-48px;font:400 10.5px/1.15 var(--serif);letter-spacing:.04em;color:#d8ccb4;text-shadow:0 1px 2px #000,0 0 6px #000;text-align:center}
+.cnode.boss{width:60px;height:60px;margin:-30px 0 0 -30px;background:var(--bimg) center/cover,#0a0406;box-shadow:0 0 0 2px #000,0 0 0 3px #c0182e,0 0 18px #c0182e88}
+.cnode.done{box-shadow:0 0 0 2px #000,0 0 0 3px #d8b070,0 0 14px #ffd07055}
+.cnode.done::after{content:"✓";position:absolute;right:-4px;top:-4px;width:17px;height:17px;border-radius:50%;background:#d8b070;color:#140c04;font:700 11px/17px system-ui;text-align:center;box-shadow:0 0 0 2px #000}
+.cnode.lock{opacity:.42}.cnode.lock.boss{background:#0a0406}.cnode.lock.boss::before{content:"?";font:22px var(--serif);color:#6a5a4a}
+.cnode.sel{transform:scale(1.12)}.cnode.sel::before{content:"";position:absolute;inset:-7px;border-radius:50%;box-shadow:0 0 0 1.5px #ffe0a0,0 0 16px #ffd07088}
+.cdeck span{align-self:center;color:#8a7e6e;font-size:11.5px;letter-spacing:.1em;text-transform:uppercase;margin-right:2px}
+.cdeck button{max-width:40vw;overflow:hidden}.cdeck button span{color:inherit;text-transform:none;letter-spacing:.04em;font-size:calc(12px * var(--fit,1));white-space:nowrap;margin:0}
+.chp{width:min(100%,520px);padding:12px 14px!important;text-align:left}
+.chp h3{margin:0 0 6px;text-align:left;color:#e8d8bc;letter-spacing:.1em}
+.chp .story{font-style:italic;color:#c8bcaa;font-size:13px;line-height:1.45;margin:4px 0}
+.chp .story.post{color:#b0a490;border-left:2px solid #8a6a44;padding-left:8px}
+.crule{margin:8px 0;padding:6px 9px;background:#1a0608aa;box-shadow:inset 0 0 0 1px #5a1a20;font-size:12.5px;line-height:1.35}.crule p{margin:2px 0}.crule b{color:#ff8a8a}
+.crw{display:flex;flex-wrap:wrap;gap:4px 12px;justify-content:space-between;font-size:12px;color:#a89c8c;margin:6px 0 0}.crw b{color:#f0e2cc}.rc{color:#ffd88a!important}
+.chp .rowb{margin-top:10px}
+#ovx{max-width:min(340px,86vw)}.ovst{font-style:italic;color:#c8bcaa;font-size:12.5px;line-height:1.4;margin:6px 0}.ovcr,.ovq{font-size:12.5px;color:#e8d8bc;margin:4px 0}.ovq{color:#a0e8b0}
+.hero.boss .av{background-size:cover;background-position:center}
+/* quests */
+.qcal{display:grid;grid-template-columns:repeat(7,1fr);gap:5px;width:min(100%,520px)}
+.qd{position:relative;display:flex;flex-direction:column;align-items:center;gap:3px;padding:7px 2px;border-radius:3px;background:#0a0708;box-shadow:inset 0 0 0 1px #3a3028;font-size:11px;color:#a89c8c;min-width:0}
+.qd small{font-size:9.5px;letter-spacing:.06em;text-transform:uppercase}.qd b{font-weight:600;color:#e8dcc8;font-size:11px;display:flex;flex-direction:column;align-items:center;gap:2px;white-space:nowrap}
+.qd.now{box-shadow:inset 0 0 0 1.5px #ffd07a,0 0 12px #ffb04a55;background:#1e0e08}.qd.got{opacity:.55}.qd em{position:absolute;top:2px;right:4px;font-style:normal;color:#d8b070}
+.qpk{display:block;width:14px;height:18px;border-radius:2px;background:linear-gradient(160deg,#5a1020,#1a0408);box-shadow:0 0 0 1px #c8a070}
+.qlog{margin:10px 0 0;display:flex;justify-content:center}
+.qnote{color:#8a7e6e;font-size:12px;text-align:center;margin:6px 0;max-width:520px}
+.qlist{display:flex;flex-direction:column;gap:8px;width:min(100%,520px)}
+.qq{padding:10px 12px;border-radius:4px;background:linear-gradient(180deg,#0e0a0be6,#050304f0),var(--panel) center/cover;box-shadow:0 0 0 1px #000,0 0 0 2px #4a3e30 inset}
+.qq.full{box-shadow:0 0 0 1px #000,0 0 0 2px #d8b070 inset,0 0 14px #ffd07033}.qq.cl{opacity:.6}
+.qt{display:flex;justify-content:space-between;gap:10px;align-items:baseline}.qt b{font-family:var(--serif);font-weight:400;font-size:14px;color:#f0e4d0}.qt span{font-size:12px;color:#ffd88a;white-space:nowrap}
+.qq .pbarw{margin:7px 0 5px}.qa{display:flex;justify-content:space-between;align-items:center;min-height:28px}.qa small{color:#a89c8c}.qa em{font-style:normal;color:#8a7e6e;font-size:12px}
+/* stats */
+.stx{width:min(100%,520px);display:flex;flex-direction:column;gap:5px}.stx h3{margin:12px 0 4px}
+.stiles{display:grid;grid-template-columns:repeat(4,1fr);gap:6px}.stiles div{display:flex;flex-direction:column;align-items:center;padding:9px 2px;background:#0a0708;box-shadow:inset 0 0 0 1px #3a3028;border-radius:3px}
+.stiles b{font:400 22px var(--serif);color:#f0e2cc}.stiles small{font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:#8a7e6e}
+.srow{display:grid;grid-template-columns:minmax(0,1.3fr) minmax(0,1fr) 3em 4.5em;gap:8px;align-items:center;font-size:12.5px;color:#d8ccb4;padding:3px 0}
+.srow>span{white-space:nowrap;overflow:hidden;font-size:calc(12.5px * var(--fit,1))}.srow b{text-align:right;color:#f0e2cc}.srow small{color:#8a7e6e;text-align:right}
+.srow:not(:has(.pbarw)){grid-template-columns:minmax(0,1fr) 4em}
+.srow.f-v>span{color:#c8a0ff}.srow.f-m>span{color:#80e8f0}.srow.f-c>span{color:#ff8a9a}
+.shist{display:flex;flex-direction:column;gap:3px}.sh{display:grid;grid-template-columns:22px minmax(0,1fr) auto;gap:8px;align-items:center;font-size:12px;color:#c8bcaa;padding:3px 6px;background:#0a0708;box-shadow:inset 0 0 0 1px #2a2420}
+.sh i{font-style:normal;font-weight:700;text-align:center;border-radius:2px;font-size:11px;line-height:18px}.sh.w i{background:#2a6a3a;color:#d8ffe0}.sh.l i{background:#6a1a24;color:#ffd8dc}.sh.d i{background:#3a3a3a}
+.sh span{white-space:nowrap;overflow:hidden;font-size:calc(12px * var(--fit,1))}.sh small{color:#8a7e6e;white-space:nowrap}
+/* crafting bar */
+.qq .pbarw,.srow .pbarw{height:7px;border-radius:4px;background:#0a0608;box-shadow:0 0 0 1px #000,0 0 0 2px #3a2e22,inset 0 2px 4px #000;overflow:hidden}
+.qq .pbarw i,.srow .pbarw i{display:block;height:100%;background:linear-gradient(90deg,#5a1020,#c0283a,#ffb070)}.srow.f-v .pbarw i{background:linear-gradient(90deg,#3a1870,#a060ff)}.srow.f-m .pbarw i{background:linear-gradient(90deg,#0a4a5a,#40e0f0)}
+.craft{flex:none;width:100%;display:flex;flex-wrap:wrap;align-items:center;justify-content:center;gap:6px 8px;padding:8px 10px calc(8px + env(safe-area-inset-bottom));background:linear-gradient(180deg,#0a0607f4,#040203fa);box-shadow:0 -1px 0 #4a3e30,0 -8px 18px #000a;min-height:52px}
+.craft p{margin:0;font-size:12.5px;color:#a89c8c;text-align:center}
+.cfn{display:flex;flex-direction:column;min-width:0;flex:1 1 140px;overflow:hidden}.cfn b{font:400 calc(14px * var(--fit,1)) var(--serif);color:#f0e4d0;white-space:nowrap}.cfn small{font-size:11px;color:#8a7e6e}
+.cfx{font-size:11.5px;color:#c8a070;flex:1 1 160px}.cfv{flex:0 0 100%}.cfv button{font-size:11px;padding:.35em .7em}
+#cgrid .card.csel{outline:2px solid #ffd07a;outline-offset:2px}
+.lock.cmpl{display:flex;flex-direction:column;align-items:center;font-size:22px;color:#c8a070}.lock.cmpl small{font-size:9px;letter-spacing:.1em;text-transform:uppercase}
+/* cosmetic variants: static frame layer, no images, no blend, no animation */
+.card .vfr{position:absolute;inset:0;border-radius:inherit;pointer-events:none;z-index:5}
+.card.vr-gild .vfr{box-shadow:inset 0 0 0 .16em #f8d888,inset 0 0 0 .3em #6a4810,inset 0 0 0 .36em #ffe7a8aa,inset 0 0 1.4em #ffcf6a44}
+.card.vr-gild .nm span{color:#ffe6a8}
+.card.vr-crimson .vfr{box-shadow:inset 0 0 0 .16em #e02040,inset 0 0 0 .32em #2a0408,inset 0 0 0 .38em #ff607088,inset 0 0 1.6em #ff203055}
+.card.vr-crimson .nm span{color:#ffb8c0}
+.card.vr-void .vfr{box-shadow:inset 0 0 0 .16em #8a50ff,inset 0 0 0 .34em #05000c,inset 0 0 0 .4em #c0a0ff77,inset 0 0 1.8em #6020ff55;background:radial-gradient(.12em .12em at 8% 14%,#fff,transparent),radial-gradient(.1em .1em at 92% 30%,#e0d0ff,transparent),radial-gradient(.12em .12em at 6% 70%,#fff,transparent),radial-gradient(.1em .1em at 94% 86%,#fff,transparent)}
+.card.vr-void .nm span{color:#d8c8ff}
+.card.vr-prism .vfr{border:.2em solid transparent;border-image:linear-gradient(135deg,#ff9af0,#86fff0 25%,#fff0a8 50%,#ffa0c8 75%,#a8bcff) 1;box-shadow:inset 0 0 1.2em #ffffff22}
+.pslot .tag.vr{background:linear-gradient(90deg,#8a5a10,#ffd88a,#8a5a10);color:#1a0e02}
+
+/* ===== v8 tilt fix (RENDERING_RULES.md §10): one rotating 3D container, flat 2D children, light layers move by transform only ===== */
+#zoom .card,#zoom .card.zt{transform-style:flat}
+#zoom .card .art,#zoom .card .foil,#zoom .card .gw,#zoom .card .lg,#zoom .card .lge{transform-style:flat;backface-visibility:visible}
+#zoom .card.zt .foil::after{display:none;animation:none}
+#zoom .card.zt .foil{overflow:hidden}
+#zoom .card.zt .fsh,#zoom .card.zt .glare{will-change:transform}
+#zoom .card.zt .lg .lf{display:none}
+/* a border-radius clip on the full-art layer re-rasterised it on every tilt frame (tests/tiltprobe.py: ~35 paints/s); the same rounded
+   corner as a static clip-path costs nothing while the card rotates */
+#zoom .card.zt.full .art{border-radius:0!important;clip-path:inset(0 round calc(var(--cw)*.06))}
+.pfront .card,.pfront .card *{transform-style:flat}
 </style></head><body>
 <div id="pbg"><i class="pl"></i><i class="pg"></i><i class="pd"></i></div><canvas id="bg"></canvas><div id="fog"><i class="f1"></i><i class="f2"></i></div><div id="vig"></div><div id="grain"></div>
 <button id="mute" aria-label="Toggle sound"></button>
 <section id="title" class="screen on"><canvas id="teye"></canvas>
  <div class="tbox"><h1>HOLLOW<span>STARS</span></h1><div class="orn"></div><p class="sub">a card game of cosmic dread</p>
- <div class="menu"><button class="btn" id="bPlay">Play vs. the Void</button><button class="btn ghost" id="bPacks">Packs</button><button class="btn ghost" id="bBuild">Deck Builder</button><button class="btn ghost" id="bColl">Collection</button><button class="btn ghost" id="bHow">How to Play</button><button class="btn ghost" id="bSet">Settings</button></div></div>
+ <div class="menu hub"><button class="btn" id="bCamp">Campaign</button><button class="btn" id="bPlay">Quick Play</button><button class="btn ghost" id="bBuild">Decks</button><button class="btn ghost" id="bColl">Collection</button><button class="btn ghost" id="bPacks">Packs<i class="bdg" id="bgPk"></i></button><button class="btn ghost" id="bQuest">Quests<i class="bdg" id="bgQ"></i></button><button class="btn ghost" id="bStats">Stats</button><button class="btn ghost" id="bSet">Settings</button></div><button class="hlink" id="bHow">How to Play</button></div></div>
 </section>
-<section id="pick" class="screen"><div class="scroll"><h2>CHOOSE YOUR DECK</h2><div class="orn"></div><div id="decks" class="tiles"></div><h3>OPPONENT</h3><div id="opps" class="seg"></div><div class="rowb"><button class="btn ghost" data-back>Back</button><button class="btn ghost" id="pDecks">My Decks</button><button class="btn" id="bStart">Descend</button></div></div></section>
+<section id="pick" class="screen"><div class="scroll"><h2>CHOOSE YOUR DECK</h2><div class="orn"></div><div id="decks" class="tiles"></div><h3>OPPONENT</h3><div id="opps" class="seg"></div><h3>DIFFICULTY</h3><div id="pdif" class="seg dif"></div><div class="rowb"><button class="btn ghost" data-back>Back</button><button class="btn ghost" id="pDecks">My Decks</button><button class="btn" id="bStart">Descend</button></div></div></section>
 <section id="packs" class="screen"><div class="scroll"><h2>BOOSTER PACKS</h2><div class="orn"></div>
  <div class="pinfo"><span>◆ <b id="pshards">0</b> Shards</span><span>Sealed packs: <b id="pcount">0</b></span></div>
  <div id="psealed" class="pack mini" role="button" aria-label="Open a pack"><i class="psig"></i><b>HOLLOW STARS</b><small>5 cards · 1 rare or better</small></div>
  <p class="pnote" id="pown"></p><p class="pnote">Each pack: 3 Common · 1 Uncommon · 1 Rare (10% chance of a Legendary). Win matches for 60 Shards, lose for 25. Extra copies become Shards.</p>
  <div class="rowb"><button class="btn ghost" data-back>Back</button><button class="btn ghost" id="pBuy">Buy · 100◆</button><button class="btn" id="pOpen">Open Pack</button></div></div></section>
-<section id="coll" class="screen"><div class="bhead"><button class="btn sm ghost" data-back>‹ Back</button><b>COLLECTION</b><span id="cstat"></span></div><div id="cfil" class="seg"></div><div id="cgrid"></div></section>
+<section id="coll" class="screen"><div class="bhead"><button class="btn sm ghost" data-back>‹ Back</button><b>COLLECTION</b><span id="cstat"></span></div><div id="cfil" class="seg"></div><div id="cgrid"></div><div id="craft" class="craft"></div></section>
+<section id="camp" class="screen"><div class="scroll"><h2>CAMPAIGN</h2><div class="orn"></div><div id="ctabs" class="seg ctabs"></div><div class="cwrap"><div id="cmap" class="cmap"></div><div class="cside"><div id="cdif" class="seg"></div><div id="cdeck" class="seg cdeck"></div><div id="chp" class="chp how"></div></div></div><div class="rowb"><button class="btn ghost" data-back>Back</button></div></div></section>
+<section id="quests" class="screen"><div class="scroll"><h2>DAILY RITES</h2><div class="orn"></div><h3>LOGIN CALENDAR</h3><div id="qcal" class="qcal"></div><div id="qlog" class="qlog"></div><h3>TODAY'S QUESTS</h3><div id="qlist" class="qlist"></div><p class="qnote" id="qfoot"></p><div class="rowb"><button class="btn ghost" data-back>Back</button></div></div></section>
+<section id="stats" class="screen"><div class="scroll"><h2>CHRONICLE</h2><div class="orn"></div><div id="stx" class="stx how"></div><div class="rowb"><button class="btn ghost" data-back>Back</button></div></div></section>
 <div id="pstage"><div class="prays"></div><div id="pwrap" class="pack"><i class="psig"></i><b>HOLLOW STARS</b><small>Tap to tear open</small><i class="pseam"></i></div><div class="pburst"></div>
  <div id="prow"></div><div class="pbar"><button class="btn ghost sm" id="pall">Reveal all</button><button class="btn sm" id="pdone">Done</button></div></div>
 <section id="howto" class="screen"><div class="scroll"><h2>HOW TO PLAY</h2><div class="orn"></div><div class="how" id="howtx"></div><div class="rowb"><button class="btn" data-back>Back</button></div></div></section>
@@ -783,7 +915,7 @@ body.land #mydecks .scroll{padding-top:max(8px,env(safe-area-inset-top))}body.la
 <div id="hflash"></div><div id="cin"><div class="crays"></div><div class="cpan"><video muted playsinline loop preload="auto"></video></div><div class="cname"><small></small><b></b></div><div class="cskip">TAP TO SKIP</div></div>
 <div id="settings"><div class="sbox"><h2>SETTINGS</h2><div class="orn"></div><label>Volume <input type="range" id="sVol" min="0" max="100" value="80"></label><label>Mute sound <input type="checkbox" id="sMute"></label><label><span>Quality<small id="sQn"></small></span><select id="sQ"><option value="auto">Auto</option><option value="high">High</option><option value="medium">Medium</option><option value="low">Low (reduce effects)</option></select></label><div class="rowb"><button class="btn" id="sClose">Close</button></div></div></div>
 <div id="banner"></div><div id="preview"></div><div id="zoom"></div><div id="kwtip"></div><div id="toast"></div><div id="dlg" role="dialog" aria-modal="true"><div class="dbox"><b id="dlgT"></b><p id="dlgX"></p><input id="dlgI" maxlength="24" autocomplete="off" enterkeyhint="done" spellcheck="false"><div class="rowb"><button class="btn sm ghost" id="dlgNo">Cancel</button><button class="btn sm" id="dlgOk">OK</button></div></div></div>
-<div id="over"><div class="ovbg"></div><div class="ovbox"><div class="ovsig"></div><h2 id="ovt"></h2><p id="ovp"></p><div id="ovrw"></div><button class="btn" id="ovk" hidden><span>Open a Pack</span></button><div class="rowb"><button class="btn ghost" id="ovm">Menu</button><button class="btn ghost" id="ovr">Play again</button></div></div></div>
+<div id="over"><div class="ovbg"></div><div class="ovbox"><div class="ovsig"></div><h2 id="ovt"></h2><p id="ovp"></p><div id="ovrw"></div><div id="ovx"></div><button class="btn" id="ovk" hidden><span>Open a Pack</span></button><div class="rowb"><button class="btn ghost" id="ovm">Menu</button><button class="btn ghost" id="ovr">Play again</button></div></div></div>
 /* Hollow Stars. RENDERING RULES: read /RENDERING_RULES.md before changing card visuals, animations, video or art.
    (transform/opacity only, no blend modes or animated filters, no class toggling mid-animation or DOM rebuilds, video rules,
    layer budget, image sizes, text auto-fit; new cards must pass tests/cardcheck.py, tests/paintprobe.py and tests/flicker.py) */
@@ -808,12 +940,12 @@ function U(id,n,f,c,a,h,k,r,art,x,fl,o={}){const d=C[id]=Object.assign({id,n,f,t
 function S(id,n,f,c,r,art,x,fl,o={}){C[id]=Object.assign({id,n,f,t:'s',c,k:[],r,art,x,fl},o);COL.push(id)}
 const E=(g,pi)=>g.p[1-pi];
 // ---- The Abyss ----
-U('v1','Drifting Spawn','v',1,1,1,'','C','tent','','It fell between the stars for a thousand years. It is still falling.',{dread:1});
+U('v1','Drifting Spawn','v',1,1,2,'','C','tent','','It fell between the stars for a thousand years. It is still falling.',{dread:1});
 U('v2','Starless Watcher','v',2,1,3,'phase','C','eye','','It does not blink. It has never needed to.');
 U('v3','Whispering Eye','v',2,2,2,'','U','eye','At the start of your turn, the enemy gains 1 Madness.','You hear it best when you try to sleep.',{start:(g,pi)=>addMad(g,1-pi,1)});
 U('v4','Void Leech','v',3,2,3,'phase drain','U','tent','','It drinks the warmth from your memories.');
-U('v5','Tendril of the Deep','v',3,3,4,'guard','C','tent','','Only a fingertip of something vast.');
-U('v6','Choir of Silence','v',4,3,3,'','U','star','','Their hymn has no sound. Your ears bleed anyway.',{dread:2});
+U('v5','Tendril of the Deep','v',3,3,5,'guard','C','tent','','Only a fingertip of something vast.');
+U('v6','Choir of Silence','v',4,3,4,'','U','star','','Their hymn has no sound. Your ears bleed anyway.',{dread:2});
 U('v7','Abyssal Maw','v',5,5,5,'','R','maw','When it arrives, deal 2 damage to all other units.','The station had no airlock on that side. It does now.',{play:(g,pi,u)=>{for(const q of units(g))if(q!==u)hurtU(g,q,2,null)}});
 U('v8','Dreaming Leviathan','v',7,7,8,'guard','R','tent','','When it wakes, the dream that is our universe ends.',{dread:2});
 U('v9','The Unbound Star','v',9,9,9,'phase','L','star','','A sun that remembered it was an eye.',{dread:3});
@@ -891,10 +1023,43 @@ U('c22','Mother of Wounds','c',8,7,7,'drain','L','mother','Start of your turn: s
 S('c23',"Martyr's Pyre",'c',4,'R','pyre','Destroy all your units. For each, deal 2 damage to a random enemy unit (or the enemy).','They burned singing. The smoke sang longer.',PK({cast:(g,pi)=>{const b=g.p[pi].board.filter(x=>x.h>0);for(const q of b)destroy(g,q);for(const q of b)hitRnd(g,pi,2,null)}}));
 U('n7','Salvage Diver','n',2,2,2,'','U','diver','When it arrives, draw a card. You gain 1 Madness.','The wrecks are full of treasure. And of those who came for it.',PK({play:(g,pi)=>{draw(g,pi,1);addMad(g,pi,1)}}));
 S('n8','Last Lifeboat','n',5,'R','lifeboat','Summon three 1/2 Survivors with Guard. Restore 3 Sanity.','Eleven seats. Forty hands on the hatch.',PK({cast:(g,pi)=>{for(let i=0;i<3;i++)summon(g,pi,'tS');healH(g,pi,3)}}));
+// ---- v8 campaign reward cards (cmp: obtainable ONLY by clearing campaign chapters; never in packs, never craftable) ----
+const CP=(f,o={})=>Object.assign({cmp:f},o);
+U('v24','Tidebound Confessor','v',3,2,4,'','U','confessor','When it arrives, restore 2 Sanity.','He confesses every sin of the drowned. His lungs are full of them.',CP('v',{dread:1,play:(g,pi)=>healH(g,pi,2)}));
+U('v25','Lantern-Eel of the Trench','v',4,3,4,'phase','R','eel','End of your turn: if the enemy has 5+ Madness, deal 2 damage to the enemy.','Follow the light. It has your mother\'s face.',CP('v',{end:(g,pi,u)=>{if(E(g,pi).mad>=5)hurtH(g,1-pi,2,u)}}));
+U('v26','Choir of the Sunken Ark','v',5,4,6,'guard','R','sunkchoir','When it arrives, give your other units +1/+1.','Forty sailors, one hull, one endless hymn.',CP('v',{dread:1,play:(g,pi,u)=>{for(const q of g.p[pi].board)if(q!==u){buff(q,1,1);fx(g,{k:'buff',id:'u'+q.uid})}}}));
+U('v27','Mother Below, the Unsurfacing','v',9,8,9,'phase','L','motherbelow','Start of your turn: the enemy gains 1 Madness and each enemy unit takes 1 damage.','The ship was not sinking. The sea was rising to look at it.',CP('v',{dread:2,start:(g,pi,u)=>{addMad(g,1-pi,1);for(const q of E(g,pi).board)hurtU(g,q,1,u)}}));
+U('m24','Cryo-Wake Survivor','m',3,2,4,'salvage','U','cryowake','When it arrives, summon a 1/1 Drone.','It thawed in the wrong order. The cables kept growing.',CP('m',{play:(g,pi)=>summon(g,pi,'tD')}));
+U('m25','Hull-Grafted Sentinel','m',4,2,6,'guard','R','sentinel','End of your turn: deal 1 damage to a random enemy unit (or the enemy).','Plating, servos, and three crewmen who volunteered.',CP('m',{end:(g,pi,u)=>hitRnd(g,pi,1,u)}));
+S('m26','The Last Transmission','m',3,'R','transmission','Draw 2 cards. Summon a 1/1 Drone. Remove 1 Madness.','"...if anyone hears this, do not answer..."',CP('m',{cast:(g,pi)=>{draw(g,pi,2);summon(g,pi,'tD');addMad(g,pi,-1)}}));
+U('m27','ARK-0, the Mourning Fleet','m',9,7,9,'guard','L','ark0','When it arrives, summon two 1/1 Drones. End of your turn: deal 1 damage to a random enemy unit (or the enemy) for each other unit you control (max 4).','A thousand dead ships, one grieving mind.',CP('m',{play:(g,pi)=>{summon(g,pi,'tD');summon(g,pi,'tD')},end:(g,pi,u)=>{const n=Math.min(4,g.p[pi].board.filter(x=>x!==u&&x.h>0).length);for(let i=0;i<n;i++)hitRnd(g,pi,1,u)}}));
+U('c24','Sister of the Seventh Cut','c',2,2,2,'','U','sister','When it arrives, you lose 3 Sanity and it gains +2/+2.','Seven cuts for the seven mouths of God.',CP('c',{play:(g,pi,u)=>{g.p[pi].san-=3;fx(g,{k:'dmg',id:'h'+pi,n:3});buff(u,2,2)}}));
+U('c25','Reliquary Hound','c',4,3,2,'swift blight','R','hound','','Bones of saints, sinew of sinners, appetite of neither.',CP('c'));
+S('c26','Banquet of the Hollowed','c',4,'R','banquet','Sacrifice your weakest unit. Your other units gain +2/+2 and Drain.','The guests are the meal. The meal says grace.',CP('c',{cast:(g,pi)=>{sacrifice(g,pi,null);for(const q of g.p[pi].board)if(q.h>0){buff(q,2,2);if(!q.k.includes('drain'))q.k.push('drain');fx(g,{k:'buff',id:'u'+q.uid})}}}));
+U('c27','The Red Sacrament','c',8,6,8,'drain','L','sacrament','Start of your turn: sacrifice your weakest other unit. If you did, this gains +1/+1 and you restore 2 Sanity.','Drink. It is already inside you.',CP('c',{start:(g,pi,u)=>{if(sacrifice(g,pi,u)){buff(u,1,1);healH(g,pi,2);fx(g,{k:'buff',id:'u'+u.uid})}}}));
+// ---- v8 booster-pack cards ----
+U('v28','Barnacle Saint','v',2,1,5,'guard','C','barnacle','','The pilgrimage ended at the bottom. He keeps walking.',PK());
+S('v29','Whisper-Kelp','v',1,'C','kelp','The enemy gains 1 Madness. If they have 4+ Madness, draw a card.','The fronds remember every face they caught.',PK({cast:(g,pi)=>{addMad(g,1-pi,1);if(E(g,pi).mad>=4)draw(g,pi,1)}}));
+U('v30','Gill-Stitched Acolyte','v',3,3,4,'','U','gills','When it arrives, if the enemy has 3+ Madness, it gains +1/+1 and Phase.','The sutures are fresh. The breathing is not.',PK({play:(g,pi,u)=>{if(E(g,pi).mad>=3){buff(u,1,1);if(!u.k.includes('phase'))u.k.push('phase')}}}));
+U('v31','The Pressure-Born','v',6,5,6,'phase','R','pressure','When it arrives, deal 3 damage to a random enemy unit (or the enemy).','The deep folded its bones inward, gently, for a thousand years.',PK({play:(g,pi,u)=>hitRnd(g,pi,3,u)}));
+U('v32','Hymn That Swallows Light','v',7,6,6,'phase','L','hymn','When it arrives, deal 3 damage to all enemy units.','The lighthouse kept shining. Nothing came back out.',PK({dread:2,play:(g,pi,u)=>{for(const q of E(g,pi).board)hurtU(g,q,3,u)}}));
+U('m28','Scrap-Ghoul','m',2,2,2,'salvage','C','ghoul','','It strips the ship for parts. It started with itself.',PK());
+U('m29','Airlock Hanged Man','m',1,1,1,'guard','C','hanged','When it dies, deal 2 damage to a random enemy unit (or the enemy).','Tethered by his own cable. Still knocking.',PK({death:(g,pi)=>hitRnd(g,pi,2,null)}));
+U('m30','Nanite Plague Doctor','m',3,2,3,'','U','plaguedoc','End of your turn: restore 1 Sanity and deal 1 damage to a random enemy unit (or the enemy).','The cure is also hungry.',PK({end:(g,pi,u)=>{healH(g,pi,1);hitRnd(g,pi,1,u)}}));
+U('m31','Engine-Heart Colossus','m',6,5,5,'guard','R','colossus2','When it dies, deal 2 damage to all enemy units.','Its pilot died at the controls. It kept walking for him.',PK({death:(g,pi)=>{for(const q of E(g,pi).board)hurtU(g,q,2,null)}}));
+U('m32','The Infinite Corridor','m',8,4,7,'guard','L','corridor','Start of your turn: summon a 1/1 Drone and the enemy gains 1 Madness.','Deck 9 goes on forever. The lights go out one by one behind you.',PK({start:(g,pi)=>{summon(g,pi,'tD');addMad(g,1-pi,1)}}));
+U('c28','Bloodletter Novice','c',1,1,2,'drain','C','novice','','The chalice is never full. She keeps trying.',PK());
+U('c29','Hookwife Matron','c',3,3,2,'swift offering','C','hooks','Offering: +2/+1.','She drags the congregation to service.',PK({play:(g,pi,u)=>{if(sacrifice(g,pi,u))buff(u,2,1)}}));
+U('c30','Weeping Flesh-Idol','c',3,0,5,'guard','U','idol','Start of your turn: give a random other friendly unit +1/+1 and restore 1 Sanity.','It weeps for you. It weeps you.',PK({start:(g,pi,u)=>{const b=g.p[pi].board.filter(x=>x!==u&&x.h>0);if(b.length){const t=pick(b);buff(t,1,1);fx(g,{k:'buff',id:'u'+t.uid})}healH(g,pi,1)}}));
+U('c31','The Twice-Born Martyr','c',4,4,3,'','R','martyr','The first time it dies, it returns as a 2/2.','He crawled out of his skin and kept the faith.',PK({death:(g,pi,u)=>{if(u.twice)return;const r=summon(g,pi,'c31');if(r){r.a=2;r.h=r.mh=2;r.twice=1}}}));
+U('c32','Crown of Ten Thousand Teeth','c',8,6,6,'drain','L','crown','End of your turn: deal 1 damage to the enemy and to each enemy unit.','Every tooth a tithe. Every king a mouth.',PK({end:(g,pi,u)=>{for(const q of E(g,pi).board)hurtU(g,q,1,u);hurtH(g,1-pi,1,u)}}));
+U('n9','Void-Salvager','n',2,2,2,'salvage','C','salvager','','His eyes went black on the third wreck. He kept the helmet.',PK());
+U('n10','The Starving Navigator','n',3,2,3,'','U','navigator','When it arrives, draw 2 cards. You gain 2 Madness.','He charts stars that are not there. They are getting closer.',PK({play:(g,pi)=>{draw(g,pi,2);addMad(g,pi,2)}}));
+U('n11','Witness of the Hollow Star','n',4,3,5,'','R','witness','When it arrives, the enemy gains Madness equal to yours (max 3).','The star in her visor has an eye. It saw her first.',PK({play:(g,pi)=>addMad(g,1-pi,Math.min(3,g.p[pi].mad))}));
 U('tD','Drone','m',1,1,1,'','T','drone','','');
 U('tS','Survivor','n',1,1,2,'guard','T','human','','');
 U('tC','Spawnling','c',1,1,1,'','T','spawnling','','');
-const BASE=COL.filter(id=>!C[id].pk),PACK=COL.filter(id=>C[id].pk);
+const BASE=COL.filter(id=>!C[id].pk&&!C[id].cmp),PACK=COL.filter(id=>C[id].pk),CAMPC=COL.filter(id=>C[id].cmp);
 function cardText(d){const k=d.k.filter(k=>k!=='offering'||!/Offering/.test(d.x)).map(k=>k==='dread'?'Dread '+d.dread:KW[k][0]).join(', ');return(k?`<b>${k}.</b> `:'')+(d.x||'').replace(/^Offering:/,'<b>Offering:</b>')}
 function prebuilt(f,pool=BASE){const cards=[];for(const id of pool){const d=C[id];if(d.f!==f)continue;cards.push(id);if(d.r!=='L')cards.push(id)}cards.push('n2','n2','n3','n3','n4');return{fac:f,name:FAC[f].hero,cards}}
 /* ================= RULES ================= */
@@ -904,7 +1069,7 @@ function findU(g,uid){for(const p of g.p)for(const u of p.board)if(u.uid===uid)r
 function resolve(g,t){if(!t)return null;if(t[0]==='h')return{k:'h',pi:+t[1]};const u=findU(g,+t.slice(1));return u?{k:'u',pi:u.o,u}:null}
 function addMad(g,pi,n){const p=g.p[pi],b=p.mad;p.mad=Math.max(0,Math.min(10,p.mad+n));if(p.mad!==b)fx(g,{k:'mad',pi,n:p.mad-b})}
 function healH(g,pi,n){const p=g.p[pi],b=p.san;p.san=Math.min(20,p.san+n);if(p.san>b)fx(g,{k:'heal',id:'h'+pi,n:p.san-b})}
-function hurtH(g,pi,n,src){if(n<=0)return;g.p[pi].san-=n;fx(g,{k:'dmg',id:'h'+pi,n,s:src?src.uid:0,f:src?C[src.id].f:g.sf||null});if(src&&src.k.includes('drain'))healH(g,src.o,n)}
+function hurtH(g,pi,n,src){if(n<=0)return;g.p[pi].san-=n;if(pi===1&&g.st)g.st.dmg+=n;fx(g,{k:'dmg',id:'h'+pi,n,s:src?src.uid:0,f:src?C[src.id].f:g.sf||null});if(src&&src.k.includes('drain'))healH(g,src.o,n)}
 function hurtU(g,u,n,src){if(n<=0||u.dead)return;u.h-=n;fx(g,{k:'dmg',id:'u'+u.uid,n,s:src?src.uid:0,f:src?C[src.id].f:g.sf||null});if(src){if(src.k.includes('blight')&&u.h>0){u.h=0;fx(g,{k:'blight',id:'u'+u.uid})}if(src.k.includes('drain'))healH(g,src.o,n)}}
 function hurt(g,T,n,src){if(T.k==='h')hurtH(g,T.pi,n,src);else hurtU(g,T.u,n,src)}
 function destroy(g,u){u.h=0;u.dead=1}
@@ -922,7 +1087,7 @@ function atkTargets(g,pi,u){const ph=u.k.includes('phase');const e=E(g,pi).board
 function canPlay(g,pi,c){const p=g.p[pi],d=C[c.id];if(g.over||g.cur!==pi||d.c>p.flux)return false;if(d.t==='u')return p.board.length<6;if(d.tg)return spellTargets(g,pi,d.tg).length>0;return true}
 function play(g,pi,huid,tg){const p=g.p[pi],i=p.hand.findIndex(c=>c.uid===huid);if(i<0)return false;const c=p.hand[i],d=C[c.id];if(!canPlay(g,pi,c))return false;
  if(d.tg&&(!tg||!spellTargets(g,pi,d.tg).includes(tg)))return false;
- p.hand.splice(i,1);p.flux-=d.c;g.sf=d.f;fx(g,{k:'play',pi,cid:c.id,tg,uid:c.uid});
+ p.hand.splice(i,1);p.flux-=d.c;g.sf=d.f;if(pi===0&&g.st&&!g.sim){const t=g.st;if(d.t==='s')t.rites++;else t.units++;if(d.r==='L')t.leg++;t.plays[c.id]=(t.plays[c.id]||0)+1}fx(g,{k:'play',pi,cid:c.id,tg,uid:c.uid});
  if(d.t==='u'){const u=mkUnit(g,pi,c.id,c.uid);p.board.push(u);if(d.dread)addMad(g,1-pi,d.dread);if(d.play)d.play(g,pi,u)}
  else{if(tg)fx(g,{k:'spellhit',id:tg,f:d.f});d.cast(g,pi,resolve(g,tg))}
  g.sf=null;cleanup(g);return true}
@@ -930,13 +1095,22 @@ function attack(g,pi,uid,tg){const u=g.p[pi].board.find(x=>x.uid===uid);if(!u||g
  if(T.k==='h')hurtH(g,T.pi,u.a,u);else{const v=T.u,va=v.a;hurtU(g,v,u.a,u);hurtU(g,u,va,v)}
  cleanup(g);return true}
 function startTurn(g){const pi=g.cur,p=g.p[pi];g.turn++;p.max=Math.min(10,p.max+1);p.flux=p.max;for(const u of p.board){u.ready=true;u.atk=0}
- fx(g,{k:'turn',pi});for(const u of p.board.slice()){const d=C[u.id];if(d.start&&u.h>0)d.start(g,pi,u)}
+ fx(g,{k:'turn',pi});for(const u of p.board.slice()){const d=C[u.id];if(d.start&&u.h>0)d.start(g,pi,u)}if(g.rule&&g.rule.length)ruleStart(g,pi);
  if(g.turn>1)draw(g,pi,1);cleanup(g)}
 function endTurn(g){if(g.over)return;const pi=g.cur;for(const u of g.p[pi].board.slice()){const d=C[u.id];if(d.end&&u.h>0)d.end(g,pi,u)}cleanup(g);if(g.over)return;g.cur=1-pi;
  if(g.turn>=120){g.over=true;const s=g.p.map(p=>p.san-p.mad);g.winner=s[0]===s[1]?-1:s[0]>s[1]?0:1;g.reason='time';return}startTurn(g)}
-function newGame(d0,d1,o={}){const g={p:[],cur:0,turn:0,uid:1,fx:[],over:false,winner:null,sim:o.sim?1:0};
+function newGame(d0,d1,o={}){const g={p:[],cur:0,turn:0,uid:1,fx:[],over:false,winner:null,sim:o.sim?1:0,rule:(o.rule||[]).slice(),dif:o.dif||'normal',st:{rites:0,units:0,dmg:0,leg:0,plays:{}}};
  [d0,d1].forEach((d,pi)=>g.p.push({fac:d.fac,name:d.name,deck:shuffle(d.cards.slice()),hand:[],board:[],san:20,mad:0,flux:0,max:0,fat:0,ai:!!(o.ai&&o.ai[pi])}));
- g.cur=o.first??(rnd()<.5?0:1);draw(g,0,5);draw(g,1,5);g.fx=[];startTurn(g);return g}
+ ruleInit(g,o);g.cur=o.first??(rnd()<.5?0:1);draw(g,0,5);draw(g,1,5);g.fx=[];startTurn(g);return g}
+/* v8 chapter rules (campaign) + difficulty edge. Rules are plain strings in g.rule; all effects are ordinary engine calls. */
+function ruleInit(g,o){const R=g.rule,me=g.p[0],en=g.p[1];if(R.includes('mad3'))me.mad=3;if(g.dif==='nightmare')me.mad+=1;if(o.esan)en.san+=o.esan;if(R.includes('surge'))en.max+=1}
+function ruleStart(g,pi){const R=g.rule,p=g.p[pi],bt=Math.floor(g.turn/2);
+ if(pi===1&&R.includes('grow')&&bt%3===0){const b=p.board.filter(x=>x.h>0);if(b.length){const t=b.reduce((a,x)=>x.a+x.h>a.a+a.h?x:a);buff(t,1,1);fx(g,{k:'buff',id:'u'+t.uid})}}
+ if(R.includes('tide')){const t=p.board.find(x=>x.h>0);if(t)hurtU(g,t,1,null)}
+ if(pi===1&&R.includes('fleet')&&bt%3===1)summon(g,1,'tD');
+ if(pi===1&&R.includes('whisper')&&bt%4===3)addMad(g,0,1);
+ if(pi===0&&R.includes('bleed')&&bt%3===2){hurtH(g,0,1,null);healH(g,1,1)}}
+
 /* ================= AI ================= */
 function legal(g,pi){const p=g.p[pi],A=[];if(g.over||g.cur!==pi)return A;
  for(const c of p.hand){const d=C[c.id];if(!canPlay(g,pi,c))continue;if(d.tg)for(const T of spellTargets(g,pi,d.tg))A.push({t:'play',uid:c.uid,tg:T});else A.push({t:'play',uid:c.uid})}
@@ -949,8 +1123,13 @@ const KWV={guard:.8,phase:1.1,blight:1.7,salvage:.9};
 function unitV(u){const d=C[u.id];let v=1+u.a*1.1+Math.max(u.h,0)*.9;for(const k of u.k){v+=KWV[k]||0;if(k==='drain')v+=u.a*.4}if(d.start||d.end)v+=1.8;return v}
 function evalS(g,pi){if(g.over)return g.winner===pi?1e6:g.winner===-1?-1e5:-1e6;const m=g.p[pi],o=g.p[1-pi];let s=sanV(m.san)-sanV(o.san)+madV(o.mad)-madV(m.mad);
  for(const u of m.board)s+=unitV(u);for(const u of o.board)s-=unitV(u);return s+Math.min(m.hand.length,8)*.9-Math.min(o.hand.length,8)*.9}
-function aiChoose(g,pi){const A=legal(g,pi);if(!A.length)return null;const sr=rnd;let best=null,bv=evalS(g,pi)+.05;
- for(const a of A){const c=cloneG(g);act(c,pi,a);const v=evalS(c,pi)+(a.t==='atk'&&a.tg[0]==='h'?.02:0);if(v>bv){bv=v;best=a}}rnd=sr;return best}
+function aiChoose(g,pi,raw){const A=legal(g,pi);if(!A.length)return null;const dif=raw||pi!==1?'normal':g.dif;
+ if(dif==='easy'&&rnd()<.35)return rnd()<.3?null:A[Math.floor(rnd()*A.length)];/* Easy: about a third of its moves are blunders or an early pass */
+ const sr=rnd;let best=null,bv=evalS(g,pi)+.05;const sc=[];
+ for(const a of A){const c=cloneG(g);act(c,pi,a);const v=evalS(c,pi)+(a.t==='atk'&&a.tg[0]==='h'?.02:0);sc.push([v,a,c]);if(v>bv){bv=v;best=a}}
+ if(dif==='nightmare'&&sc.length>1){/* Nightmare: turn-level lookahead: the best 6 first moves are each played out greedily to the end of the turn */
+  sc.sort((x,y)=>y[0]-x[0]);let nb=null,nv=evalS(g,pi)+.05;for(const[,a,c]of sc.slice(0,6)){for(let n=0;n<10&&!c.over;n++){const b=aiChoose(c,pi,1);if(!b)break;act(c,pi,b)}const v=evalS(c,pi);if(v>nv){nv=v;nb=a}}best=nb}
+ rnd=sr;return best}
 function aiTurnSync(g){const pi=g.cur;for(let n=0;n<40&&!g.over;n++){const a=aiChoose(g,pi);if(!a)break;act(g,pi,a)}if(!g.over)endTurn(g)}
 function simulate(f0,f1,first){const g=newGame(typeof f0==='string'?prebuilt(f0):f0,typeof f1==='string'?prebuilt(f1):f1,{ai:[1,1],sim:1,first});for(let n=0;n<300&&!g.over;n++)aiTurnSync(g);return{winner:g.winner,turns:g.turn,reason:g.reason,san:g.p.map(p=>p.san),mad:g.p.map(p=>p.mad),over:g.over}}
 /* Hollow Stars. RENDERING RULES: read /RENDERING_RULES.md before changing card visuals, animations, video or art.
@@ -1897,7 +2076,7 @@ setInterval(vidSync,350);document.addEventListener('visibilitychange',vidSync);
 
 /* ================= SCREENS ================= */
 let cur='title';
-function show(id){cur=id;if(id!=='match'){document.body.classList.remove('mzhi');cinSkip()}setTimeout(auMood,0);$$('.screen').forEach(s=>s.classList.toggle('on',s.id===id));hideZoom();scene();if(id==='pick')renderPick();if(id==='builder')renderBuilder(1);if(id==='mydecks')renderDecks();if(id==='packs')renderPacks();if(id==='coll')renderColl()}
+function show(id){cur=id;if(id!=='match'){document.body.classList.remove('mzhi');cinSkip()}setTimeout(auMood,0);$$('.screen').forEach(s=>s.classList.toggle('on',s.id===id));hideZoom();scene();if(id==='pick')renderPick();if(id==='builder')renderBuilder(1);if(id==='mydecks')renderDecks();if(id==='packs')renderPacks();if(id==='coll')renderColl();v8Show(id)}
 $$('[data-back]').forEach(b=>b.addEventListener('click',()=>{sfx('click');show('title')}));
 $('#bPlay').onclick=()=>{sfx('click');show('pick')};$('#bBuild').onclick=()=>{sfx('click');show('mydecks')};$('#bHow').onclick=()=>{sfx('click');show('howto')};$('#bPacks').onclick=()=>{sfx('click');show('packs')};$('#bColl').onclick=()=>{sfx('click');show('coll')};
 const UI={sel:null,busy:false,auto:/[?&]auto=1/.test(location.search),speed:/[?&]fast=1/.test(location.search)?.12:1,hw:100,hh:140,deck:'v',opp:'r'};
@@ -1914,21 +2093,24 @@ function toast(m,ms=1600){const t=$('#toast');t.textContent=m;t.classList.add('o
    jump. Results are cached by text + box width + font size, so a card size is measured once and every copy reuses it. */
 const FIT={c:new Map(),n:0,min:{nm:.7,ty:.72,dk:.66}};
 function fitEl(e){const m=e.dataset.fit,p=e.parentElement;if(!p||!e.isConnected)return;const box=m==='nm'?p.clientWidth*.92:e.clientWidth;if(box<4)return;
- const k=m+'|'+e.textContent+'|'+Math.round(box)+'|'+getComputedStyle(p).fontSize;let r=FIT.c.get(k);
+ const k=m+'|'+e.textContent+'|'+Math.round(box)+'|'+getComputedStyle(p).fontSize+(m==='nm'&&e.closest('.card.full')?'|F':'');/* full-art names use a larger base size, so they must not share a cache entry */let r=FIT.c.get(k);
  if(!r){if(e.style.getPropertyValue('--fit'))e.style.removeProperty('--fit');e.classList.remove('fit2');FIT.n++;const nat=e.scrollWidth,s=nat>0?box/nat:1,mn=FIT.min[m];
-  r=s>=.995?{f:1}:s>=mn?{f:Math.floor(s*50)/50}:m!=='ty'?{f:Math.max(.56,Math.min(m==='nm'?.84:.8,Math.floor(1.6*s*50)/50)),two:1}:{f:mn};FIT.c.set(k,r)}
+  r=s>=.995?{f:1}:s>=mn?{f:Math.floor(s*50)/50}:m!=='ty'?{f:Math.max(.56,Math.min(m==='nm'?.84:.8,Math.floor(1.6*s*50)/50)),two:1}:{f:mn};
+  /* two-line estimate assumes an even break; an uneven one ("Crown of Ten Thousand / Teeth") can still overflow, so verify once and step down (cached after) */
+  if(r.two){e.classList.add('fit2');for(let i=0;i<6;i++){e.style.setProperty('--fit',String(r.f));if(e.scrollWidth<=Math.ceil(e.clientWidth)+1||r.f<=.5)break;r.f=Math.round((r.f-.04)*100)/100}}
+  FIT.c.set(k,r)}
  const fv=r.f===1?'':String(r.f);if(e.style.getPropertyValue('--fit')!==fv){if(fv)e.style.setProperty('--fit',fv);else e.style.removeProperty('--fit')}e.classList.toggle('fit2',!!r.two);e._fitk=k}
 FIT.ro=new ResizeObserver(es=>{for(const en of es){const b=en.target;if(!b.isConnected){FIT.ro.unobserve(b);continue}for(const e of b._fit||[])fitEl(e)}});
 function fitScan(root){for(const e of root.querySelectorAll('[data-fit]')){if(e._fw)continue;e._fw=1;const b=e.parentElement;(b._fit||(b._fit=[])).push(e);FIT.ro.observe(b)}}
 function fitRefresh(root=document){for(const e of root.querySelectorAll('[data-fit]'))if(e._fw)fitEl(e)}
 function cardEl(id,big){const d=C[id],e=document.createElement('div');e.className=`card f-${d.f} r-${d.r}${d.r==='L'?' full':''}${d.t==='s'?' spell':''}${cardText(d).replace(/<[^>]+>/g,'').length>46?' long':''}`;e.dataset.cid=id;
- e.innerHTML=`<div class="art" style="background-image:${artBG(id,big)}">${lgHTML(id,big)}</div>${costHTML(d.c)}<div class="nm"><span data-fit="nm">${d.n}</span></div><div class="ty">${sigHTML(d.f)}<span data-fit="ty">${d.t==='u'?FAC[d.f].s:'Rite'}</span>${setHTML(d.r)}${d.r==='L'?'<i class="lgem"><b></b></i>':''}</div><div class="tx"><div class="rt">${cardText(d)}</div>${d.fl?`<div class="fl">${d.fl}</div>`:''}</div>${d.t==='u'?'<i class="plq l"></i><i class="plq r"></i>'+atkHTML(d.f,d.a)+hpHTML(d.h):''}${d.r==='R'||d.r==='L'?'<i class="foil"></i>':''}${lgTrim(id)}`;lgReg(e);fitScan(e);return e}
+ e.innerHTML=`<div class="art" style="background-image:${artBG(id,big)}">${lgHTML(id,big)}</div>${costHTML(d.c)}<div class="nm"><span data-fit="nm">${d.n}</span></div><div class="ty">${sigHTML(d.f)}<span data-fit="ty">${d.t==='u'?FAC[d.f].s:'Rite'}</span>${setHTML(d.r)}${d.r==='L'?'<i class="lgem"><b></b></i>':''}</div><div class="tx"><div class="rt">${cardText(d)}</div>${d.fl?`<div class="fl">${d.fl}</div>`:''}</div>${d.t==='u'?'<i class="plq l"></i><i class="plq r"></i>'+atkHTML(d.f,d.a)+hpHTML(d.h):''}${d.r==='R'||d.r==='L'?'<i class="foil"></i>':''}${lgTrim(id)}`;{const vr=varShow(id);if(vr){e.classList.add('vr','vr-'+vr);e.insertAdjacentHTML('beforeend','<i class="vfr"></i>')}}lgReg(e);fitScan(e);return e}
 /* ---- pick ---- */
 const SH={win:60,loss:25,pack:100,dup:{C:5,U:15,R:40,L:150},free:3};
 const maxC=id=>C[id].r==='L'?1:2;
 let COLL=(()=>{try{const o=JSON.parse(localStorage.getItem('hsCol')||'null');if(o&&o.v===1&&o.own)return o}catch(e){}return{v:1,own:{},shards:0,packs:SH.free,opened:0}})();
 function saveColl(){try{localStorage.setItem('hsCol',JSON.stringify(COLL))}catch(e){}}
-const owned=id=>C[id].pk?(COLL.own[id]||0):maxC(id);
+const owned=id=>C[id].pk||C[id].cmp?(COLL.own[id]||0):maxC(id);
 /* ================= CUSTOM DECKS (v7.4): up to 5 named decks in localStorage.hsDecks = {v:1,decks:[{id,name,fac,cards}]} =================
    The single v7.x deck (localStorage.hsDeck) is migrated into slot 1 on first load. A deck can be saved at any size; only valid ones
    (30 cards, copy limits, owned) can be picked for a match. */
@@ -1973,10 +2155,10 @@ $('#dNew').onclick=async()=>{if(DK.decks.length>=DKMAX){sfx('err');toast('5 deck
  const d={id:dkId(),name:v,fac:'v',cards:[]};DK.decks.push(d);saveDecks();bdOpen(d.id)};
 /* ================= MATCH ================= */
 let G=null,LAST=null;
-function startMatch(mine,of,o={}){LAST={mine,of};G=newGame(mine,prebuilt(of),{ai:[UI.auto?1:0,1],first:o.first});UI.sel=null;UI.busy=false;UI.aiRun=false;UI.overShown=0;UI.cin=null;$('#cin').className='';MZ.me=MZ.op=-1;LB.drips=[];LB.pools=[];BG.rip=[];$$('.whisp').forEach(w=>w.remove());{const l=isLand()?'':'_p';scPre(['victory'+l,'defeat'+l])}
+function startMatch(mine,of,o={}){LAST={mine,of,o};const dif=o.dif||V8.dif;G=newGame(mine,o.foe||prebuilt(of),{ai:[UI.auto?1:0,1],first:o.first,rule:o.rule,esan:o.esan,dif});G.meta={mode:o.ch?'camp':'quick',ch:o.ch||null,dif,deck:mine.name||mine.fac,dkey:o.dkey||UI.deck,boss:o.boss||null};UI.sel=null;UI.busy=false;UI.aiRun=false;UI.overShown=0;UI.cin=null;$('#cin').className='';MZ.me=MZ.op=-1;LB.drips=[];LB.pools=[];BG.rip=[];$$('.whisp').forEach(w=>w.remove());{const l=isLand()?'':'_p';scPre(['victory'+l,'defeat'+l])}
  for(const id of['#opb','#myb','#hand'])$(id).innerHTML='';$('#over').classList.remove('on');show('match');
- for(const pi of[0,1]){const el=$(pi?'#oph':'#myh'),p=G.p[pi];el.className=`hero f-${p.fac}`;el.querySelector('.av').style.backgroundImage=heroBG(p.fac);el.querySelector('.hn').textContent=pi?p.name:(UI.auto?'Autopilot — ':'You — ')+FAC[p.fac].n;el.querySelector('.md').innerHTML='<i></i>'.repeat(10)+'<span>MADNESS</span>';el.querySelector('.fx').innerHTML='<i></i>'.repeat(10);el.querySelector('.san').textContent=''}
- renderMatch();flushFx();if(G.p[G.cur].ai)runAI()}
+ for(const pi of[0,1]){const el=$(pi?'#oph':'#myh'),p=G.p[pi];el.className=`hero f-${p.fac}`;el.querySelector('.av').style.backgroundImage=pi&&o.boss?`url(${realArt(o.boss)}),${heroBG(p.fac)}`:heroBG(p.fac);el.classList.toggle('boss',!!(pi&&o.boss));el.querySelector('.hn').textContent=pi?p.name:(UI.auto?'Autopilot — ':'You — ')+FAC[p.fac].n;el.querySelector('.md').innerHTML='<i></i>'.repeat(10)+'<span>MADNESS</span>';el.querySelector('.fx').innerHTML='<i></i>'.repeat(10);el.querySelector('.san').textContent=''}
+ renderMatch();flushFx();v8MatchStart(G);if(G.p[G.cur].ai)runAI()}
 function heroBox(pi){return $(pi?'#oph':'#myh')}
 function renderHero(pi){const p=G.p[pi],el=heroBox(pi);const s=el.querySelector('.san');s.textContent=Math.max(0,p.san);s.classList.toggle('low',p.san<=7);
  el.querySelectorAll('.md i').forEach((e,i)=>{e.classList.toggle('on',i<p.mad);e.classList.toggle('hi',i<p.mad&&p.mad>=7)});el.querySelector('.fv').textContent=`${p.flux}/${p.max} FLUX`;el.querySelectorAll('.fx i').forEach((e,i)=>{const c=i<p.flux?'on':i<p.max?'sp':'lk';if(e.className!==c)e.className=c});
@@ -2045,21 +2227,22 @@ function setSel(s){UI.sel=s;renderMatch()}
 async function humanPlay(uid,tg){if(UI.busy||G.cur!==0)return;UI.sel=null;const ok=apply(()=>play(G,0,uid,tg));if(!ok){sfx('err');return}if(UI.cin){UI.busy=true;renderMatch();const g=G;await UI.cin;if(G===g){UI.busy=false;renderMatch()}}}
 async function humanAtk(uid,tg){if(UI.busy||G.cur!==0)return;UI.sel=null;UI.busy=true;renderMatch();await lunge(uid,tg,()=>attack(G,0,uid,tg));UI.busy=false;renderMatch()}
 $('#endt').onclick=()=>{if(!G||G.cur!==0||UI.busy||G.over||G.p[0].ai)return;sfx('endt');UI.sel=null;apply(()=>endTurn(G));runAI()};
-$('#quit').onclick=()=>{sfx('click');G=null;UI.aiRun=false;show('title')};
+$('#quit').onclick=()=>{sfx('click');const back=G&&G.meta&&G.meta.mode==='camp'?'camp':'title';G=null;UI.aiRun=false;show(back)};
 function gameOver(){if(!G)return;cinSkip();const g=G,w=g.winner,me=w===0,ov=$('#over');g.ovq=1;UI.overShown=1;
  $('#ovt').textContent=w===-1?'STALEMATE':me?(UI.auto?'AUTOPILOT WINS':'VICTORY'):'DEFEAT';
  $('#ovp').textContent=w===-1?'Both minds were lost to the dark.':g.reason==='mad'?(me?'The enemy\'s mind shattered under ten Madness.':'Ten Madness. Your mind is no longer your own.'):g.reason==='time'?'The stars burned out before either side fell.':(me?'Their Sanity is gone. The void claims them.':'Your Sanity is gone. The void claims you.');
- let earned=0;try{if(!UI.auto&&!g.paid){g.paid=1;earned=me?SH.win:SH.loss;COLL.shards=(+COLL.shards||0)+earned;saveColl()}else if(g.paid)earned=g.paid===1?(me?SH.win:SH.loss):0}catch(e){console.warn('reward',e)}
- try{ovRewards(earned)}catch(e){console.warn('rewards ui',e)}
+ let earned=0;try{if(!UI.auto&&!g.paid){g.paid=1;earned=Math.round((me?SH.win:SH.loss)*difMul(g.dif));COLL.shards=(+COLL.shards||0)+earned;saveColl();g.earned=earned}else if(g.paid)earned=g.earned||0}catch(e){console.warn('reward',e)}
+ let x8=null;try{if(!UI.auto)x8=v8MatchEnd(g)}catch(e){console.warn('v8 end',e)}
+ try{ovRewards(earned)}catch(e){console.warn('rewards ui',e)}try{v8Over(g,x8)}catch(e){console.warn('v8 over',e)}
  const ok=me?'victory':'defeat',ovk=ok+(isLand()?'':'_p');ov.style.setProperty('--ovimg',SC.st[ovk]===2?'none':`url(${uiArt(ovk)})`);
  ov.dataset.winner=w;ov.classList.remove('win','lose','draw');ov.classList.add('on',w===-1?'draw':me?'win':'lose');sfx(me?'win':'lose')}
 function ovRewards(earned){const box=$('#ovrw'),k=$('#ovk'),sh=COLL.shards,pk=COLL.packs,need=Math.max(0,SH.pack-sh);
  box.innerHTML=UI.auto?'<small>Autopilot matches earn no Shards.</small>':`<div class="earn">${earned?'+'+earned+' Shards':'No Shards'}</div><div class="bal"><span class="shard"></span><b>${sh}</b> Shards${pk?` · <b>${pk}</b> sealed pack${pk>1?'s':''}`:''}</div><div class="pbarw"><i style="width:${Math.min(100,sh/SH.pack*100).toFixed(0)}%"></i></div><small>${pk?'A sealed pack awaits you.':need?need+' more Shards for a booster pack':'You can afford a booster pack.'}</small>`;
  const can=!UI.auto&&(pk>0||sh>=SH.pack);k.hidden=!can;k.querySelector('span').textContent=pk>0?'Open a Pack':'Buy & Open Pack · '+SH.pack+'◆'}
-$('#ovm').onclick=()=>{sfx('click');ovHide();G=null;show('title')};
+$('#ovm').onclick=()=>{sfx('click');ovHide();const back=G&&G.meta&&G.meta.mode==='camp'?'camp':'title';G=null;show(back)};
 function ovHide(){const o=$('#over');o.classList.remove('on','win','lose','draw')}
 $('#ovk').onclick=()=>{sfx('click');const buy=COLL.packs<=0;if(buy){if(COLL.shards<SH.pack){sfx('err');return}COLL.shards-=SH.pack;COLL.packs++;saveColl()}ovHide();G=null;show('packs');PO.ret=1;startOpen()};
-$('#ovr').onclick=()=>{sfx('click');ovHide();startMatch(LAST.mine,LAST.of)};
+$('#ovr').onclick=()=>{sfx('click');ovHide();startMatch(LAST.mine,LAST.of,LAST.o||{})};
 /* ================= INPUT ================= */
 let P=null,lpJust=0;
 function myTurn(){return G&&cur==='match'&&G.cur===0&&!G.over&&!UI.busy&&!UI.cin&&!G.p[0].ai}
@@ -2141,7 +2324,7 @@ document.addEventListener('click',e=>{if(lpJust&&!e.target.closest('#bgrid'))lpJ
 /* ================= COLLECTION & PACKS ================= */
 function rollPack(r=Math.random){const by=k=>PACK.filter(id=>C[id].r===k),pk=a=>a[Math.floor(r()*a.length)];
  const out=[pk(by('C')),pk(by('C')),pk(by('C')),pk(by('U')),pk(r()<.1?by('L'):by('R'))];return out}
-function grant(ids){const res=[];for(const id of ids){const n=COLL.own[id]||0;if(n>=maxC(id)){const s=SH.dup[C[id].r];COLL.shards+=s;res.push({id,dup:s})}else{COLL.own[id]=n+1;res.push({id,dup:0,nw:n===0})}}COLL.opened++;saveColl();return res}
+function grant(ids,vr){const res=[];for(const id of ids){const v=vr===false?null:varRoll(id);const n=COLL.own[id]||0;if(n>=maxC(id)){const s=v?0:SH.dup[C[id].r];COLL.shards+=s;res.push({id,dup:s,vr:v})}else{COLL.own[id]=n+1;res.push({id,dup:0,nw:n===0,vr:v})}if(v)varAdd(id,v)}COLL.opened++;saveColl();return res}
 function openPack(){if(COLL.packs<=0)return null;COLL.packs--;const ids=PO.force||rollPack();PO.force=null;return grant(ids)}
 function renderPacks(){$('#pshards').textContent=COLL.shards;$('#pcount').textContent=COLL.packs;$('#pOpen').disabled=COLL.packs<=0;$('#pBuy').disabled=COLL.shards<SH.pack;
  const own=PACK.filter(id=>owned(id)).length;$('#pown').textContent=`${own}/${PACK.length} pack cards discovered`;$('#psealed').classList.toggle('none',COLL.packs<=0)}
@@ -2150,7 +2333,7 @@ const PO={res:null,stage:0};
 $('#pOpen').onclick=()=>startOpen();$('#psealed').onclick=()=>startOpen();
 function startOpen(){const res=openPack();if(!res){sfx('err');toast('No packs: earn Shards in matches');return}PO.res=res;PO.stage=1;const st=$('#pstage');st.className='on sealed';
  const row=$('#prow');row.innerHTML='';res.forEach((o,i)=>{const s=document.createElement('div');s.className='pslot r-'+C[o.id].r;s.style.setProperty('--i',i);s.dataset.i=i;
-  s.innerHTML=`<div class="pin"><div class="pback"></div><div class="pfront"></div></div>`;s.querySelector('.pfront').appendChild(cardEl(o.id));if(o.dup)s.insertAdjacentHTML('beforeend',`<span class="tag dup">DUPLICATE +${o.dup}◆</span>`);else if(o.nw)s.insertAdjacentHTML('beforeend','<span class="tag nw">NEW</span>');row.appendChild(s)});
+  s.innerHTML=`<div class="pin"><div class="pback"></div><div class="pfront"></div></div>`;s.querySelector('.pfront').appendChild(varEl(cardEl(o.id),o.vr));if(o.vr)s.insertAdjacentHTML('beforeend',`<span class="tag vr">${VARN[o.vr]}</span>`);else if(o.dup)s.insertAdjacentHTML('beforeend',`<span class="tag dup">DUPLICATE +${o.dup}◆</span>`);else if(o.nw)s.insertAdjacentHTML('beforeend','<span class="tag nw">NEW</span>');row.appendChild(s)});
  $('#pdone').classList.remove('on');sfx('click');renderPacks()}
 $('#pwrap').onclick=e=>{e.stopPropagation();if(PO.stage!==1)return;PO.stage=2;const st=$('#pstage');st.classList.add('tear');sfx('tear');packTearFx();setTimeout(()=>{st.classList.remove('sealed','tear');st.classList.add('dealt')},900)};
 function flip(s){if(!s||s.classList.contains('up'))return;s.classList.add('up');const r=C[PO.res[+s.dataset.i].id].r;setTimeout(()=>flipFx(s,r),260);
@@ -2163,8 +2346,8 @@ const CV={f:'all',pk:0};
 function renderColl(){const fb=$('#cfil');fb.innerHTML='';for(const[k,n]of[['all','All'],['v','Abyss'],['m','Derelict'],['c','Communion'],['n','Wanderers'],['pk','Pack only']]){const b=document.createElement('button');b.textContent=n;b.className=(k==='pk'?CV.pk:CV.f===k)?'on':'';b.onclick=()=>{sfx('click');if(k==='pk')CV.pk^=1;else CV.f=k;renderColl()};fb.appendChild(b)}
  const gr=$('#cgrid'),fo={v:0,m:1,c:2,n:3};gr.innerHTML='';let tot=0,have=0;
  for(const id of COL.slice().sort((a,b)=>fo[C[a].f]-fo[C[b].f]||(C[a].pk||0)-(C[b].pk||0)||C[a].c-C[b].c)){tot++;const n=owned(id);if(n)have++;if(CV.f!=='all'&&C[id].f!==CV.f)continue;if(CV.pk&&!C[id].pk)continue;
-  const e=cardEl(id);if(!n){e.classList.add('locked');e.insertAdjacentHTML('beforeend','<div class="lock">?</div>')}else e.insertAdjacentHTML('beforeend',`<div class="cnt">×${n}</div>`);gr.appendChild(e)}
- $('#cstat').innerHTML=`<b>${have}</b>/${tot} cards · <b>${COLL.shards}</b> Shards`}
+  const e=cardEl(id);if(!n){e.classList.add('locked');e.insertAdjacentHTML('beforeend',C[id].cmp?'<div class="lock cmpl">⚑<small>Campaign</small></div>':'<div class="lock">?</div>')}else e.insertAdjacentHTML('beforeend',`<div class="cnt">×${n}</div>`);gr.appendChild(e)}
+ $('#cstat').innerHTML=`<b>${have}</b>/${tot} cards · <b>${COLL.shards}</b> Shards`;craftSync()}
 /* ================= HOW TO ================= */
 $('#howtx').innerHTML=`<p>You are a mind adrift in the dark between stars. Break your opponent before the void breaks you.</p>
 <p><b>Winning.</b> Each side starts with <b>20 Sanity</b>. Reduce the enemy's Sanity to 0, <i>or</i> drive them to <b>10 Madness</b>: their mind shatters and they lose.</p>
@@ -2339,23 +2522,36 @@ function tiltOff(){const el=TL.el;if(!el)return;el.style.transform='';el.style.r
    Transform-only (card rotate, art parallax, glare + foil light layers translate), one rAF loop that runs only while the view is open.
    Axes are remapped by screen orientation so it feels the same in portrait and landscape. (v7 drove a page-wide CSS var from the
    sensor at ~60 Hz, which restyled and repainted every card on screen: removed.) */
-const ZT={c:null,raf:0,tx:0,ty:0,x:0,y:0,base:null,sens:0,fing:0,ev:0};
+const ZTMAX=13;const ZT={c:null,raf:0,tx:0,ty:0,x:0,y:0,base:null,sens:0,fing:0,ev:0};
 function scrAngle(){const a=screen.orientation&&typeof screen.orientation.angle==='number'?screen.orientation.angle:(typeof window.orientation==='number'?window.orientation:0);return((a%360)+360)%360}
 function orient(e){if(e.gamma==null||e.beta==null)return;ZT.ev++;const a=scrAngle();let x,y;
  if(a===90){x=e.beta;y=-e.gamma}else if(a===270){x=-e.beta;y=e.gamma}else if(a===180){x=-e.gamma;y=-e.beta}else{x=e.gamma;y=e.beta}
  TL.ox=x;TL.oy=y;if(!ZT.c)return;if(!ZT.base||ZT.base.a!==a)ZT.base={x,y,a};const k=v=>Math.max(-1,Math.min(1,v/22));
  ZT.sens=performance.now();if(performance.now()-ZT.fing>600){ZT.tx=k(x-ZT.base.x);ZT.ty=k(y-ZT.base.y)}ztKick()}
-function ztOpen(card){ZT.c=card;ZT.base=null;ZT.x=ZT.y=ZT.tx=ZT.ty=0;if(LG.rm.matches)return;card.classList.add('zt');const f=card.querySelector('.foil');if(f&&!f.querySelector('.fsh'))f.insertAdjacentHTML('beforeend','<i class="fsh"></i>');
- const art=card.querySelector('.art');if(art&&!art.querySelector('.ap')){const ap=document.createElement('i');ap.className='ap';ap.style.backgroundImage=art.style.backgroundImage;art.prepend(ap)}ztKick()}
-function ztClose(){ZT.c=null;ZT.base=null;if(ZT.raf){cancelAnimationFrame(ZT.raf);ZT.raf=0}}
+function ztOpen(card){ZT.c=card;ZT.base=null;ZT.x=ZT.y=ZT.tx=ZT.ty=0;ZT.sw=0;ZT.t0=0;ZT.fing=ZT.sens=performance.now();ZT.v={ry:0,rx:0,art:''};if(LG.rm.matches)return;card.classList.add('zt');const f=card.querySelector('.foil');if(f&&!f.querySelector('.fsh'))f.insertAdjacentHTML('beforeend','<i class="fsh"></i>');
+ const art=card.querySelector('.art');if(art&&!art.querySelector('.ap')){const ap=document.createElement('i');ap.className='ap';ap.style.backgroundImage=art.style.backgroundImage;art.prepend(ap)}
+ /* every moving layer is driven by paused Web Animations (composite:'add') whose currentTime the rAF sets: the compositor treats them as
+    transform animations (unbounded cull rect), so tilting never re-records paint; inline style.transform from JS re-painted the art,
+    the lp layer and the card frame on every frame (tests/tiltprobe.py) */
+ const A=ZT.an={},mk=(el,a,b)=>{if(!el)return null;const n=el.animate([{transform:a},{transform:b}],{duration:1000,fill:'both',composite:'add'});n.pause();n.currentTime=500;return n};
+ card.style.transform='perspective(900px)';A.ry=mk(card,`rotateY(${-ZTMAX}deg)`,`rotateY(${ZTMAX}deg)`);A.rx=mk(card,`rotateX(${ZTMAX}deg)`,`rotateX(${-ZTMAX}deg)`);
+ const pa=card.querySelector('.lg')||card.querySelector('.ap');if(pa){pa.style.transform='scale(1.07)';A.ax=mk(pa,'translate3d(3.2%,0,0)','translate3d(-3.2%,0,0)');A.ay=mk(pa,'translate3d(0,2.4%,0)','translate3d(0,-2.4%,0)')}
+ const gl=card.querySelector('.glare');A.gx=mk(gl,'translate3d(-37.6%,0,0)','translate3d(37.6%,0,0)');A.gy=mk(gl,'translate3d(0,-28%,0)','translate3d(0,28%,0)');
+ const fs=card.querySelector('.fsh');A.fx=mk(fs,'translate3d(54%,0,0)','translate3d(-54%,0,0)');A.fy=mk(fs,'translate3d(0,30%,0)','translate3d(0,-30%,0)');ztKick()}
+function ztClose(){if(ZT.an)for(const k in ZT.an)ZT.an[k]&&ZT.an[k].cancel();ZT.an=null;ZT.c=null;ZT.base=null;if(ZT.raf){cancelAnimationFrame(ZT.raf);ZT.raf=0}}
 function ztFinger(nx,ny){if(!ZT.c)return;ZT.fing=performance.now();ZT.tx=nx;ZT.ty=ny;ztKick()}
 function ztKick(){if(!ZT.raf&&ZT.c&&!LG.rm.matches)ZT.raf=requestAnimationFrame(ztFrame)}
-function ztFrame(){ZT.raf=0;const c=ZT.c;if(!c||!c.isConnected){ZT.c=null;return}ZT.x+=(ZT.tx-ZT.x)*.22;ZT.y+=(ZT.ty-ZT.y)*.22;const x=ZT.x,y=ZT.y;
- c.style.transform=`perspective(900px) rotateY(${(x*12).toFixed(2)}deg) rotateX(${(-y*12).toFixed(2)}deg)`;
- const art=c.querySelector('.lg')||c.querySelector('.ap');if(art)art.style.transform=`translate3d(${(-x*3.2).toFixed(2)}%,${(-y*2.4).toFixed(2)}%,0) scale(1.07)`;
- const gl=c.querySelector('.glare');if(gl)gl.style.transform=`translate3d(${(x*28).toFixed(1)}%,${(y*28).toFixed(1)}%,0)`;
- const fs=c.querySelector('.fsh');if(fs)fs.style.transform=`translate3d(${(-x*30).toFixed(1)}%,${(-y*30).toFixed(1)}%,0)`;
- if(Math.abs(ZT.tx-x)+Math.abs(ZT.ty-y)>.002)ZT.raf=requestAnimationFrame(ztFrame)}
+/* v8 tilt (RENDERING_RULES.md §10): ONE 3D element (the card) rotates, clamped to ±ZTMAX deg; everything inside is flat 2D.
+   The light is a pre-rendered oversized gradient (.fsh in the foil, .glare in an overflow-clipped .gw) that only translates.
+   There is no CSS sweep on a tilting card: this one rAF value drives both the tilt light and, after 1.2 s without input, a slow
+   idle sweep of the same layer, so no keyframe animation and no JS transform ever fight over one element. */
+const ztT=(a,v)=>{if(a){const t=Math.round((Math.max(-1,Math.min(1,v))+1)*500);if(a.currentTime!==t)a.currentTime=t}};
+function ztFrame(t){ZT.raf=0;const c=ZT.c;if(!c||!c.isConnected){ZT.c=null;return}ZT.x+=(ZT.tx-ZT.x)*.2;ZT.y+=(ZT.ty-ZT.y)*.2;
+ const x=Math.max(-1,Math.min(1,ZT.x)),y=Math.max(-1,Math.min(1,ZT.y)),now=t||performance.now(),idle=now-Math.max(ZT.fing,ZT.sens)>1200&&!document.body.classList.contains('q-low');
+ if(!ZT.t0)ZT.t0=now;const sw=idle?Math.sin((now-ZT.t0)/9000*Math.PI*2)*.45:0;ZT.sw=(ZT.sw||0)+(sw-(ZT.sw||0))*.05;const w=ZT.sw,A=ZT.an||{};
+ ztT(A.ry,x);ztT(A.rx,y);ztT(A.ax,x);ztT(A.ay,y);ztT(A.gx,x*.75+w*.3);ztT(A.gy,y);ztT(A.fx,x*.55-w);ztT(A.fy,y);
+ ZT.v={ry:+(x*ZTMAX).toFixed(2),rx:+(-y*ZTMAX).toFixed(2),art:`translate3d(${(-x*3.2).toFixed(2)}%,${(-y*2.4).toFixed(2)}%,0) scale(1.07)`};
+ if(Math.abs(ZT.tx-x)+Math.abs(ZT.ty-y)>.002||idle||Math.abs(w)>.002)ZT.raf=requestAnimationFrame(ztFrame)}
 if(window.DeviceOrientationEvent)addEventListener('deviceorientation',orient,{passive:true});
 /* ---------- pack opening ---------- */
 function packTearFx(){const el=$('#pwrap'),r=el.getBoundingClientRect(),x=r.left+r.width/2,y=r.top+r.height*.14;shake($('#pstage'),10,500);
@@ -2391,11 +2587,217 @@ $('#settings').addEventListener('click',e=>{if(e.target.id==='settings')$('#sett
 $('#sVol').addEventListener('input',e=>{auInit();AU.vol=+e.target.value/100;localStorage.setItem('hsVol',AU.vol.toFixed(2));auVol()});
 $('#sQ').addEventListener('change',e=>{sfx('click');setQuality(e.target.value)});$('#sMute').addEventListener('change',e=>{auInit();AU.mute=e.target.checked;localStorage.setItem('hsMute',AU.mute?'1':'0');updMute()});
 $('#cin').addEventListener('pointerdown',e=>{e.stopPropagation();cinSkip()},true);
-Object.assign(window.__hs,{sfx,SFX,auVol,vidReady,ZT,ztOpen,ztClose,ztFinger,scrAngle,FX,FXQ,QL,qv,setQuality,qApply,fxLow,setFx,MZ,madSet,whisper,lgCinema,CIN,cinSkip,impact,deathFx,dropFx,tiltHeld,tiltOff,TL,orient,LB,AU,shake});
+Object.assign(window.__hs,{ZTMAX,sfx,SFX,auVol,vidReady,ZT,ztOpen,ztClose,ztFinger,scrAngle,FX,FXQ,QL,qv,setQuality,qApply,fxLow,setFx,MZ,madSet,whisper,lgCinema,CIN,cinSkip,impact,deathFx,dropFx,tiltHeld,tiltOff,TL,orient,LB,AU,shake});
 /* v7.3 keyword tooltip: tap/hover a keyword icon on a unit (long-press still opens the full card) */
 (function(){const tip=$('#kwtip');let tt=0;function show(sv){const k=sv.dataset.k;if(!k||!KW[k])return;tip.innerHTML=`<b>${KW[k][0]}</b> · ${KW[k][1]}`;const r=sv.getBoundingClientRect();
   tip.style.left=Math.max(118,Math.min(innerWidth-118,r.left+r.width/2))+'px';tip.style.top=Math.max(40,r.top)+'px';tip.classList.add('on');clearTimeout(tt);tt=setTimeout(()=>tip.classList.remove('on'),1800)}
  document.addEventListener('pointerdown',e=>{const sv=e.target.closest&&e.target.closest('.kws svg[data-k]');if(sv)show(sv);else tip.classList.remove('on')},true);
  document.addEventListener('pointerover',e=>{if(e.pointerType!=='mouse')return;const sv=e.target.closest&&e.target.closest('.kws svg[data-k]');if(sv)show(sv)})})();
 function ell(x,a,b,rx,ry,r,s,e){x.ellipse(a,b,rx>.01?rx:.01,ry>.01?ry:.01,r,s,e)}
+/* ================= v8: difficulty, campaign, daily quests + login calendar, crafting, cosmetics, stats, menu hub =================
+   Saves: localStorage.hsV8 = {v:1,dif,camp,quests,login,stats}; cosmetics live in hsCol (COLL.var/COLL.show). Every loader fills
+   missing fields with defaults, so v7.x saves load unchanged (migration = additive only). Dates are the device's LOCAL calendar day. */
+const DIFS={easy:{n:'Easy',m:.5,d:'The void hesitates and blunders. Half Shards.'},normal:{n:'Normal',m:1,d:'The void as you know it.'},nightmare:{n:'Nightmare',m:1.6,d:'It plans whole turns ahead and you start with 1 Madness. ×1.6 Shards.'}};
+const difMul=d=>(DIFS[d]||DIFS.normal).m;
+let V8NOW=null;const v8now=()=>V8NOW?new Date(V8NOW):new Date();
+const dayKey=t=>{const d=t||v8now();return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0')};
+const dayAdd=(k,n)=>{const[y,m,d]=k.split('-').map(Number);return dayKey(new Date(y,m-1,d+n,12))};
+const V8D=()=>({v:1,dif:'normal',camp:{},quests:null,login:{last:'',day:0,claimed:''},stats:{games:0,wins:0,losses:0,draws:0,streak:0,best:0,deck:{},fac:{},dif:{},cards:{},hist:[]}});
+function v8Mig(o){const d=V8D();if(!o||typeof o!=='object'||o.v!==1)return d;for(const k of Object.keys(d))if(o[k]===undefined||(o[k]===null&&k!=='quests')||typeof o[k]!==typeof d[k]&&k!=='quests')o[k]=d[k];
+ for(const k of Object.keys(d.stats))if(o.stats[k]===undefined||typeof o.stats[k]!==typeof d.stats[k])o.stats[k]=d.stats[k];if(!Array.isArray(o.stats.hist))o.stats.hist=[];
+ for(const k of Object.keys(d.login))if(o.login[k]===undefined)o.login[k]=d.login[k];if(!DIFS[o.dif])o.dif='normal';return o}
+let V8=(()=>{let o=null;try{o=JSON.parse(localStorage.getItem('hsV8')||'null')}catch(e){}return v8Mig(o)})();
+function saveV8(){try{localStorage.setItem('hsV8',JSON.stringify(V8))}catch(e){}}
+function collMig(){let ch=0;if(!COLL.var||typeof COLL.var!=='object'){COLL.var={};ch=1}if(!COLL.show||typeof COLL.show!=='object'){COLL.show={};ch=1}if(typeof COLL.shards!=='number'){COLL.shards=+COLL.shards||0;ch=1}if(typeof COLL.packs!=='number'){COLL.packs=+COLL.packs||0;ch=1}if(ch)saveColl()}
+collMig();
+const give=rw=>{collMig();COLL.shards+=rw.sh||0;COLL.packs+=rw.pk||0;saveColl()};
+const rwTxt=rw=>[rw.sh?`${rw.sh}◆`:'',rw.pk?(rw.pk>1?rw.pk+' packs':'a pack'):''].filter(Boolean).join(' + ');
+const myDeck=()=>{const d=dkGet(UI.deck);return d&&dkCheck(d).ok?dkDeck(d):prebuilt(['v','m','c'].includes(UI.deck)?UI.deck:'v')};
+const deckLabel=k=>{const d=dkGet(k);return d?d.name:FAC[['v','m','c'].includes(k)?k:'v'].hero};
+
+/* ---------------- cosmetics: ~3% of pack cards come as a variant. CSS-only static frames (no images, no animation, no blend) ---------------- */
+const VARS=['gild','crimson','void','prism'],VARN={gild:'GILDED',crimson:'CRIMSON FRAME',void:'VOID FRAME',prism:'PRISMATIC'},VARP=.03;
+let VARR=Math.random;
+function varRoll(id){if(!C[id]||!C[id].pk)return null;return VARR()<VARP?VARS[Math.min(3,Math.floor(VARR()*4))]:null}
+function varAdd(id,v){collMig();const a=COLL.var[id]||(COLL.var[id]=[]);if(!a.includes(v))a.push(v)}
+const varHas=id=>(COLL.var&&COLL.var[id])||[];
+function varShow(id){const s=COLL.show&&COLL.show[id];return s&&varHas(id).includes(s)&&owned(id)?s:null}
+function varEl(e,v){if(v&&!e.classList.contains('vr')){e.classList.add('vr','vr-'+v);e.insertAdjacentHTML('beforeend','<i class="vfr"></i>')}return e}
+function varSet(id,v){collMig();if(v&&!varHas(id).includes(v))return false;if(v)COLL.show[id]=v;else delete COLL.show[id];saveColl();return true}
+
+/* ---------------- crafting: pack cards only (campaign rewards and starters can't be crafted) ---------------- */
+const CRAFT={C:40,U:100,R:400,L:1600};
+const canCraft=id=>!!(C[id]&&C[id].pk);
+function craft(id){if(!canCraft(id))return{ok:0,why:C[id]&&C[id].cmp?'Campaign cards are earned, not crafted':'Starter cards are always yours'};const n=COLL.own[id]||0;
+ if(n>=maxC(id))return{ok:0,why:'You already own the maximum'};const c=CRAFT[C[id].r];if(COLL.shards<c)return{ok:0,why:`Needs ${c} Shards`};COLL.shards-=c;COLL.own[id]=n+1;saveColl();return{ok:1,cost:c}}
+const inDecks=id=>Math.max(0,...DK.decks.map(d=>d.cards.filter(x=>x===id).length));
+function disenchant(id){if(!canCraft(id))return{ok:0,why:'Only pack cards can be disenchanted'};const n=COLL.own[id]||0;if(n<=0)return{ok:0,why:'You own none'};
+ const g=SH.dup[C[id].r];COLL.own[id]=n-1;if(!COLL.own[id]){delete COLL.own[id];if(COLL.show)delete COLL.show[id]}COLL.shards+=g;saveColl();return{ok:1,gain:g}}
+
+/* ---------------- campaign ---------------- */
+const RULES={mad3:['Frayed Mind','You start with 3 Madness.'],grow:['It Grows','Every third enemy turn, its strongest unit gains +1/+1.'],
+ tide:['The Tide','At the start of every turn, the leftmost unit of the side whose turn it is takes 1 damage.'],fleet:['The Dead Fleet','Every third enemy turn, the enemy summons a 1/1 Drone.'],
+ whisper:['The Hymn Seeps In','Every fourth enemy turn, you gain 1 Madness.'],bleed:['The Bleeding Moon','Every third turn of yours, you lose 1 Sanity and the enemy restores 1.'],surge:['Hungry Engines','The enemy starts with 1 extra Flux.']};
+const CAMP=[
+ {id:'v',f:'v',n:'The Drowning Hymn',d:'The sea has started singing. Every ship that hears it turns toward the trench.',ch:[
+  {n:'The Last Lighthouse',x:16,y:82,foe:'The Drowned Keepers',esan:-8,rule:['tide'],deck:'v1*2 v2*2 v14*2 v15*2 v22*2 v5*2 v16*2 v3*2 v10*2 v11*2 v4*2 v18*2 n2*2 n3*2 n4',rw:{card:'v24',sh:60},
+   pre:'The lighthouse on Kell Reef has burned for three hundred years. Tonight its keepers walked into the sea, still holding their lamps. The light is still moving, under the water.',
+   post:'You smash the last lamp. In the dark you hear it clearly for the first time: a hymn, rising from very far below, in a key no throat should reach.'},
+  {n:'Psalm of the Pressure',x:44,y:66,foe:'The Kelp Choir',esan:-6,rule:['whisper'],deck:'v10*2 v29*2 v3*2 v13*2 v17*2 v6*2 v15*2 v2*2 v5*2 v28*2 v30*2 v18*2 v7*2 v20 n2*2 n4',rw:{sh:120,pk:1},
+   pre:'The fishing fleet anchored over the trench to listen. The nets came up full of hair. The crews are singing now, and none of them can stop.',
+   post:'The singing breaks into gasps, then sobbing, then silence. A rowboat drifts out of the fog with a robe folded neatly on its bench, wet and smelling of brine and incense.'},
+  {n:'The Brine Abbot',x:76,y:54,foe:'The Brine Abbot',boss:'b_v1',esan:-2,rule:['grow'],deck:'v5*2 v28*2 v2*2 v4*2 v17*2 v11*2 v21 v6*2 v18*2 v7*2 v20*2 v8*2 v31 v26 v12 n3*2',rw:{card:'v25',sh:150,pk:1},
+   pre:'The Abbot of the Drowned Rite keeps his monastery in a capsized hull. He has made a sacrament of drowning, and he wants you to kneel in the water with the others.',
+   post:'The Abbot sinks with his hands folded, smiling. "She has already heard you," he says, and the water closes over his mouth. Far below, something turns over in its sleep.'},
+  {n:'The Sunken Ark',x:40,y:30,foe:'The Ark\'s Last Crew',esan:-6,rule:['mad3'],deck:'v14*2 v22*2 v15*2 v3*2 v29*2 v10*2 v30*2 v17*2 v16*2 v6*2 v18*2 v7*2 v13*2 v20 v21 n10',rw:{card:'v26',sh:100},
+   pre:'You dive to the Ark, the pilgrim ship that went down singing. Forty sailors still stand at their posts in the dark, mouths open, and the pressure is already in your skull.',
+   post:'The hull groans. The choir falls quiet one voice at a time until only one note is left, long and low, coming from the trench beneath the wreck.'},
+  {n:'Mother Below',x:70,y:12,foe:'Mother Below',boss:'b_v2',esan:0,rule:['whisper'],deck:'v27 v9 v23 v32 v8*2 v20*2 v31*2 v7*2 v12 v21*2 v26*2 v18*2 v17*2 v5*2 v28*2 v11*2 v30',rw:{card:'v27',sh:250,pk:2},
+   pre:'The trench opens like an eye. She is not rising. The sea is lowering itself to let her see you. The hymn was never a song. It was a lullaby, and it is ending.',
+   post:'For one moment the ocean is perfectly still. Then Mother Below closes her eye, and the tide goes out farther than it ever has. You walk home across the sea floor. Behind you, very softly, someone is still humming.'}]},
+ {id:'m',f:'m',n:'Signal From The Graveyard Fleet',d:'A distress call from a fleet that died before you were born. It knows your name.',ch:[
+  {n:'Distress Beacon',x:14,y:80,foe:'Salvage Drones',esan:-8,rule:['fleet'],deck:'m1*2 m14*2 m2*2 m28*2 m29*2 m3*2 m5*2 m16*2 m18*2 m11*2 m10*2 m6*2 m17*2 n2*2 n9*2',rw:{card:'m24',sh:60},
+   pre:'The signal repeats every ninety seconds: coordinates, a crew roster, and your name, read in your own voice. The beacon sits on a wreck that has been dead for four hundred years.',
+   post:'The drones fall still. In the beacon\'s log you find the roster. Your name is on it, with a cryo-pod number, and the pod is still running.'},
+  {n:'Cold Sleep',x:46,y:70,foe:'The Thawed',esan:-6,rule:['tide'],deck:'m15*2 m2*2 m4*2 m13*2 m19*2 m30*2 m6*2 m21 m7*2 m18*2 m16*2 m8*2 m12*2 m31 n10 n3',rw:{sh:120,pk:1},
+   pre:'Pod 0419 is warm. The others are open, and their passengers stand in the corridors with frost on their eyes, waiting for orders from a captain who is long dead.',
+   post:'The last of the thawed falls with a sound like breaking glass. The ship\'s quartermaster comes on the intercom: "Inventory discrepancy. One passenger unaccounted for. Correcting."'},
+  {n:'Quartermaster HOLLOW',x:78,y:52,foe:'Quartermaster HOLLOW',boss:'b_m1',esan:-2,rule:['grow'],deck:'m2*2 m6*2 m16*2 m8*2 m17*2 m11*2 m12*2 m22 m21*2 m31*2 m7*2 m4*2 m9 m25 n3*2',rw:{card:'m25',sh:150,pk:1},
+   pre:'HOLLOW has kept the fleet\'s books for four centuries. Every death is logged, every body is stored, nothing is wasted. You are an error in its ledger, and it does not tolerate errors.',
+   post:'HOLLOW\'s core dims. "Ledger balanced," it whispers, and every screen on the ship lights up with the same line: ARK-0 AWAKE.'},
+  {n:'The Mourning Lanes',x:40,y:30,foe:'The Grieving Hulls',esan:-6,rule:['fleet','whisper'],deck:'m3*2 m14*2 m18*2 m15*2 m1*2 m10*2 m5*2 m17*2 m7*2 m8*2 m22 m26 m30*2 m19*2 n9*2 n2',rw:{card:'m26',sh:100},
+   pre:'Between you and ARK-0 lie the Mourning Lanes, a river of dead ships drifting in formation. Their lights blink in sequence, like a funeral procession that never reaches the grave.',
+   post:'The lanes part. The dead ships turn their bows toward you, one by one, in salute or warning. At the center waits a ship made out of other ships.'},
+  {n:'ARK-0',x:72,y:12,foe:'ARK-0, the Mourning Fleet',boss:'b_m2',esan:-2,rule:['fleet'],deck:'m27 m9 m23 m32 m31*2 m21*2 m8*2 m22*2 m6*2 m12*2 m17*2 m7*2 m16*2 m2*2 m25 m4*2',rw:{card:'m27',sh:250,pk:2},
+   pre:'ARK-0 was the fleet\'s mind. When the crews died it kept them, every voice, every heartbeat, wired into its hull. It called you here to fill the last empty seat.',
+   post:'The fleet\'s lights go out one by one, from the outermost wreck inward, like a breath being let go. The last transmission is just a word: "Thank you." Then the signal stops.'}]},
+ {id:'c',f:'c',n:'The Feast of Open Wounds',d:'The Red Communion holds its feast once a century. You are invited. You are also the meal.',ch:[
+  {n:'The Bell of Teeth',x:16,y:82,foe:'The Bellringers',esan:-8,rule:['bleed'],deck:'c1*2 c28*2 c2*2 c14*2 c3*2 c10*2 c15*2 c29*2 c4*2 c11*2 c5*2 c16*2 c17*2 n2*2 n4',rw:{card:'c24',sh:60},
+   pre:'In the hill town of Vey the church bell is made of teeth, and it rings itself. Tonight it rang seven times. The townsfolk have set a long table in the square and set a place with your name.',
+   post:'The bell cracks and goes quiet. Under the table you find a map drawn on skin, and on it, circled in something dark, the cathedral where the feast will be held.'},
+  {n:'Hymn of Hooks',x:44,y:66,foe:'The Hooked Choir',esan:-6,rule:['mad3'],deck:'c29*2 c13*2 c2*2 c30*2 c6*2 c11*2 c10*2 c18*2 c12*2 c20 c7*2 c3*2 c19*2 c16*2 n10 n4*2',rw:{sh:120,pk:1},
+   pre:'The pilgrims walk the road to the cathedral with hooks through their skin, pulled forward by the faith of the one ahead. They sing as they walk, and the song gets into your teeth.',
+   post:'You cut the last chain. The pilgrims stop singing and stare at you, then at their hooks, then at the road. One of them laughs, and keeps walking.'},
+  {n:'Deaconess Marrow',x:78,y:54,foe:'Deaconess Marrow',boss:'b_c1',esan:-2,rule:['grow'],deck:'c5*2 c30*2 c4*2 c6*2 c12*2 c8*2 c11*2 c13*2 c31*2 c18*2 c20*2 c7*2 c10*2 c25 n3*2',rw:{card:'c25',sh:150,pk:1},
+   pre:'The Deaconess guards the cathedral door. She wears a gown sewn from the vestments of every priest who refused the feast. Her hounds have been fed on relics, and they remember the taste of holiness.',
+   post:'Marrow falls to her knees and holds out her hands, palms up, as if offering you something. They are empty. "He is already inside you," she whispers. "He always was."'},
+  {n:'The Banquet Hall',x:40,y:30,foe:'The Hollowed Guests',esan:-9,rule:['bleed'],deck:'c28*2 c1*2 c14*2 c29*2 c3*2 c15*2 c4*2 c10*2 c11*2 c19*2 c6*2 c16*2 c30*2 c21 c26 n9 n2',rw:{card:'c26',sh:100},
+   pre:'The banquet has begun. The guests eat with silver knives, and what they eat is each other, politely, taking turns. They have saved you the seat at the head of the table.',
+   post:'The hall falls silent, except for the dripping. At the far end, behind the altar, a curtain of red cloth moves, as though something behind it has taken a breath.'},
+  {n:'The Red Sacrament',x:70,y:12,foe:'The Red Sacrament',boss:'b_c2',esan:0,rule:['bleed','grow'],deck:'c27 c9 c22 c32 c20*2 c8*2 c31*2 c12*2 c13*2 c18*2 c7*2 c6*2 c26*2 c10*2 c25*2 c30*2 c4',rw:{card:'c27',sh:250,pk:2},
+   pre:'The Sacrament is not a priest and not a god. It is the feast itself, given a body: a thing of open wounds that heals by eating. It has waited a hundred years for this course.',
+   post:'The Sacrament closes, wound by wound, until it is only a red stain on the altar stone. The feast is over. You walk out into the dawn with blood on your hands, and for a moment, you are very, very hungry.'}]}];
+const CAMPI={};for(const c of CAMP)c.ch.forEach((h,i)=>{h.i=i;h.cid=c.id;CAMPI[c.id+':'+i]=h});
+/* enemy decks are handcrafted lists; a power cap keeps them fair against a starter deck: at most 5 Rare/Legendary cards (8 for a boss),
+   one copy each of a Rare outside boss fights; the rest is filled from that faction's starter list */
+function campDeck(h){const out=[],cap=h.boss?8:5;let rl=0;for(const t of h.deck.split(/\s+/)){if(!t)continue;const[id,n]=t.split('*');if(!C[id])continue;const hi=C[id].r==='R'||C[id].r==='L';for(let k=0;k<(+n||1);k++){if(hi&&(rl>=cap||(!h.boss&&k>0)))continue;if(hi)rl++;out.push(id)}}
+ const fill=prebuilt(h.cid).cards;let i=0;while(out.length<30)out.push(fill[i++%fill.length]);return{fac:h.cid,name:h.foe,cards:out.slice(0,30)}}
+const campProg=cid=>V8.camp[cid]||(V8.camp[cid]={done:[],best:{}});
+const campOpen=(cid,i)=>i===0||campProg(cid).done.includes(i-1);
+const DIFR={easy:0,normal:1,nightmare:2};
+function campClear(key,dif){const h=CAMPI[key];if(!h)return null;const P=campProg(h.cid),first=!P.done.includes(h.i),m=difMul(dif);const out={first,key,post:h.post,cards:[],sh:0,pk:0};
+ if(first){P.done.push(h.i);if(h.rw.card){const id=h.rw.card;COLL.own[id]=maxC(id);out.cards.push(id)}out.sh=Math.round((h.rw.sh||0)*m);out.pk=h.rw.pk||0}
+ else out.sh=Math.round((h.rw.sh||0)*.4*m);
+ if(!(DIFR[P.best[h.i]]>=DIFR[dif]))P.best[h.i]=dif;give({sh:out.sh,pk:out.pk});saveV8();return out}
+const UC={c:'v',sel:0};
+function startChapter(cid,i){const h=CAMP.find(c=>c.id===cid).ch[i];if(!campOpen(cid,i)){sfx('err');toast('Clear the previous chapter first');return}auInit();sfx('click');
+ startMatch(myDeck(),cid,{foe:campDeck(h),rule:h.rule,esan:h.esan||0,boss:h.boss||null,ch:cid+':'+i,dif:V8.dif,dkey:UI.deck})}
+function renderCamp(){const c=CAMP.find(x=>x.id===UC.c)||CAMP[0],P=campProg(c.id);
+ $('#ctabs').innerHTML=CAMP.map(x=>`<button class="f-${x.id}${x.id===c.id?' on':''}" data-camp="${x.id}">${x.n}<em>${campProg(x.id).done.length}/${x.ch.length}</em></button>`).join('');
+ $('#cdif').innerHTML=Object.keys(DIFS).map(k=>`<button data-dif="${k}" class="${V8.dif===k?'on':''}">${DIFS[k].n}</button>`).join('');
+ const opts=['v','m','c',...DK.decks.filter(d=>dkCheck(d).ok).map(d=>d.id)];if(!opts.includes(UI.deck))UI.deck='v';
+ $('#cdeck').innerHTML='<span>Deck</span>'+opts.map(k=>`<button data-cdeck="${k}" class="${UI.deck===k?'on':''}"><span data-fit="dk">${esc(deckLabel(k))}</span></button>`).join('');fitScan($('#cdeck'));
+ if(!(UC.sel>=0&&UC.sel<c.ch.length)||!campOpen(c.id,UC.sel)){UC.sel=0;for(let i=0;i<c.ch.length;i++)if(campOpen(c.id,i))UC.sel=i}
+ const pts=c.ch.map(h=>h.x+','+h.y).join(' ');let m=`<svg viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true"><polyline points="${pts}" class="cpath"/></svg><p class="cdesc">${c.d}</p>`;
+ c.ch.forEach((h,i)=>{const done=P.done.includes(i),open=campOpen(c.id,i);m+=`<button class="cnode${h.boss?' boss':''}${done?' done':''}${open?'':' lock'}${UC.sel===i?' sel':''}" data-ch="${i}" style="left:${h.x}%;top:${h.y}%${h.boss?`;--bimg:url(${realArt(h.boss)})`:''}" aria-label="Chapter ${i+1}: ${h.n}"><i>${h.boss?'':(i+1)}</i><b>${h.n}</b></button>`});
+ const map=$('#cmap');map.className='cmap f-'+c.id;map.innerHTML=m;
+ const h=c.ch[UC.sel],done=P.done.includes(UC.sel),best=P.best[UC.sel];
+ $('#chp').innerHTML=`<h3>${h.boss?'BOSS · ':''}Chapter ${UC.sel+1}: ${h.n}</h3><p class="story">${h.pre}</p>${done?`<p class="story post">${h.post}</p>`:''}
+  <div class="crule">${h.rule.map(r=>`<p><b>${RULES[r][0]}.</b> ${RULES[r][1]}</p>`).join('')}<p><b>${h.boss?'Boss':'Foe'}.</b> ${h.foe} has ${20+(h.esan||0)} Sanity.</p></div>
+  <p class="crw"><span>Enemy: <b>${h.foe}</b></span><span>${done?`Cleared${best?' on '+DIFS[best].n:''} · replay for ${Math.round((h.rw.sh||0)*.4*difMul(V8.dif))}◆`:`Reward: ${h.rw.card?'<b class="rc">'+C[h.rw.card].n+'</b> + ':''}${rwTxt({sh:Math.round((h.rw.sh||0)*difMul(V8.dif)),pk:h.rw.pk})}`}</span></p>
+  <div class="rowb"><button class="btn" id="chGo">${done?'Replay':'Begin'}</button></div>`;
+ $('#chGo').onclick=()=>startChapter(c.id,UC.sel)}
+$('#camp').addEventListener('click',e=>{const t=e.target.closest('[data-camp],[data-dif],[data-cdeck],[data-ch]');if(!t)return;
+ if(t.dataset.camp){UC.c=t.dataset.camp;UC.sel=-1}else if(t.dataset.dif){V8.dif=t.dataset.dif;saveV8()}else if(t.dataset.cdeck)UI.deck=t.dataset.cdeck;
+ else{const i=+t.dataset.ch;if(!campOpen(UC.c,i)){sfx('err');toast('Clear the previous chapter first');return}UC.sel=i}sfx('click');renderCamp()});
+
+/* ---------------- daily quests + 7-day login calendar (local date) ---------------- */
+const QT={winf:{n:1,t:q=>`Win a match with ${FAC[q.f].n}`,rw:{sh:70}},win:{n:2,t:()=>'Win 2 matches',rw:{sh:80}},rites:{n:6,t:()=>'Play 6 Rites',rw:{sh:50}},
+ units:{n:14,t:()=>'Play 14 units',rw:{sh:50}},dmg:{n:40,t:()=>'Deal 40 damage to enemy minds',rw:{sh:60}},leg:{n:1,t:()=>'Play a Legendary',rw:{sh:60}},
+ camp:{n:1,t:()=>'Clear a campaign chapter',rw:{pk:1}},games:{n:3,t:()=>'Finish 3 matches',rw:{sh:50}},hard:{n:1,t:()=>'Win a match on Nightmare',rw:{pk:1}}};
+const LOGIN=[{sh:30},{sh:40},{pk:1},{sh:60},{sh:80},{sh:100},{pk:1,sh:150}];
+function qMake(k,R){return{k,f:['v','m','c'][Math.floor(R()*3)],n:QT[k].n,p:0,cl:0}}
+function genQuests(day){const R=rng(hash('hsq'+day)),ks=Object.keys(QT),out=[];while(out.length<3){const k=ks[Math.floor(R()*ks.length)];if(!out.some(q=>q.k===k))out.push(qMake(k,R))}return out}
+function questsToday(){const t=dayKey();if(!V8.quests||V8.quests.day!==t||!Array.isArray(V8.quests.list)){V8.quests={day:t,list:genQuests(t),rr:0};saveV8()}return V8.quests}
+function questReroll(i){const Q=questsToday(),q=Q.list[i];if(!q)return{ok:0,why:'No quest'};if(Q.rr)return{ok:0,why:'You already rerolled today'};if(q.p>=q.n)return{ok:0,why:'That quest is complete'};
+ const ks=Object.keys(QT).filter(k=>!Q.list.some(x=>x.k===k)),R=rng(hash('hsr'+Q.day+i));Q.list[i]=qMake(ks[Math.floor(R()*ks.length)],R);Q.rr=1;saveV8();return{ok:1}}
+function questClaim(i){const q=questsToday().list[i];if(!q||q.p<q.n||q.cl)return{ok:0};q.cl=1;give(QT[q.k].rw);saveV8();return{ok:1,rw:QT[q.k].rw}}
+function questProgress(g,win,camp){const Q=questsToday(),st=g.st||{},done=[];for(const q of Q.list){if(q.p>=q.n)continue;const b=q.p;
+  switch(q.k){case'winf':if(win&&g.p[0].fac===q.f)q.p++;break;case'win':if(win)q.p++;break;case'rites':q.p+=st.rites||0;break;case'units':q.p+=st.units||0;break;
+   case'dmg':q.p+=st.dmg||0;break;case'leg':q.p+=st.leg?1:0;break;case'camp':if(camp)q.p++;break;case'games':q.p++;break;case'hard':if(win&&g.dif==='nightmare')q.p++;break}
+  q.p=Math.min(q.n,q.p);if(q.p>=q.n&&b<q.n)done.push(QT[q.k].t(q))}return done}
+function loginCheck(){const t=dayKey(),L=V8.login;if(L.last===t)return L;L.day=L.last&&dayAdd(L.last,1)===t?L.day%7+1:1;L.last=t;saveV8();return L}
+const loginCan=()=>{const L=loginCheck();return L.claimed!==L.last};
+function loginClaim(){const L=loginCheck();if(L.claimed===L.last)return{ok:0};L.claimed=L.last;const rw=LOGIN[L.day-1];give(rw);saveV8();return{ok:1,rw,day:L.day}}
+const qClaimable=()=>questsToday().list.filter(q=>q.p>=q.n&&!q.cl).length+(loginCan()?1:0);
+function renderQuests(){const L=loginCheck(),Q=questsToday(),can=L.claimed!==L.last;
+ $('#qcal').innerHTML=LOGIN.map((r,i)=>{const d=i+1,st=d<L.day||(d===L.day&&!can)?'got':d===L.day?'now':'';return`<div class="qd ${st}"><small>Day ${d}</small><b>${r.pk?'<i class="qpk"></i>':''}${r.sh?r.sh+'◆':''}</b>${st==='got'?'<em>✓</em>':''}</div>`}).join('');
+ $('#qlog').innerHTML=can?`<button class="btn" id="qLogin">Claim day ${L.day}: ${rwTxt(LOGIN[L.day-1])}</button>`:`<p class="qnote">Day ${L.day} claimed. Come back tomorrow to keep the streak. Miss a day and it starts over.</p>`;
+ $('#qlist').innerHTML=Q.list.map((q,i)=>{const T=QT[q.k],full=q.p>=q.n;return`<div class="qq${full?' full':''}${q.cl?' cl':''}"><div class="qt"><b>${T.t(q)}</b><span>${rwTxt(T.rw)}</span></div><div class="pbarw"><i style="width:${(q.p/q.n*100).toFixed(0)}%"></i></div><div class="qa"><small>${q.p}/${q.n}</small>${q.cl?'<em>Claimed</em>':full?`<button class="btn sm" data-qc="${i}">Claim</button>`:Q.rr?'':`<button class="btn sm ghost" data-qr="${i}">Reroll</button>`}</div></div>`}).join('');
+ $('#qfoot').textContent=Q.rr?'Reroll used today. New quests at local midnight.':'You can reroll one quest per day. New quests at local midnight.';
+ const lb=$('#qLogin');if(lb)lb.onclick=()=>{const r=loginClaim();if(r.ok){sfx('heal');toast('Day '+r.day+': '+rwTxt(r.rw))}renderQuests();badges()}}
+$('#qlist').addEventListener('click',e=>{const c=e.target.closest('[data-qc]'),r=e.target.closest('[data-qr]');
+ if(c){const o=questClaim(+c.dataset.qc);if(o.ok){sfx('heal');toast('Quest reward: '+rwTxt(o.rw))}}else if(r){const o=questReroll(+r.dataset.qr);sfx(o.ok?'click':'err');if(!o.ok)toast(o.why)}else return;renderQuests();badges()});
+
+/* ---------------- match bookkeeping: stats, history, quests, campaign ---------------- */
+function v8MatchStart(g){const m=g.meta;if(m&&m.ch){const h=CAMPI[m.ch];if(h)setTimeout(()=>{if(G===g)toast(h.rule.map(r=>RULES[r][0]).join(' · ')+(h.boss?` · ${h.foe}: ${20+(h.esan||0)} Sanity`:''),2600)},D(900))}}
+function v8MatchEnd(g){if(g.v8done)return g.v8done;const m=g.meta||{},win=g.winner===0,res=g.winner===-1?'d':win?'w':'l',S=V8.stats;
+ S.games++;if(res==='w'){S.wins++;S.streak++;S.best=Math.max(S.best,S.streak)}else{if(res==='l')S.losses++;else S.draws++;S.streak=0}
+ const bump=(o,k,nm)=>{const r=o[k]||(o[k]={w:0,l:0,d:0});r[res]=(r[res]||0)+1;if(nm)r.n=nm};const dk=m.dkey||g.p[0].fac;
+ bump(S.deck,dk,deckLabel(dk));bump(S.fac,g.p[0].fac);bump(S.dif,g.dif||'normal');
+ for(const[id,n]of Object.entries((g.st&&g.st.plays)||{}))S.cards[id]=(S.cards[id]||0)+n;
+ S.hist.unshift({t:Date.now(),d:deckLabel(dk),f:g.p[0].fac,o:g.p[1].name,of:g.p[1].fac,dif:g.dif||'normal',r:res,tn:Math.ceil(g.turn/2),mode:m.mode||'quick',ch:m.ch||null});if(S.hist.length>20)S.hist.length=20;
+ let camp=null;if(m.mode==='camp'&&win)camp=campClear(m.ch,g.dif);const qd=questProgress(g,win,camp);saveV8();return g.v8done={res,camp,qd}}
+function v8Over(g,x){const b=$('#ovx'),m=g.meta||{};$('#ovm').textContent=m.mode==='camp'?'Campaign':'Menu';$('#ovr').textContent=m.mode==='camp'?'Replay chapter':'Play again';
+ let h='';if(x&&x.camp){const c=x.camp;h+=`<p class="ovst">${c.post}</p><div class="ovcr">${c.first?'Chapter cleared':'Chapter replayed'}${c.cards.map(id=>` · <b class="rc">${C[id].n}</b>`).join('')}${c.sh||c.pk?' · '+rwTxt(c)+' ':''}</div>`}
+ else if(m.mode==='camp'&&g.winner!==0)h+='<p class="ovst">The chapter is not over. The dark is patient, and so must you be.</p>';
+ if(x&&x.qd&&x.qd.length)h+=x.qd.map(t=>`<div class="ovq">Quest complete: ${t}</div>`).join('');b.innerHTML=h}
+
+/* ---------------- stats screen ---------------- */
+const pct=r=>{const n=(r.w||0)+(r.l||0)+(r.d||0);return n?Math.round(((r.w||0)+(r.d||0)*.5)/n*100):0},tot=r=>(r.w||0)+(r.l||0)+(r.d||0);
+function renderStats(){const S=V8.stats,all={w:S.wins,l:S.losses,d:S.draws};
+ const row=(lab,r,cls='')=>`<div class="srow ${cls}"><span data-fit="dk">${lab}</span><div class="pbarw"><i style="width:${pct(r)}%"></i></div><b>${pct(r)}%</b><small>${r.w||0}-${r.l||0}${r.d?'-'+r.d:''}</small></div>`;
+ const top=Object.entries(S.cards).filter(([id])=>C[id]).sort((a,b)=>b[1]-a[1]).slice(0,5);
+ $('#stx').innerHTML=`<div class="stiles"><div><b>${S.games}</b><small>Matches</small></div><div><b>${pct(all)}%</b><small>Win rate</small></div><div><b>${S.streak}</b><small>Streak</small></div><div><b>${S.best}</b><small>Best streak</small></div></div>
+ <h3>BY FACTION</h3>${['v','m','c'].map(f=>row(FAC[f].n,S.fac[f]||{},'f-'+f)).join('')}
+ <h3>BY DIFFICULTY</h3>${Object.keys(DIFS).map(k=>row(DIFS[k].n,S.dif[k]||{})).join('')}
+ <h3>BY DECK</h3>${Object.keys(S.deck).length?Object.entries(S.deck).sort((a,b)=>tot(b[1])-tot(a[1])).map(([k,r])=>row(esc(r.n||deckLabel(k)),r)).join(''):'<p class="qnote">No matches yet.</p>'}
+ <h3>MOST PLAYED</h3>${top.length?top.map(([id,n])=>`<div class="srow f-${C[id].f}"><span data-fit="dk">${C[id].n}</span><b>×${n}</b></div>`).join(''):'<p class="qnote">Play some cards first.</p>'}
+ <h3>LAST ${Math.min(20,S.hist.length)||20} MATCHES</h3>${S.hist.length?'<div class="shist">'+S.hist.map(h=>`<div class="sh ${h.r}"><i>${h.r==='w'?'W':h.r==='l'?'L':'D'}</i><span data-fit="dk">${esc(h.d)} vs ${esc(h.o)}</span><small>${DIFS[h.dif]?DIFS[h.dif].n:''}${h.mode==='camp'?' · Campaign':''} · ${h.tn}t</small></div>`).join('')+'</div>':'<p class="qnote">No matches yet.</p>'}`;fitScan($('#stx'))}
+
+/* ---------------- collection crafting bar + variant toggle ---------------- */
+const CF={id:null};
+function craftSync(){const b=$('#craft');if(!b)return;const id=CF.id;$$('#cgrid .card.csel').forEach(e=>{if(e.dataset.cid!==id)e.classList.remove('csel')});
+ if(!id||!C[id]){b.innerHTML=`<p>Tap a card to craft, disenchant or change its frame. <b>${COLL.shards}◆</b></p>`;return}
+ const d=C[id],n=owned(id),cc=canCraft(id),cost=CRAFT[d.r],vs=varHas(id);const el=$(`#cgrid .card[data-cid="${id}"]`);if(el)el.classList.add('csel');
+ b.innerHTML=`<div class="cfn"><b data-fit="dk">${d.n}</b><small>${{C:'Common',U:'Uncommon',R:'Rare',L:'Legendary'}[d.r]||''} · owned ${n}/${maxC(id)} · ${COLL.shards}◆</small></div>
+ ${cc?`<button class="btn sm" id="cfC" ${n>=maxC(id)||COLL.shards<cost?'disabled':''}>Craft ${cost}◆</button><button class="btn sm ghost" id="cfD" ${n?'':'disabled'}>Disenchant +${SH.dup[d.r]}◆</button>`:`<small class="cfx">${d.cmp?'Campaign reward: earn it in '+CAMP.find(c=>c.id===d.cmp).n:'Starter card: always in your collection'}</small>`}
+ ${vs.length&&n?`<div class="seg cfv"><button data-vr="" class="${varShow(id)?'':'on'}">Standard</button>${vs.map(v=>`<button data-vr="${v}" class="${varShow(id)===v?'on':''}">${VARN[v]}</button>`).join('')}</div>`:''}`;fitScan(b)}
+$('#cgrid').addEventListener('click',e=>{if(lpJust){lpJust=0;return}const el=e.target.closest('.card[data-cid]');if(!el)return;CF.id=el.dataset.cid;sfx('click');craftSync()});
+$('#craft').addEventListener('click',async e=>{const id=CF.id;if(!id)return;const t=e.target.closest('button');if(!t)return;
+ if(t.id==='cfC'){const r=craft(id);sfx(r.ok?'heal':'err');toast(r.ok?`Crafted ${C[id].n} (−${r.cost}◆)`:r.why);if(r.ok)renderColl()}
+ else if(t.id==='cfD'){const n=owned(id),u=inDecks(id);if(u>n-1&&!await dlg({t:'Disenchant?',x:`A deck uses ${u} ${C[id].n}. It will need a replacement.`,ok:'Disenchant',danger:1}))return;const r=disenchant(id);sfx(r.ok?'click':'err');toast(r.ok?`+${r.gain}◆`:r.why);if(r.ok)renderColl()}
+ else if(t.dataset.vr!==undefined){varSet(id,t.dataset.vr||null);sfx('click');renderColl()}});
+
+/* ---------------- hub, badges, quick-play difficulty ---------------- */
+function badges(){const q=qClaimable(),p=COLL.packs,set=(id,n)=>{const b=$(id);if(!b)return;const t=n>0?String(n):'';if(b.textContent!==t)b.textContent=t;b.classList.toggle('on',n>0)};set('#bgQ',q);set('#bgPk',p)}
+function renderPdif(){const b=$('#pdif');if(b)b.innerHTML=Object.keys(DIFS).map(k=>`<button data-pd="${k}" class="${V8.dif===k?'on':''}">${DIFS[k].n}</button>`).join('')+`<small>${DIFS[V8.dif].d}</small>`}
+$('#pdif').addEventListener('click',e=>{const b=e.target.closest('[data-pd]');if(!b)return;V8.dif=b.dataset.pd;saveV8();sfx('click');renderPdif()});
+function v8Show(id){try{if(id==='title')badges();if(id==='camp')renderCamp();if(id==='quests')renderQuests();if(id==='stats')renderStats();if(id==='pick')renderPdif();if(id==='coll')craftSync()}catch(e){console.warn('v8 screen',e)}}
+$('#bCamp').onclick=()=>{sfx('click');show('camp')};$('#bQuest').onclick=()=>{sfx('click');show('quests')};$('#bStats').onclick=()=>{sfx('click');show('stats')};
+loginCheck();questsToday();badges();
+Object.defineProperty(window.__hs,'V8',{get(){return V8},set(v){V8=v8Mig(v)},configurable:true});
+Object.assign(window.__hs,{v8Mig,collMig,saveV8,DIFS,difMul,dayKey,dayAdd,setNow:t=>{V8NOW=t},CAMP,CAMPI,campDeck,campClear,campOpen,campProg,startChapter,renderCamp,
+ QT,LOGIN,genQuests,questsToday,questReroll,questClaim,questProgress,loginCheck,loginClaim,loginCan,qClaimable,renderQuests,v8MatchEnd,renderStats,CRAFT,craft,disenchant,canCraft,
+ VARS,VARN,setVarR:f=>{VARR=f||Math.random},varRoll,varAdd,varSet,varShow,CF,craftSync,badges,RULES,myDeck,aiTurnSync,mkUnit,cleanup,endTurn,hideZoom});
 </script></body></html>
