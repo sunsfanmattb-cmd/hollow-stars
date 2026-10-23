@@ -1009,6 +1009,59 @@ body.land .cdx{width:44%;position:sticky;top:0}
 .tile{transition:opacity .2s,transform .14s var(--ez)}.tile:active{transform:scale(.985)}
 .qq,.srow{transition:opacity .2s}
 #toast{max-width:92vw;white-space:normal;text-align:center}
+
+/* ---- v9.1 title / hub layout (fluid, centered) ----
+   v9 pinned the landscape hub to the bottom-right corner (padding-left:50vw + align/justify flex-end) with fixed px sizes
+   (440px block, 12px buttons, 54px title). On big or fullscreen desktop windows it sat in the far corner, tiny, and ran past
+   the right edge. Now: one centered column, sized from viewport units with px floors, never wider than the window. */
+body.land #title .tbox{align-items:center;justify-content:safe center;gap:clamp(6px,1.2vh,22px);
+ padding:max(16vh,env(safe-area-inset-top)) max(3vw,env(safe-area-inset-right)) max(4vh,env(safe-area-inset-bottom)) max(5vw,env(safe-area-inset-left));overflow:hidden}
+body.land .tscrim{background:radial-gradient(ellipse 46% 62% at 52% 60%,#000c 0,#0009 45%,#0000 80%),linear-gradient(180deg,#0005,#0000 26%)}
+body.land .thead{width:auto;max-width:100%;padding:0 0 2px;gap:clamp(4px,.7vh,14px)}
+body.land .thead h1{font-size:clamp(28px,min(8.4vh,7vw),300px)}
+body.land .thead .orn{width:min(70%,42vh)}
+body.land .thead .sub{font-size:clamp(11px,min(1.6vh,1.15vw),34px)}
+body.land .tmenu{width:clamp(380px,72vh,94vw);max-width:94vw;gap:clamp(6px,1vh,20px)}
+body.land .menu.hub.main{gap:clamp(7px,1vh,20px)}
+body.land .menu.hub.main .btn{font-size:clamp(12px,min(1.95vh,1.35vw),42px);padding:.78em .3em}
+body.land .menu.hub.sec{gap:clamp(6px,.8vh,16px)}
+body.land .menu.hub.sec .btn{font-size:clamp(10.5px,min(1.45vh,1vw),31px);padding:.66em .2em}
+body.land .hlink{font-size:clamp(11px,min(1.3vh,.95vw),28px)}
+/* desktop-size portrait windows scale up too; phone portrait values are unchanged (the min() picks the old vw term on phones) */
+.thead h1{font-size:clamp(38px,min(12vw,8.4vh),220px)}
+.tmenu{width:min(94vw,max(420px,52vh))}
+.menu.hub.main .btn{font-size:clamp(11.5px,min(3.3vw,1.9vh),34px)}
+.menu.hub.sec .btn{font-size:clamp(9.5px,min(2.65vw,1.5vh),26px)}
+
+/* ---- v9.1 desktop menu scale: menus/panels were laid out in fixed px for phones and looked tiny on big windows.
+   layout() sets --dmz = min(W/1000,H/640) (landscape) clamped 1..3; phones stay at 1. CSS zoom re-lays out the menu screens
+   in a smaller virtual viewport (no transform, no repaint per frame), so nothing is clipped and everything scales together. */
+body.dz .screen:not(#match):not(#title),body.dz #settings .sbox,body.dz #dlg .dbox,body.dz .ovbox{zoom:var(--dmz,1)}
+
+/* ---- v9.1 match HUD: hero portrait, name, Madness, Flux, deck/hand counts and Sanity scale with --hz (set in layout()).
+   CSS zoom on the panel only: its grid column (--side) is widened in layout() by the same factor so the board never overlaps. */
+#match .hero{zoom:var(--hz,1)}
+body.land #match #mid{zoom:min(var(--hz,1),1.6)}
+
+/* ---- v9.1 campaign: v9 sized the map from height (height:100% + aspect-ratio) capped at 44vw, so on tall desktop windows it ate
+   the 900px row and squeezed the side panel (difficulty, deck choice, chapter text) to a ~40px sliver. The side panel now has a floor. */
+body.land #camp .cwrap{width:min(100%,1000px)}
+body.land #camp .cside{flex:1 0 clamp(240px,34%,380px)}
+body.land #camp .cmap{flex:0 1 auto;min-width:0;max-width:calc(100% - clamp(240px,34%,380px) - 10px)}
+/* ---- v9.1 themed scrollbars: thin dark track, muted bronze/blood thumb; only shown where content actually scrolls (overflow:auto) */
+*{scrollbar-width:thin;scrollbar-color:#6a3a2c #0a0607}
+::-webkit-scrollbar{width:8px;height:8px;background:transparent}
+::-webkit-scrollbar-track{background:#0a0607cc;border-radius:8px;box-shadow:inset 0 0 0 1px #1a100c}
+::-webkit-scrollbar-thumb{background:linear-gradient(180deg,#7a4a30,#5a1a1c);border-radius:8px;border:2px solid #0a0607;min-height:36px}
+::-webkit-scrollbar-thumb:hover{background:linear-gradient(180deg,#9a6a44,#7a2026)}
+::-webkit-scrollbar-corner,::-webkit-scrollbar-button{display:none;background:transparent}
+html,body{scrollbar-width:none}html::-webkit-scrollbar,body::-webkit-scrollbar{display:none}
+body.dz #hand{height:calc(var(--hh) + 20px + var(--hh)*.03)}/* bigger desktop hands: room for the fan rotation */
+/* v9.1 desktop card view: the zoomed card was capped at 260px (phone size) and looked tiny on big windows; scale it with --dmz.
+   Only --cw changes (static size, no animation), so the tilt/holo layers are untouched. */
+body.dz #zoom .card{--cw:min(calc(260px*var(--dmz,1)),64vw,calc(60vh/1.4))}
+body.dz #zoom.modal .card{--cw:min(calc(260px*var(--dmz,1)*1.12),64vw,calc(64vh/1.4))}
+body.dz #zoom .kd{max-width:min(calc(300px*var(--dmz,1)),86vw);font-size:calc(12.5px*min(var(--dmz,1),1.9))}
 </style></head><body>
 <div id="pbg"><i class="pl"></i><i class="pg"></i><i class="th"></i><i class="pd"></i></div><canvas id="bg"></canvas><div id="fog"><i class="f1"></i><i class="f2"></i></div><div id="vig"></div><div id="grain"></div>
 <button id="mute" aria-label="Toggle sound"></button>
@@ -2242,8 +2295,10 @@ $$('[data-back]').forEach(b=>b.addEventListener('click',()=>{sfx('click');show('
 $('#bPlay').onclick=()=>{sfx('click');show('pick')};$('#bBuild').onclick=()=>{sfx('click');show('mydecks')};$('#bHow').onclick=()=>{sfx('click');show('howto')};$('#bPacks').onclick=()=>{sfx('click');show('packs')};$('#bColl').onclick=()=>{sfx('click');show('coll')};
 const UI={sel:null,busy:false,auto:/[?&]auto=1/.test(location.search),speed:/[?&]fast=1/.test(location.search)?.12:1,hw:100,hh:140,deck:'v',opp:'r'};
 function layout(){const W=innerWidth,H=innerHeight,land=W>H*1.15;document.body.classList.toggle('land',land);let uw,hw,side=0;
- if(!land){uw=Math.min((W-16)/6.2,100,H*.1);hw=Math.min(W/3.7,150,H*.17)}else{side=Math.round(Math.max(176,Math.min(260,W*.22)));uw=Math.min((H-50)/4.6,(W-side-60)/6.4,130);hw=uw*1.2}
- const st=document.documentElement.style;st.setProperty('--uw',uw+'px');st.setProperty('--uh',uw*1.34+'px');st.setProperty('--hw',hw+'px');st.setProperty('--hh',hw*1.4+'px');st.setProperty('--side',side+'px');UI.hw=hw;UI.hh=hw*1.4;
+ /* v9.1: match HUD scale (hero panels + turn controls). Desktop scales with the window; phones get a moderate fixed bump */
+ const hzf=land?Math.round(Math.max(H<380?1:H<480?1.04:1.12,Math.min(2.4,W/1000,H/620))*100)/100:1.1;document.documentElement.style.setProperty('--hz',hzf);
+ if(!land){uw=Math.min((W-16)/6.2,100,H*.1);hw=Math.min(W/3.7,150,H*.17)}else{side=Math.round(Math.max(176,Math.min(260*hzf,W*(hzf>1.2?.25:.22))));uw=Math.min((H-50)/4.6,(W-side-60)/6.4,130*hzf);hw=uw*1.2}
+ const st=document.documentElement.style;st.setProperty('--uw',uw+'px');st.setProperty('--uh',uw*1.34+'px');st.setProperty('--hw',hw+'px');st.setProperty('--hh',hw*1.4+'px');st.setProperty('--side',side+'px');const mz=Math.round(Math.max(1,Math.min(3,land?Math.min(W/1000,H/640):Math.min(W/760,H/1000)))*100)/100;st.setProperty('--dmz',mz);document.body.classList.toggle('dz',mz>1);UI.mz=mz;UI.hw=hw;UI.hh=hw*1.4;
  $('#bgrid').style.setProperty('--bw',Math.max(92,Math.min(130,(land?W*.62:W)/3.6))+'px');bgInit();teSize();if(SC.key)scene();if(G&&cur==='match')renderMatch()}
 addEventListener('resize',()=>{clearTimeout(UI.rt);UI.rt=setTimeout(layout,120)});
 function toast(m,ms=1600){const t=$('#toast');t.textContent=m;t.classList.add('on');clearTimeout(t._t);t._t=setTimeout(()=>t.classList.remove('on'),ms)}
@@ -2339,7 +2394,7 @@ function updUnit(e,u){const d=C[u.id],a=e.querySelector('.atk'),h=e.querySelecto
  e.classList.toggle('guard',u.k.includes('guard'));e.classList.toggle('phase',u.k.includes('phase'));e.classList.toggle('sleep',u.o===G.cur&&!u.ready&&!G.over);
  e.classList.toggle('ready',u.o===0&&G.cur===0&&!G.p[0].ai&&!G.over&&canAtk(u));e.classList.toggle('sel',UI.sel?.k==='u'&&UI.sel.uid===u.uid)}
 function syncHand(){const box=$('#hand'),hand=G.p[0].hand,ex=new Map();for(const el of box.children)ex.set(+el.dataset.h,el);const keep=new Set();
- const n=hand.length,W=box.clientWidth||innerWidth,hw=UI.hw,gap=n>1?Math.min(hw*1.04,(W-hw-28)/(n-1)):0,x0=(W-(hw+gap*(n-1)))/2;
+ const n=hand.length,W=box.clientWidth||innerWidth,hw=UI.hw,rmax=n>1?Math.min(3.2,15/n)*(n-1)/2*Math.PI/180:0,gap=n>1?Math.min(hw*1.04,(W-hw-28-(document.body.classList.contains('dz')?UI.hh*Math.sin(rmax)+16:0))/(n-1)):0,x0=(W-(hw+gap*(n-1)))/2;
  hand.forEach((c,i)=>{let el=ex.get(c.uid);if(!el){el=cardEl(c.id);el.dataset.h=c.uid;if(c.echo){el.classList.add('echo');el.insertAdjacentHTML('beforeend','<i class="ech">ECHO</i>')}el.classList.add('drawn');box.appendChild(el);setTimeout(()=>el.classList.remove('drawn'),600)}keep.add(el);
   const off=i-(n-1)/2;el.style.left=x0+i*gap+'px';el.style.top=(4+Math.min(12,off*off*.5)).toFixed(1)+'px';el.style.rotate=(n>1?off*Math.min(3.2,15/n):0).toFixed(2)+'deg';el.style.zIndex=i+1;el.style.setProperty('--i',i);
   el.classList.toggle('can',G.cur===0&&!G.p[0].ai&&!G.over&&canPlay(G,0,c));el.classList.toggle('sel',UI.sel?.k==='h'&&UI.sel.uid===c.uid)});
@@ -2455,7 +2510,7 @@ function tap(t){if(!G)return;if(!myTurn()){if(G.p[G.cur].ai&&!G.over&&t.closest(
 function showZoom(el,modal){const id=el.dataset.cid;if(!id||!C[id])return;const z=$('#zoom'),d=C[id];z.innerHTML='';const zc=cardEl(id,1);zc.insertAdjacentHTML('beforeend','<i class="gw"><i class="glare"></i></i>');z.appendChild(zc);
  const u=el.dataset.u&&G?findU(G,+el.dataset.u):null;let h='';if(u&&(u.a!==d.a||u.h!==d.h))h+=`<p><b>Currently ${u.a}/${u.h}</b></p>`;for(const k of new Set(u?u.k:d.k))if(KW[k])h+=`<p><b>${KW[k][0]}${k==='dread'?' '+d.dread:''}:</b> ${KW[k][1]}</p>`;
  if(d.fl)h+=`<p class="fl">“${d.fl}”</p>`;h+=`<p><i>${FAC[d.f].n} · ${{C:'Common',U:'Uncommon',R:'Rare',L:'Legendary',T:'Token'}[d.r]}</i></p>`;const k=document.createElement('div');k.className='kd';k.innerHTML=h;z.appendChild(k);
- z.className='on'+(modal?' modal':'');if(modal)ztOpen(zc);if(!modal){const r=el.getBoundingClientRect(),zw=Math.min(250,innerWidth*.62),cf=$('#coll.on #craft'),lim=cf?cf.getBoundingClientRect().top:innerHeight,left=r.left+r.width/2>innerWidth/2?Math.max(8,r.left-zw-16):Math.min(innerWidth-zw-8,r.right+16);z.style.left=left+'px';z.style.top=Math.max(8,Math.min(lim-z.offsetHeight-8,r.top+r.height/2-z.offsetHeight/2))+'px'}else{z.style.left=z.style.top=''}}
+ z.className='on'+(modal?' modal':'');if(modal)ztOpen(zc);if(!modal){const r=el.getBoundingClientRect(),zw=document.body.classList.contains('dz')?Math.min(z.offsetWidth,innerWidth*.62):Math.min(250,innerWidth*.62),cf=$('#coll.on #craft'),lim=cf?cf.getBoundingClientRect().top:innerHeight,left=r.left+r.width/2>innerWidth/2?Math.max(8,r.left-zw-16):Math.min(innerWidth-zw-8,r.right+16);z.style.left=left+'px';z.style.top=Math.max(8,Math.min(lim-z.offsetHeight-8,r.top+r.height/2-z.offsetHeight/2))+'px'}else{z.style.left=z.style.top=''}}
 function tilt(e){const c=$('#zoom.on .card');if(!c||LG.rm.matches)return;const r=c.getBoundingClientRect(),nx=Math.max(-1,Math.min(1,(e.clientX-r.left-r.width/2)/(r.width/2))),ny=Math.max(-1,Math.min(1,(e.clientY-r.top-r.height/2)/(r.height/2)));
  if(ZT.c!==c)ztOpen(c);ztFinger(nx,ny)}
 document.addEventListener('pointermove',e=>{if($('#zoom').classList.contains('on'))tilt(e)},{passive:true});
