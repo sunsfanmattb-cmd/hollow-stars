@@ -1,0 +1,286 @@
+/* ===== v8 UI: hub, badges, campaign map, quests, stats, crafting bar, cosmetic frames. Static styling; only opacity/transform transitions ===== */
+.screen.on{animation-duration:.18s}
+.menu.hub{display:grid;grid-template-columns:1fr 1fr;gap:10px 10px;width:min(88vw,360px);margin-top:12px}
+.menu.hub .btn{padding:.85em .5em;font-size:12.5px;letter-spacing:.12em;white-space:nowrap}
+body.land .menu.hub{display:grid;grid-template-columns:repeat(4,1fr);width:min(92vw,700px);max-width:none;margin-top:4px}
+body.land .menu.hub .btn{padding:.7em .5em;font-size:12px}
+.hlink{margin-top:8px;color:#9a8c78;font-size:11.5px;letter-spacing:.18em;text-transform:uppercase;padding:6px 10px;font-family:var(--serif)}
+body.land .hlink{margin-top:2px}
+.bdg{position:absolute;top:-7px;right:-5px;min-width:19px;height:19px;padding:0 5px;border-radius:10px;background:#b8102a;color:#fff;font:700 11px/19px system-ui,sans-serif;letter-spacing:0;text-shadow:none;box-shadow:0 0 0 2px #000,0 0 8px #ff2040aa;opacity:0;transform:scale(.6);transition:opacity .2s,transform .2s var(--ezo);pointer-events:none;z-index:3}
+.bdg.on{opacity:1;transform:none}
+.seg.dif small{flex:0 0 100%;text-align:center;color:#8a7e6e;font-size:11.5px;margin-top:2px}
+/* campaign */
+#camp .scroll{gap:8px}
+.ctabs button{display:flex;flex-direction:column;align-items:center;gap:1px;max-width:31vw;white-space:normal;line-height:1.15;font-size:11.5px}
+.ctabs button em{font-style:normal;font-size:10px;color:#8a7e6e}
+.cwrap{display:flex;flex-direction:column;gap:10px;width:min(100%,560px);align-items:center}
+body.land .cwrap{flex-direction:row;align-items:flex-start;width:min(100%,900px)}
+.cside{display:flex;flex-direction:column;gap:8px;width:100%;align-items:center}
+body.land .cside{flex:1;min-width:0}
+.cmap{position:relative;width:min(100%,520px);aspect-ratio:1/.92;flex:none;border-radius:6px;overflow:hidden;
+ background:radial-gradient(ellipse at 50% 0%,var(--glow,#6030a044),transparent 60%),radial-gradient(1px 1px at 12% 22%,#fff6,transparent),radial-gradient(1px 1px at 62% 38%,#fff5,transparent),radial-gradient(1.5px 1.5px at 84% 72%,#fff4,transparent),radial-gradient(1px 1px at 32% 64%,#fff4,transparent),radial-gradient(1px 1px at 90% 18%,#fff5,transparent),linear-gradient(180deg,#07050a,#020103);
+ box-shadow:0 0 0 1px #000,0 0 0 2px #5a4632,0 0 0 3px #120c08,inset 0 0 50px #000}
+body.land .cmap{width:min(46vw,360px)}
+.cmap.f-v{--glow:#7040c060}.cmap.f-m{--glow:#20a0c050}.cmap.f-c{--glow:#c0183460}
+.cmap svg{position:absolute;inset:0;width:100%;height:100%}
+.cpath{fill:none;stroke:#8a6a44;stroke-width:.6;stroke-dasharray:1.6 1.4;vector-effect:non-scaling-stroke;stroke-width:1.5px}
+.cdesc{position:absolute;left:8px;right:8px;bottom:6px;margin:0;font-size:11px;color:#8a7e6e;font-style:italic;text-align:right;line-height:1.3;max-width:62%;margin-left:auto}
+.cnode{position:absolute;width:46px;height:46px;margin:-23px 0 0 -23px;border-radius:50%;background:radial-gradient(circle at 50% 40%,#2a1218,#0a0406);box-shadow:0 0 0 2px #000,0 0 0 3px #8a6a44,0 0 14px #000;display:flex;align-items:center;justify-content:center;transition:transform .15s var(--ezo)}
+.cnode i{font-style:normal;font-family:var(--serif);font-size:17px;color:#f0e2cc}
+.cnode b{position:absolute;top:100%;margin-top:5px;left:50%;width:96px;margin-left:-48px;font:400 10.5px/1.15 var(--serif);letter-spacing:.04em;color:#d8ccb4;text-shadow:0 1px 2px #000,0 0 6px #000;text-align:center}
+.cnode.boss{width:60px;height:60px;margin:-30px 0 0 -30px;background:var(--bimg) center/cover,#0a0406;box-shadow:0 0 0 2px #000,0 0 0 3px #c0182e,0 0 18px #c0182e88}
+.cnode.done{box-shadow:0 0 0 2px #000,0 0 0 3px #d8b070,0 0 14px #ffd07055}
+.cnode.done::after{content:"✓";position:absolute;right:-4px;top:-4px;width:17px;height:17px;border-radius:50%;background:#d8b070;color:#140c04;font:700 11px/17px system-ui;text-align:center;box-shadow:0 0 0 2px #000}
+.cnode.lock{opacity:.42}.cnode.lock.boss{background:#0a0406}.cnode.lock.boss::before{content:"?";font:22px var(--serif);color:#6a5a4a}
+.cnode.sel{transform:scale(1.12)}.cnode.sel::before{content:"";position:absolute;inset:-7px;border-radius:50%;box-shadow:0 0 0 1.5px #ffe0a0,0 0 16px #ffd07088}
+.cdeck span{align-self:center;color:#8a7e6e;font-size:11.5px;letter-spacing:.1em;text-transform:uppercase;margin-right:2px}
+.cdeck button{max-width:40vw;overflow:hidden}.cdeck button span{color:inherit;text-transform:none;letter-spacing:.04em;font-size:calc(12px * var(--fit,1));white-space:nowrap;margin:0}
+.chp{width:min(100%,520px);padding:12px 14px!important;text-align:left}
+.chp h3{margin:0 0 6px;text-align:left;color:#e8d8bc;letter-spacing:.1em}
+.chp .story{font-style:italic;color:#c8bcaa;font-size:13px;line-height:1.45;margin:4px 0}
+.chp .story.post{color:#b0a490;border-left:2px solid #8a6a44;padding-left:8px}
+.crule{margin:8px 0;padding:6px 9px;background:#1a0608aa;box-shadow:inset 0 0 0 1px #5a1a20;font-size:12.5px;line-height:1.35}.crule p{margin:2px 0}.crule b{color:#ff8a8a}
+.crw{display:flex;flex-wrap:wrap;gap:4px 12px;justify-content:space-between;font-size:12px;color:#a89c8c;margin:6px 0 0}.crw b{color:#f0e2cc}.rc{color:#ffd88a!important}
+.chp .rowb{margin-top:10px}
+#ovx{max-width:min(340px,86vw)}.ovst{font-style:italic;color:#c8bcaa;font-size:12.5px;line-height:1.4;margin:6px 0}.ovcr,.ovq{font-size:12.5px;color:#e8d8bc;margin:4px 0}.ovq{color:#a0e8b0}
+.hero.boss .av{background-size:cover;background-position:center}
+/* quests */
+.qcal{display:grid;grid-template-columns:repeat(7,1fr);gap:5px;width:min(100%,520px)}
+.qd{position:relative;display:flex;flex-direction:column;align-items:center;gap:3px;padding:7px 2px;border-radius:3px;background:#0a0708;box-shadow:inset 0 0 0 1px #3a3028;font-size:11px;color:#a89c8c;min-width:0}
+.qd small{font-size:9.5px;letter-spacing:.06em;text-transform:uppercase}.qd b{font-weight:600;color:#e8dcc8;font-size:11px;display:flex;flex-direction:column;align-items:center;gap:2px;white-space:nowrap}
+.qd.now{box-shadow:inset 0 0 0 1.5px #ffd07a,0 0 12px #ffb04a55;background:#1e0e08}.qd.got{opacity:.55}.qd em{position:absolute;top:2px;right:4px;font-style:normal;color:#d8b070}
+.qpk{display:block;width:14px;height:18px;border-radius:2px;background:linear-gradient(160deg,#5a1020,#1a0408);box-shadow:0 0 0 1px #c8a070}
+.qlog{margin:10px 0 0;display:flex;justify-content:center}
+.qnote{color:#8a7e6e;font-size:12px;text-align:center;margin:6px 0;max-width:520px}
+.qlist{display:flex;flex-direction:column;gap:8px;width:min(100%,520px)}
+.qq{padding:10px 12px;border-radius:4px;background:linear-gradient(180deg,#0e0a0be6,#050304f0),var(--panel) center/cover;box-shadow:0 0 0 1px #000,0 0 0 2px #4a3e30 inset}
+.qq.full{box-shadow:0 0 0 1px #000,0 0 0 2px #d8b070 inset,0 0 14px #ffd07033}.qq.cl{opacity:.6}
+.qt{display:flex;justify-content:space-between;gap:10px;align-items:baseline}.qt b{font-family:var(--serif);font-weight:400;font-size:14px;color:#f0e4d0}.qt span{font-size:12px;color:#ffd88a;white-space:nowrap}
+.qq .pbarw{margin:7px 0 5px}.qa{display:flex;justify-content:space-between;align-items:center;min-height:28px}.qa small{color:#a89c8c}.qa em{font-style:normal;color:#8a7e6e;font-size:12px}
+/* stats */
+.stx{width:min(100%,520px);display:flex;flex-direction:column;gap:5px}.stx h3{margin:12px 0 4px}
+.stiles{display:grid;grid-template-columns:repeat(4,1fr);gap:6px}.stiles div{display:flex;flex-direction:column;align-items:center;padding:9px 2px;background:#0a0708;box-shadow:inset 0 0 0 1px #3a3028;border-radius:3px}
+.stiles b{font:400 22px var(--serif);color:#f0e2cc}.stiles small{font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:#8a7e6e}
+.srow{display:grid;grid-template-columns:minmax(0,1.3fr) minmax(0,1fr) 3em 4.5em;gap:8px;align-items:center;font-size:12.5px;color:#d8ccb4;padding:3px 0}
+.srow>span{white-space:nowrap;overflow:hidden;font-size:calc(12.5px * var(--fit,1))}.srow b{text-align:right;color:#f0e2cc}.srow small{color:#8a7e6e;text-align:right}
+.srow:not(:has(.pbarw)){grid-template-columns:minmax(0,1fr) 4em}
+.srow.f-v>span{color:#c8a0ff}.srow.f-m>span{color:#80e8f0}.srow.f-c>span{color:#ff8a9a}
+.shist{display:flex;flex-direction:column;gap:3px}.sh{display:grid;grid-template-columns:22px minmax(0,1fr) auto;gap:8px;align-items:center;font-size:12px;color:#c8bcaa;padding:3px 6px;background:#0a0708;box-shadow:inset 0 0 0 1px #2a2420}
+.sh i{font-style:normal;font-weight:700;text-align:center;border-radius:2px;font-size:11px;line-height:18px}.sh.w i{background:#2a6a3a;color:#d8ffe0}.sh.l i{background:#6a1a24;color:#ffd8dc}.sh.d i{background:#3a3a3a}
+.sh span{white-space:nowrap;overflow:hidden;font-size:calc(12px * var(--fit,1))}.sh small{color:#8a7e6e;white-space:nowrap}
+/* crafting bar */
+.qq .pbarw,.srow .pbarw{height:7px;border-radius:4px;background:#0a0608;box-shadow:0 0 0 1px #000,0 0 0 2px #3a2e22,inset 0 2px 4px #000;overflow:hidden}
+.qq .pbarw i,.srow .pbarw i{display:block;height:100%;background:linear-gradient(90deg,#5a1020,#c0283a,#ffb070)}.srow.f-v .pbarw i{background:linear-gradient(90deg,#3a1870,#a060ff)}.srow.f-m .pbarw i{background:linear-gradient(90deg,#0a4a5a,#40e0f0)}
+.craft{flex:none;width:100%;display:flex;flex-wrap:wrap;align-items:center;justify-content:center;gap:6px 8px;padding:8px 10px calc(8px + env(safe-area-inset-bottom));background:linear-gradient(180deg,#0a0607f4,#040203fa);box-shadow:0 -1px 0 #4a3e30,0 -8px 18px #000a;min-height:52px}
+.craft p{margin:0;font-size:12.5px;color:#a89c8c;text-align:center}
+.cfn{display:flex;flex-direction:column;min-width:0;flex:1 1 140px;overflow:hidden}.cfn b{font:400 calc(14px * var(--fit,1)) var(--serif);color:#f0e4d0;white-space:nowrap}.cfn small{font-size:11px;color:#8a7e6e}
+.cfx{font-size:11.5px;color:#c8a070;flex:1 1 160px}.cfv{flex:0 0 100%}.cfv button{font-size:11px;padding:.35em .7em}
+#cgrid .card.csel{outline:2px solid #ffd07a;outline-offset:2px}
+.lock.cmpl{display:flex;flex-direction:column;align-items:center;font-size:22px;color:#c8a070}.lock.cmpl small{font-size:9px;letter-spacing:.1em;text-transform:uppercase}
+/* cosmetic variants: static frame layer, no images, no blend, no animation */
+.card .vfr{position:absolute;inset:0;border-radius:inherit;pointer-events:none;z-index:5}
+.card.vr-gild .vfr{box-shadow:inset 0 0 0 .16em #f8d888,inset 0 0 0 .3em #6a4810,inset 0 0 0 .36em #ffe7a8aa,inset 0 0 1.4em #ffcf6a44}
+.card.vr-gild .nm span{color:#ffe6a8}
+.card.vr-crimson .vfr{box-shadow:inset 0 0 0 .16em #e02040,inset 0 0 0 .32em #2a0408,inset 0 0 0 .38em #ff607088,inset 0 0 1.6em #ff203055}
+.card.vr-crimson .nm span{color:#ffb8c0}
+.card.vr-void .vfr{box-shadow:inset 0 0 0 .16em #8a50ff,inset 0 0 0 .34em #05000c,inset 0 0 0 .4em #c0a0ff77,inset 0 0 1.8em #6020ff55;background:radial-gradient(.12em .12em at 8% 14%,#fff,transparent),radial-gradient(.1em .1em at 92% 30%,#e0d0ff,transparent),radial-gradient(.12em .12em at 6% 70%,#fff,transparent),radial-gradient(.1em .1em at 94% 86%,#fff,transparent)}
+.card.vr-void .nm span{color:#d8c8ff}
+.card.vr-prism .vfr{border:.2em solid transparent;border-image:linear-gradient(135deg,#ff9af0,#86fff0 25%,#fff0a8 50%,#ffa0c8 75%,#a8bcff) 1;box-shadow:inset 0 0 1.2em #ffffff22}
+.pslot .tag.vr{background:linear-gradient(90deg,#8a5a10,#ffd88a,#8a5a10);color:#1a0e02}
+
+/* ===== v8 tilt fix (RENDERING_RULES.md §10): one rotating 3D container, flat 2D children, light layers move by transform only ===== */
+#zoom .card,#zoom .card.zt{transform-style:flat}
+#zoom .card .art,#zoom .card .foil,#zoom .card .gw,#zoom .card .lg,#zoom .card .lge{transform-style:flat;backface-visibility:visible}
+#zoom .card.zt .foil::after{display:none;animation:none}
+#zoom .card.zt .foil{overflow:hidden}
+#zoom .card.zt .fsh,#zoom .card.zt .glare{will-change:transform}
+#zoom .card.zt .lg .lf{display:none}
+/* a border-radius clip on the full-art layer re-rasterised it on every tilt frame (tests/tiltprobe.py: ~35 paints/s); the same rounded
+   corner as a static clip-path costs nothing while the card rotates */
+#zoom .card.zt.full .art{border-radius:0!important;clip-path:inset(0 round calc(var(--cw)*.06))}
+.pfront .card,.pfront .card *{transform-style:flat}
+
+/* ===== v9 UI (static styling; transitions on transform/opacity only; see RENDERING_RULES.md §11 battery) ===== */
+:root{--gild:#c8a070;--gild2:#8a6a44;--ink:#e8dcc8;--mute:#a89c8c;--pnlbg:linear-gradient(180deg,#0c0809e8,#040203f2),var(--panel) center/cover,#050304;
+ --pnlsh:0 0 0 1px #000,0 0 0 2px #6a5640,0 0 0 3px #120c08,0 0 0 4px #3a2e22,inset 0 0 0 1px #c8a07022,inset 0 0 24px #000,0 12px 30px #000c}
+/* battery: everything that loops is frozen while idle or backgrounded (no restart: play-state only) */
+body.idle *,body.idle *::before,body.idle *::after{animation-play-state:paused!important}
+.bnote{margin:-4px 0 0;font-size:11px;color:#8a7e70;line-height:1.35}
+/* ornate panel: card-frame style double gilt line + corner diamonds (static) */
+.how,.qq,.gtfoe,.wkmod,.wkp,.cdx,.ach,.gthd,.gtlast,.stiles div,.cdprog,#settings .sbox,#dlg .dbox,.ovbox{position:relative}
+.how,.wkmod,.wkp,.gtfoe,.cdx,.gthd{background:var(--pnlbg);box-shadow:var(--pnlsh);border-radius:3px}
+.how::before,.wkmod::before,.gtfoe::before,.cdx::before,.gthd::before,#settings .sbox::before{content:"";position:absolute;inset:5px;border:1px solid #c8a07026;border-radius:2px;pointer-events:none}
+.how::after,.wkmod::after,.gtfoe::after,.cdx::after,.gthd::after,#settings .sbox::after{content:"";position:absolute;left:50%;top:-4px;width:7px;height:7px;margin-left:-3.5px;background:var(--gild);transform:rotate(45deg);box-shadow:0 0 0 1.5px #000,0 0 8px #ff6a3a88;pointer-events:none}
+.scroll h3{font-family:var(--serif);font-weight:400;letter-spacing:.22em;font-size:12.5px;color:#c8b89c;margin:16px 0 8px;text-align:center}
+.scroll>.rowb{margin-top:16px}
+.seg button{transition:transform .14s var(--ez),opacity .2s}.seg button:active{transform:scale(.95)}
+.dsub{text-align:center}
+/* ---- title / hub ---- */
+body.painted #teye{display:none}
+#title{justify-content:stretch}
+.tscrim{position:absolute;inset:0;pointer-events:none;background:linear-gradient(180deg,#000d 0,#0008 16%,#0000 30%,#0000 52%,#000a 66%,#000e 100%)}
+body.land .tscrim{background:radial-gradient(ellipse 62% 90% at 78% 72%,#000e 0,#000a 45%,#0000 75%),linear-gradient(180deg,#0006,#0000 30%)}
+#title .tbox{position:relative;z-index:1;width:100%;height:100%;margin:0;padding:max(5vh,env(safe-area-inset-top)) 4vw max(2.5vh,env(safe-area-inset-bottom));display:flex;flex-direction:column;align-items:center;justify-content:space-between;gap:0}
+body.painted #title .tbox,body.painted.land #title .tbox{margin-top:0}
+.thead{display:flex;flex-direction:column;align-items:center;gap:6px;padding:10px 18px 12px}
+.thead h1{font-size:clamp(38px,12vw,84px)}
+.tmenu{display:flex;flex-direction:column;align-items:center;gap:10px;width:min(94vw,420px)}
+.menu.hub.main,.menu.hub.sec{margin:0;width:100%}
+.menu.hub.main{grid-template-columns:1fr 1fr;gap:10px}
+.menu.hub.main .btn{padding:1em .4em;font-size:clamp(11.5px,3.3vw,14px);letter-spacing:.14em}
+.menu.hub.sec{grid-template-columns:repeat(4,1fr);gap:7px}
+.menu.hub.sec .btn{padding:.78em .2em;font-size:clamp(9.5px,2.65vw,11.5px);letter-spacing:.05em}
+body.land #title .tbox{align-items:flex-end;justify-content:flex-end;padding:3vh 3.5vw 3vh 50vw;gap:8px}
+body.land .thead{align-items:center;width:min(46vw,440px);padding:0 0 2px}
+body.land .thead h1{font-size:clamp(28px,7.2vh,54px)}body.land .thead .sub{font-size:11.5px}
+body.land .tmenu{width:min(46vw,440px);gap:7px}
+body.land .menu.hub.main{grid-template-columns:repeat(2,1fr);gap:7px}body.land .menu.hub.main .btn{padding:.72em .3em;font-size:12px}
+body.land .menu.hub.sec{grid-template-columns:repeat(4,1fr);gap:6px}body.land .menu.hub.sec .btn{padding:.6em .2em;font-size:10.5px}
+body.land .hlink{margin:0;padding:3px 8px}
+body.land .menu.hub.main,body.land .menu.hub.sec,#title .menu.hub{width:100%;max-width:none;margin:0}
+.menu.hub.sec .btn.ghost{color:#d8ccb8}
+/* Goop God menu art: slow transform-only drift, portrait/landscape crops; procedural glow off (the eye is painted) */
+body.mbg #pbg .pg{display:none}
+body.mbg.land #pbg .pl{background-position:50% 22%}
+body.mbg[data-scr=title] #pbg .pl,body.mbg.q-medium[data-scr=title] #pbg .pl{animation:mbgd 80s ease-in-out infinite alternate}
+@keyframes mbgd{from{transform:scale(1.02) translate3d(.6%,.4%,0)}to{transform:scale(1.06) translate3d(-.8%,-.6%,0)}}
+body.mbg.q-low #pbg .pl{animation:none}
+@media (prefers-reduced-motion:reduce){body.mbg #pbg .pl{animation:none!important}}
+body.mbg[data-scr=title] #pbg .pd{opacity:0}
+/* board theme overlay: static gradient over the painted mat (normal blending, never on cards) */
+#pbg .th{inset:0;background:var(--th,none);opacity:0;transition:opacity .6s}
+body[data-scr=match]:not([data-th=none]) #pbg .th{opacity:1}
+/* ---- deck list: faction shown = real deck faction ---- */
+.drow .dfac{color:var(--f2,#c8b8a0)}
+/* ---- campaign: landscape fits one screen, no page scroll ---- */
+body.land #camp .scroll{height:100%;overflow:hidden;padding-top:6px;padding-bottom:6px}
+body.land #camp h2{margin:2px 0;font-size:17px}body.land #camp .orn{display:none}
+body.land #camp .ctabs button{font-size:10.5px;padding:.3em .8em}
+body.land #camp .cwrap{flex:1;min-height:0;align-items:stretch}
+body.land #camp .cmap{height:100%;width:auto;max-width:44vw;aspect-ratio:1/.92}
+body.land #camp .cside{height:100%;overflow-y:auto;justify-content:flex-start;padding-right:4px;overscroll-behavior:contain}
+body.land #camp .scroll>.rowb{position:absolute;left:10px;top:6px;width:auto;margin:0;padding:0;background:none}
+body.land #camp .scroll>.rowb .btn{padding:.45em .9em;font-size:11px}
+/* ---- collection craft bar: one tidy row, grid never covered ---- */
+#coll #cgrid{padding-bottom:10px}
+.craft{display:grid;grid-template-columns:minmax(0,1fr) auto auto;gap:6px 8px;justify-items:stretch}
+.craft p{grid-column:1/-1}.craft .cfn{min-width:0}.craft .cfn b{display:block;white-space:nowrap;overflow:hidden;font-size:calc(14px*var(--fit,1))}
+.craft .cfv{grid-column:1/-1;justify-content:center}.craft .cfx{grid-column:2/-1;text-align:right}
+/* ---- hand: fading echo copy ---- */
+#hand .card.echo .art{opacity:.82}
+#hand .card .ech{position:absolute;left:50%;top:-8px;transform:translateX(-50%);z-index:9;padding:1px 7px;border-radius:8px;font:700 9px/14px system-ui;letter-spacing:.12em;color:#e0d0ff;background:#2a1448;box-shadow:0 0 0 1px #000,0 0 8px #a070ff88}
+.unit .atk.dn b{color:#b0ff70}
+[data-kw]{cursor:help}
+/* ---- gauntlet ---- */
+.gtx,.wkx{width:min(100%,560px);display:flex;flex-direction:column;align-items:center;gap:10px}
+.gtin{color:#c8bcaa;font-style:italic;text-align:center;font-size:14px;line-height:1.5;margin:0 6px}
+.gtlast{color:#d8ccb4;font-size:13px}
+.gtx .stiles{width:100%}
+.gthd{display:flex;justify-content:space-around;gap:10px;width:100%;padding:10px}.gthd small{display:block;text-align:center;font-size:10px;letter-spacing:.14em;color:#8a7e6e;margin-bottom:5px}
+.pips{display:flex;gap:4px;justify-content:center;flex-wrap:wrap}.pips i{width:12px;height:12px;transform:rotate(45deg);background:#120c0a;box-shadow:0 0 0 1px #000,0 0 0 2px #4a3e30}
+.pips i.on{background:linear-gradient(135deg,#ffe0a0,#c8a070 50%,#6a4a20);box-shadow:0 0 0 1px #000,0 0 8px #ffb06088}
+.pips.l i.on{background:linear-gradient(135deg,#ff8a9a,#c0182e 55%,#4a0610)}
+.gtfoe{display:flex;gap:14px;align-items:center;width:100%;padding:12px 14px}.gtfoe .ta{width:70px;height:70px;border-radius:50%;flex:none;background-size:cover;box-shadow:0 0 0 2px #000,0 0 0 4px var(--f3,#8a6a44),0 0 14px var(--glow,#0000)}
+.gtfoe small{font-size:10px;letter-spacing:.16em;color:#8a7e6e}.gtfoe b{display:block;font:400 18px var(--serif);letter-spacing:.06em;color:#f0e2cc;margin:2px 0}.gtfoe p{margin:0;font-size:12.5px;color:#a89c8c}
+.gtpick{display:flex;gap:10px;justify-content:center;flex-wrap:wrap}.gtpick .card{--cw:min(31vw,170px);cursor:pointer;transition:transform .15s var(--ez)}.gtpick .card:active{transform:scale(.96)}
+.gtdeck{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:4px;width:100%}
+.gtdeck span{display:flex;gap:6px;align-items:center;font-size:12px;color:#d8ccb4;padding:4px 7px;background:#0a0708;box-shadow:inset 0 0 0 1px #2e2620;border-radius:2px;white-space:nowrap;overflow:hidden}
+.gtdeck span b{font:400 12px var(--serif);color:#9ad0ff;min-width:12px}.gtdeck span.new{box-shadow:inset 0 0 0 1px #c8a070}
+/* ---- weekly ---- */
+.wkmod{width:100%;padding:16px 16px 14px;text-align:center}.wkmod small{font-size:10.5px;letter-spacing:.18em;color:#8a7e6e}
+.wkmod h3{font:400 22px var(--serif)!important;letter-spacing:.12em!important;color:#f0e2cc!important;margin:6px 0 6px!important;text-shadow:0 0 16px #c0102a}
+.wkmod p{margin:0;color:#c8bcaa;font-size:14px}
+.wkp{width:100%;padding:12px 14px;text-align:center}.wkp p{margin:8px 0 0;font-size:12.5px;color:#a89c8c}.wkp .pips i{width:18px;height:18px;margin:0 6px}
+/* ---- codex ---- */
+.cdprog{width:min(100%,560px);text-align:center;font-size:12.5px;color:#a89c8c}.cdprog b{color:#f0e2cc}.cdprog .pbarw{margin-top:6px;height:7px;border-radius:4px;background:#0a0608;box-shadow:0 0 0 1px #000,0 0 0 2px #3a2e22;overflow:hidden}
+.cdprog .pbarw i,.achx>.pbarw i{display:block;height:100%;background:linear-gradient(90deg,#5a1020,#c0283a,#ffb070)}
+.cdfac{max-width:560px;font-size:12.5px;color:#a89c8c;text-align:center;margin:4px 8px}
+.cdwrap{display:flex;flex-direction:column;gap:12px;width:min(100%,900px)}
+body.land .cdwrap,.cdwrap.wide{flex-direction:row;align-items:flex-start}
+.cdgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(84px,1fr));gap:8px;flex:1}
+.cdt{display:flex;flex-direction:column;gap:4px;align-items:stretch;padding:4px;border-radius:3px;background:#0a0708;box-shadow:0 0 0 1px #000,inset 0 0 0 1px #3a3028;transition:transform .14s var(--ez)}
+.cdt:active{transform:scale(.95)}.cdt.on{box-shadow:0 0 0 1px #000,inset 0 0 0 2px var(--gild),0 0 12px #c0102a66}
+.cdt i{display:block;aspect-ratio:4/3;background:#150e10 center/cover;border-radius:2px}
+.cdt.qL i{aspect-ratio:4/3;background-position:50% 22%}
+.cdt span{font:400 10.5px/1.15 var(--serif);color:#d8ccb4;text-align:center;min-height:2.3em;display:flex;align-items:center;justify-content:center}
+.cdt.unk i{background:radial-gradient(circle at 50% 45%,#2a2024,#08060a 70%)}.cdt.unk span{color:#5a5048}
+.cdx{width:100%;padding:12px!important;display:flex;flex-direction:column;gap:10px}
+body.land .cdx{width:44%;position:sticky;top:0}
+.cdart{width:100%;aspect-ratio:4/3;background:#100a0c center/cover;border-radius:2px;box-shadow:0 0 0 1px #000,0 0 0 2px #4a3e30}
+.cdart.unk{background:radial-gradient(circle at 50% 45%,#2a1a20,#050304 70%)}
+.cdtx h3{margin:0 0 2px!important;text-align:left!important;font-size:17px!important;letter-spacing:.06em!important;color:#f0e2cc!important}
+.cdty{margin:0;font-size:11.5px;color:#8a7e6e;letter-spacing:.06em}.cdrt{margin:8px 0 4px;font-size:13px}.cdlore{margin:8px 0;font-size:13.5px;line-height:1.5;color:#d0c4b0}
+.cdx .fl{font-style:italic;color:#a8906c;margin:6px 0}.cdst{font-size:11.5px;color:#8a7e6e;margin:4px 0 0}
+/* ---- achievements + cosmetics ---- */
+.achx{width:min(100%,640px);display:flex;flex-direction:column;gap:8px}
+.achx>.pbarw{height:7px;border-radius:4px;background:#0a0608;box-shadow:0 0 0 1px #000,0 0 0 2px #3a2e22;overflow:hidden}
+.achl{display:grid;grid-template-columns:1fr;gap:6px}body.land .achl{grid-template-columns:1fr 1fr}
+.ach{display:grid;grid-template-columns:28px minmax(0,1fr) auto;gap:10px;align-items:center;padding:8px 10px;border-radius:3px;background:var(--pnlbg);box-shadow:0 0 0 1px #000,0 0 0 2px #3a3028 inset;opacity:.62}
+.ach.got{opacity:1;box-shadow:0 0 0 1px #000,0 0 0 2px #c8a070 inset,0 0 12px #ffd07022}
+.ach .am{font-style:normal;font-size:18px;color:#6a5a4a;text-align:center}.ach.got .am{color:#ffd080;text-shadow:0 0 8px #ffb060}
+.ach b{display:block;font:400 13.5px var(--serif);letter-spacing:.06em;color:#f0e2cc}.ach small{display:block;font-size:11.5px;color:#a89c8c}
+.ach em{font-style:normal;font-size:10.5px;color:#c8a070;text-align:right;max-width:9.5em}
+.cosg{display:grid;gap:8px}.cosg.backs{grid-template-columns:repeat(auto-fill,minmax(92px,1fr))}.cosg.themes{grid-template-columns:repeat(auto-fill,minmax(140px,1fr))}
+.cos{display:flex;flex-direction:column;gap:4px;padding:6px;border-radius:3px;background:#0a0708;box-shadow:0 0 0 1px #000,inset 0 0 0 1px #3a3028;transition:transform .14s var(--ez),opacity .2s;text-align:center}
+.cos:active{transform:scale(.96)}.cos.on{box-shadow:0 0 0 1px #000,inset 0 0 0 2px var(--gild),0 0 14px #c0102a66}.cos.unk{opacity:.5}
+.cos i{display:block;border-radius:4px;box-shadow:0 0 0 1px #000,0 0 0 2px #5a4a3a}.cos.cb i{aspect-ratio:5/7}.cos.tb i{aspect-ratio:16/9}
+.cos b{font:400 11.5px var(--serif);color:#e8dcc8;letter-spacing:.04em}.cos small{font-size:10px;color:#8a7e6e}
+#settings #sCos{align-self:center}
+/* ---- general polish ---- */
+.tile{transition:opacity .2s,transform .14s var(--ez)}.tile:active{transform:scale(.985)}
+.qq,.srow{transition:opacity .2s}
+#toast{max-width:92vw;white-space:normal;text-align:center}
+
+/* ---- v9.1 title / hub layout (fluid, centered) ----
+   v9 pinned the landscape hub to the bottom-right corner (padding-left:50vw + align/justify flex-end) with fixed px sizes
+   (440px block, 12px buttons, 54px title). On big or fullscreen desktop windows it sat in the far corner, tiny, and ran past
+   the right edge. Now: one centered column, sized from viewport units with px floors, never wider than the window. */
+body.land #title .tbox{align-items:center;justify-content:safe center;gap:clamp(6px,1.2vh,22px);
+ padding:max(16vh,env(safe-area-inset-top)) max(3vw,env(safe-area-inset-right)) max(4vh,env(safe-area-inset-bottom)) max(5vw,env(safe-area-inset-left));overflow:hidden}
+body.land .tscrim{background:radial-gradient(ellipse 46% 62% at 52% 60%,#000c 0,#0009 45%,#0000 80%),linear-gradient(180deg,#0005,#0000 26%)}
+body.land .thead{width:auto;max-width:100%;padding:0 0 2px;gap:clamp(4px,.7vh,14px)}
+body.land .thead h1{font-size:clamp(28px,min(8.4vh,7vw),300px)}
+body.land .thead .orn{width:min(70%,42vh)}
+body.land .thead .sub{font-size:clamp(11px,min(1.6vh,1.15vw),34px)}
+body.land .tmenu{width:clamp(380px,72vh,94vw);max-width:94vw;gap:clamp(6px,1vh,20px)}
+body.land .menu.hub.main{gap:clamp(7px,1vh,20px)}
+body.land .menu.hub.main .btn{font-size:clamp(12px,min(1.95vh,1.35vw),42px);padding:.78em .3em}
+body.land .menu.hub.sec{gap:clamp(6px,.8vh,16px)}
+body.land .menu.hub.sec .btn{font-size:clamp(10.5px,min(1.45vh,1vw),31px);padding:.66em .2em}
+body.land .hlink{font-size:clamp(11px,min(1.3vh,.95vw),28px)}
+/* desktop-size portrait windows scale up too; phone portrait values are unchanged (the min() picks the old vw term on phones) */
+.thead h1{font-size:clamp(38px,min(12vw,8.4vh),220px)}
+.tmenu{width:min(94vw,max(420px,52vh))}
+.menu.hub.main .btn{font-size:clamp(11.5px,min(3.3vw,1.9vh),34px)}
+.menu.hub.sec .btn{font-size:clamp(9.5px,min(2.65vw,1.5vh),26px)}
+
+/* ---- v9.1 desktop menu scale: menus/panels were laid out in fixed px for phones and looked tiny on big windows.
+   layout() sets --dmz = min(W/1000,H/640) (landscape) clamped 1..3; phones stay at 1. CSS zoom re-lays out the menu screens
+   in a smaller virtual viewport (no transform, no repaint per frame), so nothing is clipped and everything scales together. */
+body.dz .screen:not(#match):not(#title),body.dz #settings .sbox,body.dz #dlg .dbox,body.dz .ovbox{zoom:var(--dmz,1)}
+
+/* ---- v9.1 match HUD: hero portrait, name, Madness, Flux, deck/hand counts and Sanity scale with --hz (set in layout()).
+   CSS zoom on the panel only: its grid column (--side) is widened in layout() by the same factor so the board never overlaps. */
+#match .hero{zoom:var(--hz,1)}
+body.land #match #mid{zoom:min(var(--hz,1),1.6)}
+
+/* ---- v9.1 campaign: v9 sized the map from height (height:100% + aspect-ratio) capped at 44vw, so on tall desktop windows it ate
+   the 900px row and squeezed the side panel (difficulty, deck choice, chapter text) to a ~40px sliver. The side panel now has a floor. */
+body.land #camp .cwrap{width:min(100%,1000px)}
+body.land #camp .cside{flex:1 0 clamp(240px,34%,380px)}
+body.land #camp .cmap{flex:0 1 auto;min-width:0;max-width:calc(100% - clamp(240px,34%,380px) - 10px)}
+/* ---- v9.1 themed scrollbars: thin dark track, muted bronze/blood thumb; only shown where content actually scrolls (overflow:auto) */
+*{scrollbar-width:thin;scrollbar-color:#6a3a2c #0a0607}
+::-webkit-scrollbar{width:8px;height:8px;background:transparent}
+::-webkit-scrollbar-track{background:#0a0607cc;border-radius:8px;box-shadow:inset 0 0 0 1px #1a100c}
+::-webkit-scrollbar-thumb{background:linear-gradient(180deg,#7a4a30,#5a1a1c);border-radius:8px;border:2px solid #0a0607;min-height:36px}
+::-webkit-scrollbar-thumb:hover{background:linear-gradient(180deg,#9a6a44,#7a2026)}
+::-webkit-scrollbar-corner,::-webkit-scrollbar-button{display:none;background:transparent}
+html,body{scrollbar-width:none}html::-webkit-scrollbar,body::-webkit-scrollbar{display:none}
+body.dz #hand{height:calc(var(--hh) + 20px + var(--hh)*.03)}/* bigger desktop hands: room for the fan rotation */
+/* v9.1 desktop card view: the zoomed card was capped at 260px (phone size) and looked tiny on big windows; scale it with --dmz.
+   Only --cw changes (static size, no animation), so the tilt/holo layers are untouched. */
+body.dz #zoom .card{--cw:min(calc(260px*var(--dmz,1)),64vw,calc(60vh/1.4))}
+body.dz #zoom.modal .card{--cw:min(calc(260px*var(--dmz,1)*1.12),64vw,calc(64vh/1.4))}
+body.dz #zoom .kd{max-width:min(calc(300px*var(--dmz,1)),86vw);font-size:calc(12.5px*min(var(--dmz,1),1.9))}
+.pvb{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);z-index:8;pointer-events:none;padding:.15em .45em;border-radius:4px;background:#0a0204e6;color:#ffd6d6;font:800 calc(var(--uw)*.19)/1.15 var(--serif);letter-spacing:.06em;white-space:nowrap;box-shadow:0 0 0 1px #ff4a5a,0 0 10px #000;text-shadow:0 0 6px #ff304088}.pvb.bad{color:#ffc080;box-shadow:0 0 0 1px #c87a30,0 0 10px #000;text-shadow:none}.pvb.lethal{color:#fff;background:#8a0010ee;font-size:15px;box-shadow:0 0 0 1px #ffb0b0,0 0 16px #ff2030}
