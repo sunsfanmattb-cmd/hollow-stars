@@ -1,0 +1,12 @@
+{
+	"appId": "com.sunsfanmattb.hollowstars",
+	"appName": "Hollow Stars",
+	"webDir": "www",
+	"backgroundColor": "#000000",
+	"android": {
+		"allowMixedContent": false,
+		"captureInput": false,
+		"webContentsDebuggingEnabled": false,
+		"backgroundColor": "#000000"
+	}
+}
