@@ -2,7 +2,7 @@
 <html lang="en"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no">
 <meta name="theme-color" content="#05030a">
-<title>Hollow Stars — a card game of cosmic dread</title>
+<title>Hollow Stars — a card game of cosmic dread</title><!-- v1.6 -->
 <style>
 /* Hollow Stars. RENDERING RULES: read /RENDERING_RULES.md before changing card visuals, animations, video or art.
    (transform/opacity only, no blend modes or animated filters, no class toggling mid-animation or DOM rebuilds, video rules,
@@ -1062,7 +1062,7 @@ body.dz #hand{height:calc(var(--hh) + 20px + var(--hh)*.03)}/* bigger desktop ha
 body.dz #zoom .card{--cw:min(calc(260px*var(--dmz,1)),64vw,calc(60vh/1.4))}
 body.dz #zoom.modal .card{--cw:min(calc(260px*var(--dmz,1)*1.12),64vw,calc(64vh/1.4))}
 body.dz #zoom .kd{max-width:min(calc(300px*var(--dmz,1)),86vw);font-size:calc(12.5px*min(var(--dmz,1),1.9))}
-</style></head><body>
+.pvb{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);z-index:8;pointer-events:none;padding:.15em .45em;border-radius:4px;background:#0a0204e6;color:#ffd6d6;font:800 calc(var(--uw)*.19)/1.15 var(--serif);letter-spacing:.06em;white-space:nowrap;box-shadow:0 0 0 1px #ff4a5a,0 0 10px #000;text-shadow:0 0 6px #ff304088}.pvb.bad{color:#ffc080;box-shadow:0 0 0 1px #c87a30,0 0 10px #000;text-shadow:none}.pvb.lethal{color:#fff;background:#8a0010ee;font-size:15px;box-shadow:0 0 0 1px #ffb0b0,0 0 16px #ff2030}</style></head><body>
 <div id="pbg"><i class="pl"></i><i class="pg"></i><i class="th"></i><i class="pd"></i></div><canvas id="bg"></canvas><div id="fog"><i class="f1"></i><i class="f2"></i></div><div id="vig"></div><div id="grain"></div>
 <button id="mute" aria-label="Toggle sound"></button>
 <section id="title" class="screen on"><canvas id="teye"></canvas>
@@ -1102,7 +1102,7 @@ body.dz #zoom .kd{max-width:min(calc(300px*var(--dmz,1)),86vw);font-size:calc(12
 </section>
 <svg id="arrow"><defs><marker id="ah" markerWidth="8" markerHeight="8" refX="4" refY="4" orient="auto"><path d="M0 .6L7.4 4L0 7.4L1.6 4z" fill="#ff5a66"/></marker></defs><path class="arg" id="arg"/><path id="arl" stroke-linecap="round" marker-end="url(#ah)"/></svg>
 <div id="hflash"></div><div id="cin"><div class="crays"></div><div class="cpan"><video muted playsinline loop preload="auto"></video></div><div class="cname"><small></small><b></b></div><div class="cskip">TAP TO SKIP</div></div>
-<div id="settings"><div class="sbox"><h2>SETTINGS</h2><div class="orn"></div><label>Volume <input type="range" id="sVol" min="0" max="100" value="80"></label><label>Mute sound <input type="checkbox" id="sMute"></label><label><span>Quality<small id="sQn"></small></span><select id="sQ"><option value="auto">Auto</option><option value="high">High</option><option value="medium">Medium</option><option value="low">Low (reduce effects)</option></select></label><p class="bnote">Battery saver is always on: effects pause after 10 s without input and everything stops in the background.</p><button class="btn sm ghost" id="sCos">Card Backs &amp; Board Themes</button><div class="rowb"><button class="btn" id="sClose">Close</button></div></div></div>
+<div id="settings"><div class="sbox"><h2>SETTINGS</h2><div class="orn"></div><label>Volume <input type="range" id="sVol" min="0" max="100" value="80"></label><label>Mute sound <input type="checkbox" id="sMute"></label><label><span>Quality<small id="sQn"></small></span><select id="sQ"><option value="auto">Auto</option><option value="high">High</option><option value="medium">Medium</option><option value="low">Low (reduce effects)</option></select></label><label><span>Game speed<small>animations and enemy turns</small></span><select id="sSpd"><option value="1">Normal</option><option value="0.6">Fast</option><option value="0.35">Very fast</option></select></label><p class="bnote">Battery saver is always on: effects pause after 10 s without input and everything stops in the background.</p><button class="btn sm ghost" id="sCos">Card Backs &amp; Board Themes</button><div class="rowb"><button class="btn" id="sClose">Close</button></div></div></div>
 <div id="banner"></div><div id="preview"></div><div id="zoom"></div><div id="kwtip"></div><div id="toast"></div><div id="dlg" role="dialog" aria-modal="true"><div class="dbox"><b id="dlgT"></b><p id="dlgX"></p><input id="dlgI" maxlength="24" autocomplete="off" enterkeyhint="done" spellcheck="false"><div class="rowb"><button class="btn sm ghost" id="dlgNo">Cancel</button><button class="btn sm" id="dlgOk">OK</button></div></div></div>
 <div id="over"><div class="ovbg"></div><div class="ovbox"><div class="ovsig"></div><h2 id="ovt"></h2><p id="ovp"></p><div id="ovrw"></div><div id="ovx"></div><button class="btn" id="ovk" hidden><span>Open a Pack</span></button><div class="rowb"><button class="btn ghost" id="ovm">Menu</button><button class="btn ghost" id="ovr">Play again</button></div></div></div>
 /* Hollow Stars. RENDERING RULES: read /RENDERING_RULES.md before changing card visuals, animations, video or art.
@@ -1269,7 +1269,7 @@ function units(g){return g.p[0].board.concat(g.p[1].board)}
 function findU(g,uid){for(const p of g.p)for(const u of p.board)if(u.uid===uid)return u}
 function resolve(g,t){if(!t)return null;if(t[0]==='h')return{k:'h',pi:+t[1]};const u=findU(g,+t.slice(1));return u?{k:'u',pi:u.o,u}:null}
 function addMad(g,pi,n){if(n>0&&g.rule&&g.rule.includes('w_mad'))n*=2;const p=g.p[pi],b=p.mad;p.mad=Math.max(0,Math.min(10,p.mad+n));if(p.mad!==b)fx(g,{k:'mad',pi,n:p.mad-b})}
-function healH(g,pi,n){const p=g.p[pi],b=p.san;p.san=Math.min(20,p.san+n);if(p.san>b)fx(g,{k:'heal',id:'h'+pi,n:p.san-b})}
+function healH(g,pi,n){const p=g.p[pi],b=p.san,cap=Math.max(20,p.cap||20);if(p.san>=cap)return;p.san=Math.min(cap,p.san+n);if(p.san>b)fx(g,{k:'heal',id:'h'+pi,n:p.san-b})}
 function hurtH(g,pi,n,src){if(n<=0)return;g.p[pi].san-=n;if(pi===1&&g.st)g.st.dmg+=n;fx(g,{k:'dmg',id:'h'+pi,n,s:src?src.uid:0,f:src?C[src.id].f:g.sf||null});if(src&&src.k.includes('drain'))healH(g,src.o,n)}
 function hurtU(g,u,n,src){if(n<=0||u.dead)return;if(u.k.includes('ward')){u.k=u.k.filter(k=>k!=='ward');fx(g,{k:'ward',id:'u'+u.uid});return}u.h-=n;if(src&&src.k.includes('corrupt')&&u.h>0&&u.a>0){u.a--;fx(g,{k:'cor',id:'u'+u.uid})}fx(g,{k:'dmg',id:'u'+u.uid,n,s:src?src.uid:0,f:src?C[src.id].f:g.sf||null});if(src){if(src.k.includes('blight')&&u.h>0){u.h=0;fx(g,{k:'blight',id:'u'+u.uid})}if(src.k.includes('drain'))healH(g,src.o,n)}}
 function hurt(g,T,n,src){if(T.k==='h')hurtH(g,T.pi,n,src);else hurtU(g,T.u,n,src)}
@@ -1295,14 +1295,14 @@ function play(g,pi,huid,tg){const p=g.p[pi],i=p.hand.findIndex(c=>c.uid===huid);
 function attack(g,pi,uid,tg){const u=g.p[pi].board.find(x=>x.uid===uid);if(!u||g.over||g.cur!==pi||!canAtk(u)||!atkTargets(g,pi,u).includes(tg))return false;const T=resolve(g,tg);u.atk=1;
  if(T.k==='h')hurtH(g,T.pi,u.a,u);else{const v=T.u,va=v.a;hurtU(g,v,u.a,u);hurtU(g,u,va,v);for(const[a,b]of[[u,v],[v,u]])if(a.k.includes('devour')&&a.h>0&&b.h<=0){buff(a,1,1);fx(g,{k:'buff',id:'u'+a.uid})}}
  cleanup(g);return true}
-function startTurn(g){const pi=g.cur,p=g.p[pi];g.turn++;p.max=Math.min(10,p.max+1);p.flux=p.max;for(const u of p.board){u.ready=true;u.atk=0}
+function startTurn(g){const pi=g.cur,p=g.p[pi];g.turn++;p.max=Math.min(10,p.max+1);p.flux=p.max;if(p.bonusF){p.flux+=p.bonusF;p.bonusF=0}for(const u of p.board){u.ready=true;u.atk=0}
  fx(g,{k:'turn',pi});for(const u of p.board.slice()){const d=C[u.id];if(d.start&&u.h>0)d.start(g,pi,u)}if(g.rule&&g.rule.length)ruleStart(g,pi);
  if(g.turn>1)draw(g,pi,g.rule&&g.rule.includes('w_draw')&&g.turn>2?2:1);cleanup(g)}
 function endTurn(g){if(g.over)return;const pi=g.cur;for(const u of g.p[pi].board.slice()){const d=C[u.id];if(d.end&&u.h>0)d.end(g,pi,u)}{const h=g.p[pi].hand,n=h.length;g.p[pi].hand=h.filter(c=>!c.echo);if(g.p[pi].hand.length<n)fx(g,{k:'echoFade',pi})}cleanup(g);if(g.over)return;g.cur=1-pi;
  if(g.turn>=120){g.over=true;const s=g.p.map(p=>p.san-p.mad);g.winner=s[0]===s[1]?-1:s[0]>s[1]?0:1;g.reason='time';return}startTurn(g)}
 function newGame(d0,d1,o={}){const g={p:[],cur:0,turn:0,uid:1,fx:[],over:false,winner:null,sim:o.sim?1:0,rule:(o.rule||[]).slice(),dif:o.dif||'normal',st:{rites:0,units:0,dmg:0,leg:0,plays:{}}};
  [d0,d1].forEach((d,pi)=>g.p.push({fac:d.fac,name:d.name,deck:shuffle(d.cards.slice()),hand:[],board:[],san:20,mad:0,flux:0,max:0,fat:0,ai:!!(o.ai&&o.ai[pi])}));
- ruleInit(g,o);g.cur=o.first??(rnd()<.5?0:1);draw(g,0,5);draw(g,1,5);g.fx=[];startTurn(g);return g}
+ ruleInit(g,o);for(const p of g.p)p.cap=Math.max(20,p.san);g.cur=o.first??(rnd()<.5?0:1);draw(g,0,5);draw(g,1,5);/* v1.6: the side going second draws a 6th card and gets +1 Flux on its first turn (AI self-play: first-player win rate 70% -> 49%) */{const s2=1-g.cur;draw(g,s2,1);g.p[s2].bonusF=1;g.second=s2}g.fx=[];startTurn(g);return g}
 /* v8 chapter rules (campaign) + difficulty edge. Rules are plain strings in g.rule; all effects are ordinary engine calls. */
 function ruleInit(g,o){const R=g.rule,me=g.p[0],en=g.p[1];if(R.includes('w_san'))for(const p of g.p)p.san+=5;if(R.includes('w_flux'))for(const p of g.p)p.max+=1;if(R.includes('mad3'))me.mad=3;if(g.dif==='nightmare')me.mad+=1;if(o.esan)en.san+=o.esan;if(R.includes('surge'))en.max+=1}
 function ruleStart(g,pi){const R=g.rule,p=g.p[pi],bt=Math.floor(g.turn/2);
@@ -2293,7 +2293,7 @@ let cur='title';
 function show(id){cur=id;if(id!=='match'){document.body.classList.remove('mzhi');cinSkip()}setTimeout(auMood,0);$$('.screen').forEach(s=>s.classList.toggle('on',s.id===id));hideZoom();scene();if(id==='pick')renderPick();if(id==='builder')renderBuilder(1);if(id==='mydecks')renderDecks();if(id==='packs')renderPacks();if(id==='coll')renderColl();v8Show(id);try{v9Show(id)}catch(e){console.warn('v9 screen',e)}batPoke()}
 $$('[data-back]').forEach(b=>b.addEventListener('click',()=>{sfx('click');show('title')}));
 $('#bPlay').onclick=()=>{sfx('click');show('pick')};$('#bBuild').onclick=()=>{sfx('click');show('mydecks')};$('#bHow').onclick=()=>{sfx('click');show('howto')};$('#bPacks').onclick=()=>{sfx('click');show('packs')};$('#bColl').onclick=()=>{sfx('click');show('coll')};
-const UI={sel:null,busy:false,auto:/[?&]auto=1/.test(location.search),speed:/[?&]fast=1/.test(location.search)?.12:1,hw:100,hh:140,deck:'v',opp:'r'};
+const UI={sel:null,busy:false,auto:/[?&]auto=1/.test(location.search),speed:/[?&]fast=1/.test(location.search)?.12:(()=>{try{const v=+localStorage.getItem('hsSpd');return v>0&&v<=1?v:1}catch(e){return 1}})(),hw:100,hh:140,deck:'v',opp:'r'};
 function layout(){const W=innerWidth,H=innerHeight,land=W>H*1.15;document.body.classList.toggle('land',land);let uw,hw,side=0;
  /* v9.1: match HUD scale (hero panels + turn controls). Desktop scales with the window; phones get a moderate fixed bump */
  const hzf=land?Math.round(Math.max(H<380?1:H<480?1.04:1.12,Math.min(2.4,W/1000,H/620))*100)/100:1.1;document.documentElement.style.setProperty('--hz',hzf);
@@ -2378,7 +2378,7 @@ let G=null,LAST=null;
 function startMatch(mine,of,o={}){LAST={mine,of,o};const dif=o.dif||V8.dif;G=newGame(mine,o.foe||prebuilt(of),{ai:[UI.auto?1:0,1],first:o.first,rule:o.rule,esan:o.esan,dif});G.meta={mode:o.mode||(o.ch?'camp':'quick'),ch:o.ch||null,dif,deck:mine.name||mine.fac,dkey:o.dkey||UI.deck,boss:o.boss||null};UI.sel=null;UI.busy=false;UI.aiRun=false;UI.overShown=0;UI.cin=null;$('#cin').className='';MZ.me=MZ.op=-1;LB.drips=[];LB.pools=[];BG.rip=[];$$('.whisp').forEach(w=>w.remove());{const l=isLand()?'':'_p';scPre(['victory'+l,'defeat'+l])}
  for(const id of['#opb','#myb','#hand'])$(id).innerHTML='';$('#over').classList.remove('on');show('match');
  for(const pi of[0,1]){const el=$(pi?'#oph':'#myh'),p=G.p[pi];el.className=`hero f-${p.fac}`;el.querySelector('.av').style.backgroundImage=pi&&o.boss?`url(${realArt(o.boss)}),${heroBG(p.fac)}`:heroBG(p.fac);el.classList.toggle('boss',!!(pi&&o.boss));el.querySelector('.hn').textContent=pi?p.name:(UI.auto?'Autopilot — ':'You — ')+FAC[p.fac].n;el.querySelector('.md').innerHTML='<i></i>'.repeat(10)+'<span>MADNESS</span>';el.querySelector('.fx').innerHTML='<i></i>'.repeat(10);el.querySelector('.san').textContent=''}
- renderMatch();flushFx();v8MatchStart(G);if(G.p[G.cur].ai)runAI()}
+ renderMatch();flushFx();if(G.second===0&&!UI.auto){const g=G;setTimeout(()=>{if(G===g)toast('You go second: +1 card, and +1 Flux on your first turn',2200)},D(250))}v8MatchStart(G);if(G.p[G.cur].ai)runAI()}
 function heroBox(pi){return $(pi?'#oph':'#myh')}
 function renderHero(pi){const p=G.p[pi],el=heroBox(pi);const s=el.querySelector('.san');s.textContent=Math.max(0,p.san);s.classList.toggle('low',p.san<=7);
  el.querySelectorAll('.md i').forEach((e,i)=>{e.classList.toggle('on',i<p.mad);e.classList.toggle('hi',i<p.mad&&p.mad>=7)});el.querySelector('.fv').textContent=`${p.flux}/${p.max} FLUX`;el.querySelectorAll('.fx i').forEach((e,i)=>{const c=i<p.flux?'on':i<p.max?'sp':'lk';if(e.className!==c)e.className=c});
@@ -2402,10 +2402,13 @@ function syncHand(){const box=$('#hand'),hand=G.p[0].hand,ex=new Map();for(const
 function selTargets(){const s=UI.sel;if(!s||!G)return[];if(s.k==='h'){const c=G.p[0].hand.find(x=>x.uid===s.uid);if(!c)return[];const d=C[c.id];return d.tg?spellTargets(G,0,d.tg):[]}const u=findU(G,s.uid);return u&&canAtk(u)?atkTargets(G,0,u):[]}
 function hint(){if(!G)return'';if(G.over)return'';if(G.p[G.cur].ai)return G.cur===1?'The enemy stirs…':'Autopilot is thinking…';const s=UI.sel;
  if(s?.k==='h'){const c=G.p[0].hand.find(x=>x.uid===s.uid),d=c&&C[c.id];if(d)return d.tg?'Choose a target for '+d.n:'Tap again or drag up to play '+d.n}
- if(s?.k==='u')return'Choose what to attack';if(legal(G,0).length)return'Your turn: drag or tap cards, tap units to attack';return'No moves left. End your turn.'}
+ if(s?.k==='u')return'Choose what to attack · ☠ = it dies';if(legal(G,0).length)return'Your turn: drag or tap cards, tap units to attack';return'No moves left. End your turn.'}
 function renderMatch(){if(!G)return;overCheck();artPre([...G.p[0].hand.map(c=>c.id),...G.p[0].board.map(u=>u.id),...G.p[1].board.map(u=>u.id),'h'+G.p[0].fac,'h'+G.p[1].fac],1);renderHero(0);renderHero(1);syncBoard($('#opb'),G.p[1].board);syncBoard($('#myb'),G.p[0].board);syncHand();
  {const nt=new Map();for(const t of selTargets()){const el=tEl(t,1);if(el)nt.set(el,t[0]==='u'&&findU(G,+t.slice(1))?.o===0)}$$('.tgt').forEach(e=>{if(!nt.has(e))e.classList.remove('tgt','ftgt')});for(const[el,f]of nt){if(!el.classList.contains('tgt'))el.classList.add('tgt');el.classList.toggle('ftgt',f)}}
- madSet();$('#hint').textContent=hint();const my=G.cur===0&&!G.p[0].ai&&!G.over;const eb=$('#endt');eb.disabled=!my||UI.busy;eb.querySelector('span').textContent=my?'End Turn':'Enemy Turn';eb.classList.toggle('glow',my&&!legal(G,0).length);eb.classList.toggle('wait',my&&!!UI.busy)}
+ madSet();$('#hint').textContent=hint();const my=G.cur===0&&!G.p[0].ai&&!G.over;try{pvSync(my&&!!UI.sel)}catch(e){}const eb=$('#endt');eb.disabled=!my||UI.busy;eb.querySelector('span').textContent=my?'End Turn':'Enemy Turn';eb.classList.toggle('glow',my&&!legal(G,0).length);eb.classList.toggle('wait',my&&!!UI.busy)}
+/* v1.6 combat preview: play the selected attack/Rite on a cloned game and badge each target with the outcome */
+function pvCalc(t){const s=UI.sel;try{const c=cloneG(G),ok=s.k==='u'?attack(c,0,s.uid,t):play(c,0,s.uid,t);if(!ok)return'';if(c.over)return c.winner===0?'LETHAL':'✖';if(t[0]==='h')return'';const tu=findU(G,+t.slice(1)),dies=!findU(c,+t.slice(1)),me=s.k==='u'&&!findU(c,s.uid);if(tu&&tu.o===0)return dies?'☠':'';return dies&&me?'☠ TRADE':dies?'☠':me?'✖':''}catch(e){return''}}
+function pvSync(on){const pv=new Map();if(on)for(const t of selTargets()){const el=tEl(t,1);if(el){const v=pvCalc(t);if(v)pv.set(el,v)}}for(const b of $$('.pvb'))if(pv.get(b.parentElement)!==b.textContent)b.remove();for(const[el,v]of pv)if(!el.querySelector(':scope>.pvb')){const b=document.createElement('i');b.className='pvb'+(v==='LETHAL'?' lethal':v==='✖'?' bad':'');b.textContent=v;el.appendChild(b)}}
 function tEl(t,box){if(t[0]==='h')return box?heroBox(+t[1]):heroBox(+t[1]).querySelector('.av');return document.querySelector(`.unit[data-u="${t.slice(1)}"]`)}
 function center(el){const r=el.getBoundingClientRect();return[r.left+r.width/2,r.top+r.height/2]}
 function floatAt(el,txt,col,cls=''){if(!el)return;const[x,y]=center(el),d=document.createElement('div');d.className='fnum '+cls;d.style.setProperty('--rx',(Math.random()*30-15).toFixed(0)+'px');d.textContent=txt;d.style.color=col;d.style.left=x+'px';d.style.top=y+'px';document.body.appendChild(d);setTimeout(()=>d.remove(),1150)}
@@ -2576,7 +2579,7 @@ function renderColl(){const fb=$('#cfil');fb.innerHTML='';for(const[k,n]of[['all
 $('#howtx').innerHTML=`<p>You are a mind adrift in the dark between stars. Break your opponent before the void breaks you.</p>
 <p><b>Winning.</b> Each side starts with <b>20 Sanity</b>. Reduce the enemy's Sanity to 0, <i>or</i> drive them to <b>10 Madness</b>: their mind shatters and they lose.</p>
 <p><b>Flux.</b> Cards cost Flux (the blue diamond). You gain +1 maximum Flux each turn (up to 10) and refill it at the start of your turn.</p>
-<p><b>Turns.</b> Decks are 30 cards; you start with 5 and draw 1 each turn (the first player skips their first draw). Play units and Rites, attack, then press <b>End Turn</b>. Drawing from an empty deck costs Sanity and adds Madness.</p>
+<p><b>Turns.</b> Decks are 30 cards; you start with 5 and draw 1 each turn (the first player skips their first draw). Whoever goes second starts with a 6th card and gets +1 Flux on their first turn. Play units and Rites, attack, then press <b>End Turn</b>. Drawing from an empty deck costs Sanity and adds Madness.</p>
 <p><b>Units</b> have Attack (amber) and Health (red). A new unit must wait a turn before attacking, unless it has Swift. Each unit attacks once per turn. When units fight, both deal damage at the same time. Damage stays until the unit dies.</p>
 <p><b>Rites</b> are one-shot spells. Some need a target.</p>
 <p><b>Controls.</b> <b>Drag</b> a card up onto the board to play it, or onto a target. You can also <b>tap</b> a card to select it, then tap again (or tap a target). To attack, <b>tap</b> or <b>drag</b> one of your glowing units onto an enemy unit or the enemy portrait. <b>Long-press</b> any card, or hover with a mouse, to read it up close.</p>
@@ -2807,12 +2810,12 @@ function livingBoard(x,t,W,H){if(!G||!BG.painted)return;const f=G.p[0].fac,low=f
   for(let k=0;k<(p.amb?2:3);k++){const rr_=(a*(p.amb?.25:.7)*W)*(1-k*.18);if(rr_<=0)continue;x.beginPath();ell(x,p.x,p.y,rr_,rr_*.4,0,0,7);x.stroke()}}BG.rip=BG.rip.filter(p=>!p.dead);x.globalCompositeOperation='source-over';x.globalAlpha=1}
 /* ---------- settings ---------- */
 function setFx(low){setQuality(low?'low':'auto')}
-function settingsOpen(){$('#sVol').value=Math.round(AU.vol*100);$('#sQ').value=QL.pref;$('#sMute').checked=AU.mute;qApply();$('#settings').classList.add('on')}
+function settingsOpen(){{const sp=$('#sSpd');if(sp){const v=String(UI.speed);sp.value=[...sp.options].some(o=>o.value===v)?v:'1'}}$('#sVol').value=Math.round(AU.vol*100);$('#sQ').value=QL.pref;$('#sMute').checked=AU.mute;qApply();$('#settings').classList.add('on')}
 fxInit();qApply();QL.rm.addEventListener&&QL.rm.addEventListener('change',()=>setQuality(QL.pref));
 $('#bSet').onclick=()=>{sfx('click');settingsOpen()};$('#mset').onclick=()=>{sfx('click');settingsOpen()};$('#sClose').onclick=()=>{sfx('click');$('#settings').classList.remove('on')};
 $('#settings').addEventListener('click',e=>{if(e.target.id==='settings')$('#settings').classList.remove('on')});
 $('#sVol').addEventListener('input',e=>{auInit();AU.vol=+e.target.value/100;localStorage.setItem('hsVol',AU.vol.toFixed(2));auVol()});
-$('#sQ').addEventListener('change',e=>{sfx('click');setQuality(e.target.value)});$('#sMute').addEventListener('change',e=>{auInit();AU.mute=e.target.checked;localStorage.setItem('hsMute',AU.mute?'1':'0');updMute()});
+$('#sQ').addEventListener('change',e=>{sfx('click');setQuality(e.target.value)});$('#sSpd').addEventListener('change',e=>{sfx('click');UI.speed=+e.target.value||1;try{localStorage.setItem('hsSpd',String(UI.speed))}catch(x){}});$('#sMute').addEventListener('change',e=>{auInit();AU.mute=e.target.checked;localStorage.setItem('hsMute',AU.mute?'1':'0');updMute()});
 $('#cin').addEventListener('pointerdown',e=>{e.stopPropagation();cinSkip()},true);
 Object.assign(window.__hs,{gyroOn,gyroOff,qKick,ZTMAX,sfx,SFX,auVol,vidReady,ZT,ztOpen,ztClose,ztFinger,scrAngle,FX,FXQ,QL,qv,setQuality,qApply,fxLow,setFx,MZ,madSet,whisper,lgCinema,CIN,cinSkip,impact,deathFx,dropFx,tiltHeld,tiltOff,TL,orient,LB,AU,shake});
 /* v7.3 keyword tooltip: tap/hover a keyword icon on a unit (long-press still opens the full card) */
@@ -2978,7 +2981,7 @@ $('#qlist').addEventListener('click',e=>{const c=e.target.closest('[data-qc]'),r
  if(c){const o=questClaim(+c.dataset.qc);if(o.ok){sfx('heal');toast('Quest reward: '+rwTxt(o.rw))}}else if(r){const o=questReroll(+r.dataset.qr);sfx(o.ok?'click':'err');if(!o.ok)toast(o.why)}else return;renderQuests();badges()});
 
 /* ---------------- match bookkeeping: stats, history, quests, campaign ---------------- */
-function v8MatchStart(g){const m=g.meta;if(m&&m.ch){const h=CAMPI[m.ch];if(h)setTimeout(()=>{if(G===g)toast(h.rule.map(r=>RULES[r][0]).join(' · ')+(h.boss?` · ${h.foe}: ${20+(h.esan||0)} Sanity`:''),2600)},D(900))}}
+function v8MatchStart(g){const m=g.meta;if(m&&m.ch){const h=CAMPI[m.ch];if(h)setTimeout(()=>{if(G===g)toast(h.rule.map(r=>RULES[r][0]).join(' · ')+(h.boss?` · ${h.foe}: ${20+(h.esan||0)} Sanity`:''),2600)},D(900)+(g.second===0?2300:0))}}
 function v8MatchEnd(g){if(g.v8done)return g.v8done;const m=g.meta||{},win=g.winner===0,res=g.winner===-1?'d':win?'w':'l',S=V8.stats;
  S.games++;if(res==='w'){S.wins++;S.streak++;S.best=Math.max(S.best,S.streak)}else{if(res==='l')S.losses++;else S.draws++;S.streak=0}
  const bump=(o,k,nm)=>{const r=o[k]||(o[k]={w:0,l:0,d:0});r[res]=(r[res]||0)+1;if(nm)r.n=nm};const dk=m.dkey||g.p[0].fac;
