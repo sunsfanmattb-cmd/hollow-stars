@@ -3,6 +3,8 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no">
 <meta name="theme-color" content="#05030a">
 <title>Hollow Stars — a card game of cosmic dread</title><!-- v1.6 -->
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700&family=Jacquard+24&family=Metamorphous&display=swap">
 <style>
 /* Hollow Stars. RENDERING RULES: read /RENDERING_RULES.md before changing card visuals, animations, video or art.
    (transform/opacity only, no blend modes or animated filters, no class toggling mid-animation or DOM rebuilds, video rules,
@@ -741,6 +743,13 @@ body.land #mydecks .scroll{padding-top:max(8px,env(safe-area-inset-top))}body.la
 /* ===== v7.4 text auto-fit (d.js fitEl, RENDERING_RULES.md §9): base size x --fit, set once per text+box size ===== */
 .card .nm span{font-size:calc(1.12em*var(--fit,1))}
 .card.full .nm span{font-size:calc(1.2em*var(--fit,1))}
+/* v9.7 faction title faces: card names + legendary cinematic use each faction's own typeface (falls back to --serif offline) */
+.f-c{--fname:"Cinzel Decorative",var(--serif);--fnw:700;--fnls:.02em;--fncol:#f4b8ac}
+.f-m{--fname:"Jacquard 24",var(--serif);--fnw:400;--fnls:.01em;--fnsz:1.18;--fncol:#b4ecea}
+.f-v{--fname:"Metamorphous",var(--serif);--fnw:400;--fnls:.02em;--fncol:#d6c0f6}
+.card .nm span{font-family:var(--fname,var(--serif));font-weight:var(--fnw,700);letter-spacing:var(--fnls,.03em);font-size:calc(1.12em*var(--fnsz,1)*var(--fit,1));color:var(--fncol,#f2e6d2)}
+.card.full .nm span{font-size:calc(1.2em*var(--fnsz,1)*var(--fit,1))}
+#cin .cname b{font-family:var(--fname,var(--serif));font-weight:var(--fnw,400);letter-spacing:.08em;color:var(--fncol,#fff2dc)}
 .card .nm span.fit2{white-space:normal;line-height:.94;text-align:center;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;text-overflow:clip;letter-spacing:0}
 .card .ty span{font-size:calc(1em*var(--fit,1))}
 .tile b[data-fit],.dmeta b{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-size:calc(16px*var(--fit,1))}
@@ -2319,6 +2328,8 @@ function fitEl(e){const m=e.dataset.fit,p=e.parentElement;if(!p||!e.isConnected)
 FIT.ro=new ResizeObserver(es=>{for(const en of es){const b=en.target;if(!b.isConnected){FIT.ro.unobserve(b);continue}for(const e of b._fit||[])fitEl(e)}});
 function fitScan(root){for(const e of root.querySelectorAll('[data-fit]')){if(e._fw)continue;e._fw=1;const b=e.parentElement;(b._fit||(b._fit=[])).push(e);FIT.ro.observe(b)}}
 function fitRefresh(root=document){for(const e of root.querySelectorAll('[data-fit]'))if(e._fw)fitEl(e)}
+/* v9.7: names were measured in the fallback serif before the faction faces arrived; re-measure once they load */
+try{if(document.fonts){const rf=()=>{FIT.c.clear();fitRefresh()};document.fonts.ready.then(rf);document.fonts.addEventListener('loadingdone',rf)}}catch(e){}
 function cardEl(id,big){const d=C[id],e=document.createElement('div');e.className=`card f-${d.f} r-${d.r}${d.r==='L'?' full':''}${d.t==='s'?' spell':''}${cardText(d).replace(/<[^>]+>/g,'').length>46?' long':''}`;e.dataset.cid=id;
  e.innerHTML=`<div class="art" style="background-image:${artBG(id,big)}">${lgHTML(id,big)}</div>${costHTML(d.c)}<div class="nm"><span data-fit="nm">${d.n}</span></div><div class="ty">${sigHTML(d.f)}<span data-fit="ty">${d.t==='u'?FAC[d.f].s:'Rite'}</span>${setHTML(d.r)}${d.r==='L'?'<i class="lgem"><b></b></i>':''}</div><div class="tx"><div class="rt">${cardText(d)}</div>${d.fl?`<div class="fl">${d.fl}</div>`:''}</div>${d.t==='u'?'<i class="plq l"></i><i class="plq r"></i>'+atkHTML(d.f,d.a)+hpHTML(d.h):''}${d.r==='R'||d.r==='L'?'<i class="foil"></i>':''}${lgTrim(id)}`;{const vr=varShow(id);if(vr){e.classList.add('vr','vr-'+vr);e.insertAdjacentHTML('beforeend','<i class="vfr"></i>')}}lgReg(e);fitScan(e);return e}
 /* ---- pick ---- */
