@@ -18,11 +18,11 @@ def check(name, ok, info=''):
 STUB = """window.__vib=[];navigator.vibrate=function(p){window.__vib.push(p);return true};"""
 
 with sync_playwright() as p:
-    b = p.chromium.launch()
+    b = p.chromium.launch(args=['--use-gl=angle','--use-angle=swiftshader','--enable-unsafe-swiftshader'])
     pg = b.new_page(viewport={'width': 412, 'height': 860}, has_touch=True)
     pg.add_init_script(STUB)
     pg.on('pageerror', lambda e: errs.append(str(e)))
-    pg.goto(page.as_uri()); pg.wait_for_timeout(1200)
+    pg.goto(sys.argv[1] if sys.argv[1].startswith('http') else page.as_uri()); pg.wait_for_timeout(1200)
 
     # haptics: a full autopilot match should buzz, with no more than one buzz per batch of events
     pg.evaluate("UI.speed=0.2;UI.auto=true;startMatch(prebuilt('c'),'v',{first:0})")

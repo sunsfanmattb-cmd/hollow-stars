@@ -7,10 +7,10 @@ from playwright.sync_api import sync_playwright
 page = pathlib.Path(sys.argv[1]).resolve(); SECS = int(sys.argv[2]) if len(sys.argv) > 2 else 90; random.seed(int(sys.argv[3]) if len(sys.argv) > 3 else 1)
 errs = []; stalls = 0; restarts = 0
 with sync_playwright() as p:
-    b = p.chromium.launch()
+    b = p.chromium.launch(args=['--use-gl=angle','--use-angle=swiftshader','--enable-unsafe-swiftshader'])
     pg = b.new_page(viewport={'width': 412, 'height': 860}, has_touch=True)
     pg.on('pageerror', lambda e: errs.append(str(e)+' || '+(e.stack or '').replace(chr(10),' ').replace(str(page.parent.as_uri()),'')[:400]))
-    pg.goto(page.as_uri()); pg.wait_for_timeout(1500)
+    pg.goto(sys.argv[1] if sys.argv[1].startswith('http') else page.as_uri()); pg.wait_for_timeout(1500)
     pg.evaluate("setQuality('high');UI.speed=0.35;startMatch(prebuilt('c'),'v',{first:0})")
     import time; t0 = time.time(); last_turn = None; same = 0
     while time.time() - t0 < SECS:

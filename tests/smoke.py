@@ -18,12 +18,12 @@ def snap(pg, name):
         pg.screenshot(path=f'{shots}/{name}.png')
 
 with sync_playwright() as p:
-    b = p.chromium.launch(args=['--autoplay-policy=no-user-gesture-required'])
+    b = p.chromium.launch(args=['--autoplay-policy=no-user-gesture-required','--use-gl=angle','--use-angle=swiftshader','--enable-unsafe-swiftshader'])
     for vw, vh, tag in [(412, 860, 'phone'), (1280, 720, 'land')]:
         pg = b.new_page(viewport={'width': vw, 'height': vh}, device_scale_factor=1, has_touch=(tag == 'phone'))
         pg.on('pageerror', lambda e, t=tag: errs.append(f'[{t}] pageerror: {e}'))
         pg.on('console', lambda m, t=tag: m.type == 'error' and 'net::' not in m.text and 'Failed to load resource' not in m.text and errs.append(f'[{t}] console: {m.text}'))
-        pg.goto(page_path.as_uri())
+        pg.goto((sys.argv[1] if sys.argv[1:] and sys.argv[1].startswith('http') else page_path.as_uri()))
         pg.wait_for_timeout(1500)
         snap(pg, f'{tag}-title')
         for s in ['pick', 'mydecks', 'packs', 'coll', 'camp', 'quests', 'stats', 'codex', 'gaunt', 'weekly', 'ach', 'howto', 'title']:

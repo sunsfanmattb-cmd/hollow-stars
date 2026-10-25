@@ -17,7 +17,7 @@ with sync_playwright() as p:
     pg.add_init_script(INIT)
     pg.on('pageerror', lambda e: errs.append(str(e)))
     pg.on('console', lambda m: m.type == 'error' and 'net::' not in m.text and 'Failed to load' not in m.text and errs.append('console: ' + m.text))
-    pg.goto(page.as_uri()); pg.wait_for_timeout(1500)
+    pg.goto(sys.argv[1] if sys.argv[1].startswith('http') else page.as_uri()); pg.wait_for_timeout(1500)
     pg.evaluate("setQuality('high');UI.speed=0.15")
     base = pg.evaluate(STATS); print('start', base)
     facs = ['v', 'm', 'c', 'n']; pairs = list(itertools.product(facs, facs))
