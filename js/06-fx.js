@@ -17,8 +17,11 @@ function setQuality(pref){QL.pref=['auto','high','medium','low'].includes(pref)?
 /* frame monitor: 2 s windows, ignores hidden tabs and huge gaps; steps down one tier when < 45 fps (auto only), keeps watching,
    steps back up one tier (never above the device default) after 30 s of steady 58+ fps */
 function qKick(){if(!QL.run&&!BAT.idle&&!BAT.hid){QL.run=1;QL.lt=0;requestAnimationFrame(qMon)}}
-function qMon(t){if(BAT.idle||BAT.hid){QL.run=0;QL.fr=[];QL.ws=0;return}requestAnimationFrame(qMon);QL.ticks=(QL.ticks||0)+1;const d=t-QL.lt;QL.lt=t;if(document.hidden||d>400||d<=0){QL.fr=[];QL.ws=t;return}if(t<QL.warm){QL.ws=t;return}
- QL.fr.push(d);if(t-(QL.ws||t)<2000){QL.ws=QL.ws||t;return}const n=QL.fr.length,sum=QL.fr.reduce((a,b)=>a+b,0);QL.fps=n*1000/sum;QL.fr=[];QL.ws=t;QL.win=(QL.win||0)+1;
+/* v1.9 battery: the monitor kept a frame request running forever, which (like the background loop) woke the page on every vsync.
+   It now samples in bursts: one 2 s window, then a 7 s rest, but keeps watching continuously while the frame rate is below 50. */
+function qRest(){QL.run=0;QL.fr=[];QL.ws=0;QL.lt=0;clearTimeout(QL.rt);QL.rt=setTimeout(()=>{QL.rt=0;qKick()},7000)}
+function qMon(t){if(BAT.idle||BAT.hid){QL.run=0;QL.fr=[];QL.ws=0;return}if(QL.rest){QL.rest=0;qRest();return}requestAnimationFrame(qMon);QL.ticks=(QL.ticks||0)+1;const d=t-QL.lt;QL.lt=t;if(document.hidden||d>400||d<=0){QL.fr=[];QL.ws=t;return}if(t<QL.warm){QL.ws=t;return}
+ QL.fr.push(d);if(t-(QL.ws||t)<2000){QL.ws=QL.ws||t;return}const n=QL.fr.length,sum=QL.fr.reduce((a,b)=>a+b,0);QL.fps=n*1000/sum;QL.fr=[];QL.ws=t;QL.win=(QL.win||0)+1;if(QL.fps>=50)QL.rest=1;
  if(QL.pref!=='auto'||QL.rm.matches)return;const ord=['low','medium','high'],i=ord.indexOf(QL.q);
  if(QL.fps<45&&i>0&&t-QL.down>3500){QL.q=ord[i-1];QL.down=t;QL.good=0;QL.log.push({t:Math.round(t),fps:+QL.fps.toFixed(1),to:QL.q});localStorage.setItem('hsQa',QL.q);QL.warm=t+1200;qApply();return}
  if(QL.fps>=58){QL.good=(QL.good||0)+1;if(QL.good>=15&&i<ord.indexOf(qDefault())&&t-QL.down>30000){QL.q=ord[i+1];QL.good=0;QL.up=t;QL.log.push({t:Math.round(t),fps:+QL.fps.toFixed(1),to:QL.q});localStorage.setItem('hsQa',QL.q);QL.warm=t+1200;qApply()}}else QL.good=0}
@@ -132,7 +135,7 @@ function lgCinema(id,uid){if(!$('#match').classList.contains('on'))return null;C
  box.className='on f-'+d.f+(low?' low':'');box.querySelector('.cname b').textContent=d.n;box.querySelector('.cname small').textContent='LEGENDARY · '+FAC[d.f].n.toUpperCase();
  const pan=box.querySelector('.cpan');pan.style.backgroundImage=`url(${realArt(id)}),url(${realArtS(id)})`;pan.style.transform='';pan.style.opacity='';const v=pan.querySelector('video');
  pan.classList.remove('vid');const tok=pan._tok=(pan._tok||0)+1;if(full&&hq&&!LG.rm.matches&&!VID.bad[id]){v.src=`${ARTDIR}anim/${id}.mp4?${VIDV}`;v.currentTime=0;vidReady(v,()=>{if(pan._tok===tok)pan.classList.add('vid')});v.play().catch(()=>{})}else{v.removeAttribute('src');v.load()}
- sfx('sting');if(full){setTimeout(()=>{shake(document.body,5,300);const r=pan.getBoundingClientRect(),cx=r.left+r.width/2,cy=r.top+r.height/2;
+ sfx('sting');if(full){setTimeout(()=>{shake(box,5,300);/* v1.9: was document.body, which re-rasterised the whole page */const r=pan.getBoundingClientRect(),cx=r.left+r.width/2,cy=r.top+r.height/2;
   const fl=sp('fl',cx,cy,0,0,.6,Math.max(innerWidth,innerHeight)*.36,{v:'#a050ff',m:'#40e0f0',c:'#ff2030',n:'#ffd070'}[d.f]);if(fl){fl.add=1;fl.a=.5}
   for(let i=0;i<nq(30);i++){const a=rr(0,7),s=rr(220,700),p=sp('sp',cx,cy,Math.cos(a)*s,Math.sin(a)*s,rr(.35,.8),rr(1.5,3),'#fff0d0');if(p){p.add=1;p.dr=2.5}}},D(260))}
  let fin;const p=new Promise(r=>fin=r);let ended=0,tm1,tm2;

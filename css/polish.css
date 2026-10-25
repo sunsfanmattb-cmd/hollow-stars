@@ -96,3 +96,16 @@ body.q-low #madv,body.q-low #lowv{animation:none!important}
 @media (prefers-reduced-motion:reduce){
  .card.vr .vfr::before,.card.vr .vfr::after,#madv,#lowv,#madk.on,.unit .lgring{animation:none!important}
  #endfx .ef-l,#endfx .ef-v,#endfx .ef-t{animation-duration:.3s!important;animation-delay:0s!important}}
+
+/* ===== v1.9 performance (see js/11-perf.js) ===== */
+/* off-screen cards: no animations, so no layers and no per-frame compositing */
+.card.zz,.card.zz *,.card.zz::before,.card.zz::after,.card.zz *::before,.card.zz *::after{animation:none!important}
+/* a zoomed card covers the screen: everything behind it holds still */
+body.zmod .screen.on .card *,body.zmod .screen.on .card *::before,body.zmod .screen.on .card *::after{animation-play-state:paused!important}
+/* cinematic rays: small canvas scaled up by the GPU, no blend mode */
+#cin canvas.crays{background:none;mix-blend-mode:normal;opacity:.5;width:110vmax;height:110vmax;margin:-55vmax 0 0 -55vmax;animation:hsRays 14s linear infinite}
+@keyframes hsRays{from{transform:scale(2) rotate(0deg)}to{transform:scale(2) rotate(360deg)}}
+#cin.out canvas.crays{opacity:0}
+/* screen shake moves an existing layer instead of creating (and destroying) one each time, which repainted the whole board */
+#match.on,#pstage{will-change:transform}
+body.cinhold #match *,body.cinhold #match *::before,body.cinhold #match *::after{animation-play-state:paused!important}
