@@ -2,3 +2,4 @@
 *.keystore
 keystore.properties
 *.apk
+__pycache__/
