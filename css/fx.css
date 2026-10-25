@@ -1,0 +1,342 @@
+/* ---- v7: combat juice, deaths, madness, cinematics, foil ---- */
+#fxc{position:fixed;inset:0;width:100%;height:100%;z-index:92;pointer-events:none}
+.fnum{font-size:calc(26px + var(--fs,0px));text-shadow:0 0 6px #000,0 0 2px #000,0 2px 0 #000;animation:fnum2 1.1s cubic-bezier(.2,.8,.3,1) forwards}
+.fnum.mid{--fs:8px}.fnum.big{--fs:20px;font-family:var(--serif);letter-spacing:.04em;text-shadow:0 0 12px #ff0020,0 0 4px #000,0 3px 0 #000}
+@keyframes fnum2{0%{opacity:0;transform:translate(-50%,-30%) scale(.4)}12%{opacity:1;transform:translate(calc(-50% + var(--rx,0px)*.3),-70%) scale(1.45)}30%{transform:translate(calc(-50% + var(--rx,0px)*.6),-90%) scale(1)}100%{opacity:0;transform:translate(calc(-50% + var(--rx,0px)),-210%) scale(.95)}}
+.hero.heavy{animation:heavy .5s cubic-bezier(.2,.9,.3,1)}
+@keyframes heavy{0%{transform:none}12%{transform:scale(1.06) translateY(3px);filter:brightness(2.4) sepia(1) hue-rotate(-50deg) saturate(5)}40%{transform:scale(.98)}100%{transform:none}}
+.hero.heavy .av::after{content:"";position:absolute;inset:-6px;border-radius:50%;pointer-events:none;background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 60 60'%3E%3Cpath d='M30 30L8 12M30 30L52 6M30 30L56 40M30 30L18 56M30 30L4 36M30 30L38 58M22 23L14 25M42 20L46 12M44 36L50 46' stroke='%23fff' stroke-width='1.6' fill='none' stroke-linecap='round'/%3E%3C/svg%3E") center/100% 100%;animation:crackf .5s ease-out forwards;mix-blend-mode:screen}
+.hero .av{position:relative}
+@keyframes crackf{0%{opacity:1}100%{opacity:0}}
+#hflash{position:fixed;inset:0;z-index:91;pointer-events:none;opacity:0;background:radial-gradient(ellipse at 50% 50%,transparent 30%,#c0001a99 100%)}
+#hflash.on{animation:hfl .45s ease-out}@keyframes hfl{0%{opacity:1}100%{opacity:0}}
+.unit.dying.cracking{animation:none;filter:brightness(1.6) contrast(1.3)}
+.unit.dying.shatter{animation:none;opacity:0;transition:opacity .08s}
+.unit.land{animation:land .45s cubic-bezier(.2,.9,.3,1.3)}@keyframes land{0%{transform:scale(1.35)}60%{transform:scale(.94)}100%{transform:none}}
+/* blood drop refill */
+.hp.refill .fill{animation:refill .9s ease-out}.hp.refill .drop{animation:rfp .9s ease-out}
+@keyframes refill{0%{filter:brightness(2.4) saturate(1.4)}100%{filter:none}}@keyframes rfp{30%{transform:scale(1.22)}60%{transform:scale(.96)}100%{transform:none}}
+.hp.drain .fill{animation:dfl .5s ease-out}@keyframes dfl{0%{filter:brightness(2.6)}100%{filter:none}}
+/* madness */
+#madv{position:absolute;inset:0;pointer-events:none;z-index:55;opacity:calc(var(--mz,0)*1.05);background:radial-gradient(ellipse 75% 65% at 50% 52%,transparent calc(92% - var(--mz,0)*62%),#2a0418cc calc(112% - var(--mz,0)*52%),#050003 calc(140% - var(--mz,0)*50%)),radial-gradient(ellipse at 50% 52%,transparent 40%,#5a0a4a44 100%);animation:breathe calc(6s - var(--mz,0)*3s) ease-in-out infinite;will-change:transform,opacity}
+@keyframes breathe{50%{transform:scale(.97)}}
+#madv.flk{animation:flk 1.8s ease-in-out}@keyframes flk{0%,100%{transform:none}50%{transform:scale(.93)}}
+#match[data-mz="0"] #madv,#match[data-mz="1"] #madv{opacity:0}
+#madv::before{content:"";position:absolute;inset:0;opacity:calc((var(--mz,0) - .3)*.8);background:linear-gradient(90deg,#ff003c2e,transparent 9%,transparent 91%,#00e0ff26),linear-gradient(180deg,#00e0ff14,transparent 10%,transparent 90%,#ff003c1c)}
+#match:not([data-mz="0"]):not([data-mz="1"]):not([data-mz="2"]) #myb,#match:not([data-mz="0"]):not([data-mz="1"]):not([data-mz="2"]) #hand{animation:warp calc(7s - var(--mz,0)*3s) ease-in-out infinite}
+@keyframes warp{0%,100%{transform:none}33%{transform:skewX(calc(var(--mz,0)*1.4deg)) scaleY(calc(1 + var(--mz,0)*.012))}66%{transform:skewX(calc(var(--mz,0)*-1.1deg)) translateY(calc(var(--mz,0)*2px))}}
+#match[data-mo="7"] #opb,#match[data-mo="8"] #opb,#match[data-mo="9"] #opb,#match[data-mo="10"] #opb{animation:warp 5s ease-in-out infinite;--mz:var(--mo)}
+#match[data-mo="7"] #oph,#match[data-mo="8"] #oph,#match[data-mo="9"] #oph,#match[data-mo="10"] #oph{}
+#match[data-mo="7"] #oph .hn,#match[data-mo="8"] #oph .hn,#match[data-mo="9"] #oph .hn,#match[data-mo="10"] #oph .hn{text-shadow:2px 0 0 #ff003c88,-2px 0 0 #00e0ff77,0 1px 2px #000}
+.glitch{animation:glitch .24s ease-out}
+@keyframes glitch{0%{transform:translate(-4px,0) skewX(-4deg)}35%{transform:translate(4px,1px) skewX(3deg)}70%{transform:translate(-2px,0)}100%{transform:none}}
+body.mzhi .hero .hn,body.mzhi #hint{text-shadow:2px 0 0 #ff003c88,-2px 0 0 #00e0ff88,0 1px 2px #000}
+.whisp{position:absolute;z-index:56;pointer-events:none;font-family:var(--serif);font-style:italic;font-size:clamp(13px,4vw,20px);letter-spacing:.3em;color:#e8d0ff;text-shadow:0 0 10px #a040ff,0 0 3px #000;opacity:0;transform:rotate(var(--r));animation:whisp 3.2s ease-in-out forwards;white-space:nowrap}
+.whisp.op{color:#ffc8d0;text-shadow:0 0 10px #ff2040}
+@keyframes whisp{0%{opacity:0;transform:rotate(var(--r)) scale(.92)}20%{opacity:.42}70%{opacity:.3}100%{opacity:0;transform:rotate(var(--r)) scale(1.12)}}
+body.fxlow #madv{animation:none}body.fxlow #myb,body.fxlow #hand,body.fxlow #opb{animation:none!important}body.fxlow .glitch{animation:none}
+/* legendary cinematic */
+#cin{position:fixed;inset:0;z-index:96;display:none;align-items:center;justify-content:center;flex-direction:column;background:radial-gradient(ellipse at 50% 45%,#1a0a24e8,#000000f4);overflow:hidden;cursor:pointer}
+#cin.on{display:flex;animation:fade .2s}
+#cin .crays{position:absolute;left:50%;top:44%;width:220vmax;height:220vmax;margin:-110vmax 0 0 -110vmax;background:repeating-conic-gradient(from 0deg,var(--glow) 0 4deg,transparent 4deg 14deg);opacity:.32;mix-blend-mode:screen;animation:rays 6s linear infinite;-webkit-mask:radial-gradient(circle,#000 0,transparent 45%);mask:radial-gradient(circle,#000 0,transparent 45%)}
+@keyframes rays{to{transform:rotate(360deg)}}
+#cin .cpan{position:relative;width:min(74vw,calc(62vh*5/7),420px);aspect-ratio:5/7;border-radius:10px;background:#000 center/cover;box-shadow:0 0 0 2px #000,0 0 0 4px #c8a070,0 0 0 6px #000,0 0 60px var(--glow),0 0 140px var(--glow);overflow:hidden;animation:slam .42s cubic-bezier(.2,1.2,.3,1) both}
+#cin .cpan video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+#cin .cpan::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,transparent 55%,#000c);pointer-events:none}
+@keyframes slam{0%{transform:scale(2.6) rotate(-6deg);opacity:0}55%{transform:scale(.94);opacity:1}100%{transform:none}}
+#cin .cname{position:relative;margin-top:-64px;z-index:2;text-align:center;animation:cname .9s .25s both}
+#cin .cname b{display:block;font-family:var(--serif);font-weight:400;font-size:clamp(24px,7.5vw,46px);letter-spacing:.14em;color:#fff2dc;text-shadow:0 0 18px var(--glow),0 0 40px var(--glow),0 3px 0 #000}
+#cin .cname small{display:block;font-size:11px;letter-spacing:.42em;color:var(--f2);text-shadow:0 1px 2px #000;margin-bottom:4px}
+@keyframes cname{0%{opacity:0;letter-spacing:.8em}100%{opacity:1}}
+#cin .cskip{position:absolute;bottom:max(16px,env(safe-area-inset-bottom));font-size:11px;letter-spacing:.3em;color:#a8988a;opacity:.7}
+#cin.out{background:transparent;transition:background .3s}#cin.out .crays,#cin.out .cname,#cin.out .cskip{opacity:0;transition:opacity .2s}
+#cin.low .crays{display:none}#cin.low .cpan{animation:fade .3s}
+/* tilt, parallax, foil */
+.card .art{background-size:112% auto;background-position:calc(50% - var(--ox,0)*42%) calc(50% - var(--oy,0)*42%)}
+.card.full .art{background-size:110% auto}
+#hand .card.held{transition:left .25s,top .25s,rotate .25s,translate .18s,scale .18s,box-shadow .2s,transform .08s;z-index:45!important;box-shadow:0 0 0 calc(var(--cw)*.008) #000,0 1.2em 2em #000e}
+.card .foil{position:absolute;inset:0;border-radius:inherit;pointer-events:none;z-index:4;mix-blend-mode:color-dodge;opacity:.32;background:linear-gradient(115deg,transparent 22%,#5a1a8a 32%,#0a6a6a 40%,#6a5a10 48%,#6a0a2a 56%,transparent 66%) calc(50% + var(--ox,0)*55%) calc(50% + var(--oy,0)*55%)/260% 260% no-repeat;overflow:hidden}
+.card .foil::before{content:"";position:absolute;inset:0;background:repeating-linear-gradient(55deg,#ffffff0a 0 1px,transparent 1px 4px),repeating-linear-gradient(-35deg,#a060ff08 0 2px,transparent 2px 7px)}
+.card .foil::after{content:"";position:absolute;top:-20%;bottom:-20%;width:40%;left:0;display:none;background:linear-gradient(90deg,transparent,#c890ff30,#60ffe030,transparent);transform:skewX(-18deg);animation:fsw 6s ease-in-out infinite}
+@keyframes fsw{0%,55%{transform:translateX(-150%) skewX(-18deg)}100%{transform:translateX(325%) skewX(-18deg)}}
+.card.r-L .foil{opacity:.55;background:linear-gradient(115deg,transparent 15%,#8a2ac0 26%,#0a8a7a 36%,#9a7a10 46%,#9a0a3a 56%,#2a4aa0 66%,transparent 76%) calc(50% + var(--ox,0)*60%) calc(50% + var(--oy,0)*60%)/240% 240% no-repeat}
+.card.r-L .foil::after{animation-duration:3.6s;background:linear-gradient(90deg,transparent,#ff9af050,#9affe050,#ffe08a40,transparent)}
+.card.locked .foil{display:none}
+body.fxlow .card .foil::after{animation:none;display:none}
+/* settings */
+#settings{position:fixed;inset:0;z-index:98;display:none;align-items:center;justify-content:center;background:#000c}
+#settings.on{display:flex}
+#settings .sbox{width:min(88vw,340px);padding:16px 18px;display:flex;flex-direction:column;gap:14px;background:linear-gradient(180deg,#0a0607d8,#040203ec),var(--panel) center/cover,#050304;box-shadow:0 0 0 1px #000,0 0 0 2px #6a5640,0 0 0 3px #1a120c,0 10px 28px #000c}
+#settings h2{margin:0}
+#settings label{display:flex;align-items:center;justify-content:space-between;gap:12px;font-size:14px;color:#d8ccb4}
+#settings small{display:block;color:#8a7e70;font-size:11px}
+#settings input[type=range]{flex:1;accent-color:#c0102a}
+#settings input[type=checkbox]{width:20px;height:20px;accent-color:#c0102a}
+#mset{width:34px;height:34px;border-radius:50%;background:#070507e6;box-shadow:0 0 0 1px #4a4038 inset;color:#b8a890;flex:none;display:grid;place-items:center}
+#mset svg{width:17px;height:17px;fill:#b8a890}
+
+/* ===== v7.1 performance + anti-flicker ===== */
+#fog{position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden;opacity:.24}
+body[data-scr=match] #fog{opacity:.33}
+#fog i{position:absolute;left:0;width:240%;background:var(--fog,none) 0 0/50% 100% repeat-x;animation:fogm 58s linear infinite}
+#fog .f1{top:45%;height:60%;animation-direction:reverse}
+#fog .f2{top:5%;height:55%;animation-duration:84s}
+@keyframes fogm{from{transform:translate3d(0,0,0)}to{transform:translate3d(-50%,0,0)}}
+/* foil sweep only where you look: held card, zoom, pack reveal, Legendaries in hand */
+#hand .card.held .foil::after,#zoom .foil::after,.pfront .foil::after,#hand .card.r-L .foil::after,#sheet .foil::after{display:block;animation:fsw 6s ease-in-out infinite}
+#hand .card.r-L .foil::after,#zoom .r-L .foil::after,.pfront .r-L .foil::after{animation-duration:3.6s}
+body.q-medium #hand .card.r-L:not(.held) .foil::after{animation-duration:7s}
+/* medium: keep the look, drop the continuous full-screen motion */
+body.q-medium #grain,body.q-low #grain{animation:none}
+body.q-medium #pbg .pl,body.q-low #pbg .pl{animation:none}
+body.q-medium #madv,body.q-low #madv{animation:none}
+body.q-medium #myb,body.q-medium #hand,body.q-medium #opb{animation:none!important}
+body.q-low #grain{opacity:.35}
+body.q-low #fog i{animation:none}
+body.q-low .foil::after{display:none!important}
+body.q-low .r-L .set,body.q-low .flux .fx i.on{animation:none}
+
+/* ===== v7.2 lighter tiers ===== */
+body.q-medium #fog i,body.q-low #fog i{animation:none;width:110%}
+/* medium/low: no always-on per-card animations (each one forced its own GPU layer plus every card overlapping it) */
+body:not(.q-high) .cost::before,body:not(.q-high) .cost .cr::before,body:not(.q-high) .r-L .gem,body:not(.q-high) .r-L .set,body:not(.q-high) .flux .fx i.on{animation:none}
+body:not(.q-high) #pbg .pl,body:not(.q-high) #pbg .pg{will-change:auto}
+body:not(.q-high) #pbg .pg{animation:none;opacity:.7}
+body.q-medium #hand .card.r-L:not(.held) .foil::after{display:none}
+/* card-view tilt (transform-only layers) */
+#zoom .card.zt{transition:none;will-change:transform}
+#zoom .card.zt .ap{will-change:transform}
+#zoom .art .ap{position:absolute;inset:0;background-size:cover;background-position:center;z-index:0}
+#zoom .gw{position:absolute;inset:0;overflow:hidden;border-radius:inherit;pointer-events:none;z-index:6}
+#zoom .glare{inset:-50%;position:absolute;background:radial-gradient(circle at 50% 50%,#ffffff30,#ffffff10 22%,transparent 42%);border-radius:0}
+#zoom .card{overflow:visible}#zoom .card .art{overflow:hidden}
+#zoom .card.zt .foil{background:none}
+#zoom .foil .fsh{position:absolute;inset:-80%;background:linear-gradient(115deg,transparent 30%,#5a1a8a 38%,#0a6a6a 44%,#6a5a10 50%,#6a0a2a 56%,transparent 64%);pointer-events:none}
+#zoom .r-L .foil .fsh{background:linear-gradient(115deg,transparent 26%,#8a2ac0 34%,#0a8a7a 42%,#9a7a10 50%,#9a0a3a 58%,#2a4aa0 64%,transparent 72%)}
+body.land #mid{flex-direction:row;flex-wrap:wrap;align-content:center;justify-content:center;gap:5px 10px;padding:2px 6px;min-height:0;overflow:hidden}
+body.land #quit,body.land #mset{position:static;margin:0}body.land #hint{flex:0 0 100%;font-size:10.5px;line-height:1.25;max-height:2.6em;overflow:hidden}body.land #endt{margin:0;padding:.55em 1.1em}
+/* ===== v7.3: flicker fixes + polish (transform/opacity only) ===== */
+:root{--ez:cubic-bezier(.2,.8,.2,1);--ezo:cubic-bezier(.16,1,.3,1);--ezio:cubic-bezier(.45,0,.25,1)}
+/* no blend modes on any card layer: color-dodge/screen over animated or video content re-rasterises the whole card group and flickers on Android GPUs */
+.card .foil{mix-blend-mode:normal;opacity:.1;background:linear-gradient(115deg,transparent 26%,#c8a0ff 36%,#7af0e0 44%,#ffe490 51%,#ff98c0 58%,transparent 68%) 50% 50%/260% 260% no-repeat}
+.card.r-L .foil{opacity:.13;background:linear-gradient(115deg,transparent 24%,#d4a8ff 33%,#86fff0 41%,#fff0a8 48%,#ffa0c8 55%,#a8bcff 62%,transparent 70%) 50% 50%/240% 240% no-repeat}
+.card .foil::after{background:linear-gradient(90deg,transparent,#e8d8ff2a 35%,#ffffff40 50%,#d0fff42a 65%,transparent);animation-timing-function:var(--ezio)!important}
+.card.r-L .foil::after{background:linear-gradient(90deg,transparent,#ffd8f438 30%,#ffffff55 50%,#d8fff038 70%,transparent)}
+#hand .card.r-L .foil::after,#zoom .r-L .foil::after,.pfront .r-L .foil::after{animation-duration:5.2s}
+@keyframes fsw{0%,58%{transform:translateX(-150%) skewX(-18deg)}100%{transform:translateX(325%) skewX(-18deg)}}
+#zoom .glare{mix-blend-mode:normal}#zoom .foil .fsh{opacity:.55}
+/* video: invisible until a real frame is presented, then a slow crossfade over the still; .99 max opacity = never an overlay plane */
+#cin .cpan video{opacity:0;transition:opacity .5s var(--ezio)}#cin .cpan.vid video{opacity:.99}
+/* 3D/backface: tilt layers keep a flat backface so rotated cards don't z-fight with their own foil */
+/* buttons: press feedback everywhere, hover only on real pointers (sticky :hover on phones looked like a stuck flash) */
+.btn{transition:transform .14s var(--ez),opacity .25s,filter .2s;-webkit-tap-highlight-color:transparent}
+.btn:hover{filter:none}@media (hover:hover){.btn:not([disabled]):hover{filter:brightness(1.18)}}
+.btn:not([disabled]):active{transform:scale(.95);transition-duration:.06s}
+#quit,#mset,#mute{transition:transform .14s var(--ez)}#quit:active,#mset:active,#mute:active{transform:scale(.9)}
+/* End Turn: soft "busy" state during animations instead of the grey disabled flash; full disabled look only on the enemy's turn */
+#endt.wait[disabled]{opacity:.72;filter:saturate(.7)}
+#endt[disabled]:not(.wait){opacity:.45}
+#endt.glow:not([disabled])::after{animation:etp 2.4s var(--ezio) infinite}@keyframes etp{50%{opacity:.55}}
+/* screens: quick fade between screens */
+.screen.on{animation:scrIn .24s var(--ez) both}@keyframes scrIn{from{opacity:0}}
+#match.on{animation-duration:.32s}
+/* turn banner: clean fade + settle, no horizontal stretch */
+#banner{padding:10px 0;letter-spacing:.38em;background:linear-gradient(90deg,transparent,#000b 22%,#000b 78%,transparent)}
+#banner.show{animation:banner 1.35s var(--ez) forwards}
+@keyframes banner{0%{opacity:0;transform:translateY(-50%) scale(.96)}16%{opacity:1;transform:translateY(-50%) scale(1)}76%{opacity:1;transform:translateY(-50%) scale(1)}100%{opacity:0;transform:translateY(-50%) scale(1.03)}}
+/* your-turn cue: playable cards bob once, left to right */
+#hand.cue .card.can:not(.sel){animation:cue .62s var(--ez) calc(var(--i,0)*55ms) both}
+@keyframes cue{45%{transform:translateY(-9%)}}
+/* hand fan + draw/play arcs */
+#hand .card{transition:left .3s var(--ez),top .3s var(--ez),rotate .3s var(--ez),translate .2s var(--ez),scale .2s var(--ez),box-shadow .25s}
+#hand .card.drawn{animation:drawIn .62s var(--ezo)}
+@keyframes drawIn{0%{transform:translate(40vw,-26vh) scale(.3) rotate(22deg);opacity:0}45%{transform:translate(14vw,-16vh) scale(.78) rotate(8deg);opacity:1}100%{transform:none}}
+.unit.enter{animation:enter .5s var(--ezo)}
+@keyframes enter{0%{transform:translateY(46%) scale(1.22);opacity:0}55%{transform:translateY(-5%) scale(.98);opacity:1}100%{transform:none}}
+.unit.land{animation:land .42s var(--ezo)}@keyframes land{0%{transform:scale(1.18)}55%{transform:scale(.97)}100%{transform:none}}
+/* targeting: pulse via transform/opacity on a ring (outline-offset animation repainted every frame) */
+.tgt{animation:none;outline:2px dashed #ff5a66;outline-offset:3px}
+.unit.tgt::before,.hero.tgt::before{content:"";position:absolute;inset:-5px;border-radius:inherit;box-shadow:0 0 0 2px #ff6a7a,0 0 14px #ff2a4a99;pointer-events:none;z-index:5;animation:tgr 1.1s var(--ezio) infinite}
+.unit.ftgt::before{box-shadow:0 0 0 2px #8affb0,0 0 14px #3aff8a99}
+@keyframes tgr{50%{opacity:.35;transform:scale(1.035)}}
+#arrow .arg{fill:none;stroke:#ff2a3a;stroke-opacity:.22;stroke-width:12;stroke-linecap:round}
+#arrow #arl{fill:none;stroke:#ff4a5a;stroke-width:4.5;stroke-dasharray:1 9;animation:arf .5s linear infinite}
+#arrow.hot #arl{stroke:#ffd0b0}#arrow.hot .arg{stroke:#ffb080;stroke-opacity:.35}
+@keyframes arf{to{stroke-dashoffset:-10}}
+/* readability: card text */
+.card .tx{text-shadow:0 1px 0 #000a;letter-spacing:.005em}
+/* keyword tooltip */
+#kwtip{position:fixed;z-index:98;max-width:220px;padding:7px 11px;border-radius:3px;background:#0a0608f2;box-shadow:0 0 0 1px #000,0 0 0 2px #6a5640,0 8px 20px #000c;color:#e8dcc8;font-size:12px;line-height:1.35;pointer-events:none;opacity:0;transform:translate(-50%,-100%) translateY(4px);transition:opacity .18s,transform .22s var(--ez)}
+#kwtip.on{opacity:1;transform:translate(-50%,-100%) translateY(-6px)}#kwtip b{color:#ffd8a0}
+/* end screen: staged reveal */
+#over.on .ovbox>*{animation:ovIn .55s var(--ezo) both}
+#over.on .ovbox>*:nth-child(2){animation-delay:.08s}#over.on .ovbox>*:nth-child(3){animation-delay:.16s}#over.on .ovbox>*:nth-child(4){animation-delay:.24s}#over.on .ovbox>*:nth-child(5){animation-delay:.32s}#over.on .ovbox>*:nth-child(n+6){animation-delay:.4s}
+@keyframes ovIn{from{opacity:0;transform:translateY(10px)}}
+/* legendary entrance: rise + settle instead of a 2.6x slam */
+#cin.on{animation:fade .28s var(--ez)}
+#cin .cpan{animation:lgRise .62s var(--ezo) both}
+@keyframes lgRise{0%{transform:translateY(5%) scale(.82);opacity:0}60%{opacity:1}100%{transform:none}}
+#cin .cname{animation:cname2 .7s var(--ezo) .28s both}@keyframes cname2{from{opacity:0;transform:translateY(8px) scale(.97)}}
+#cin .crays{animation-duration:14s}
+#cin.out{transition:background .35s var(--ez)}
+body.fxlow #hand.cue .card.can,body.q-low #hand.cue .card.can{animation:none}
+@media (prefers-reduced-motion:reduce){#hand.cue .card.can,.screen.on,#over.on .ovbox>*{animation:none}}
+/* Phase: a slow, shallow ghost shimmer instead of a 50% opacity throb (read as flicker on phones) */
+.unit.phase .art{animation:phase 4.2s var(--ezio) infinite}@keyframes phase{50%{opacity:.8}}
+/* End Turn: icon sits in its own gutter (it overlapped the "E") */
+#endt{padding-left:2.5em!important;padding-right:1.25em!important}#endt svg{left:13px!important;width:13px;height:13px}
+body.land #endt{padding-left:2.4em!important;padding-right:1em!important}
+/* readability: lighter film grain over the match (it sat on top of every card's text) */
+body[data-scr=match] #grain{opacity:.3}
+
+/* ===== v7.4 rendering pass: the rules behind every line here are in RENDERING_RULES.md (read it before touching card CSS) ===== */
+/* layer budget: backface-visibility on every card promoted each card (and everything overlapping it) to its own GPU layer:
+   384 layers in the collection. Only the tilting zoom card and the pack flip faces need it. */
+#zoom .card,#zoom .card .art,#zoom .card .foil{backface-visibility:hidden}
+/* finished entrance animations must not linger: fill both/forwards keeps an "active" animation, i.e. a permanent full-screen layer */
+.screen.on{animation-fill-mode:backwards}
+#banner.show{animation-fill-mode:none}
+/* --- Legendary living art: still + Ken Burns + two pooled mote layers + glow + sheen, all transform/opacity keyframes.
+   Every duration (alternate counts double) divides LGP=240 s; --lgd is the per-card negative delay from d.js so re-created
+   cards resume mid-motion. Nothing here repaints: the textures are rasterised once and only moved. --- */
+.lg{position:absolute;inset:0;overflow:hidden;border-radius:inherit;pointer-events:none;z-index:1}
+.lg i{position:absolute;display:block;animation-delay:var(--lgd,0s);animation-iteration-count:infinite}
+.lg .lp{inset:-6%;background-size:cover;background-position:center;animation-name:lgkb;animation-duration:24s;animation-direction:alternate;animation-timing-function:var(--ezio)}
+.card.full .lg .lp{inset:-3.5%}
+@keyframes lgkb{0%{transform:translate3d(-1.4%,1%,0) scale(1)}50%{transform:translate3d(.3%,-.5%,0) scale(1.03)}100%{transform:translate3d(1.4%,-1%,0) scale(1.055)}}
+.lg .lm{left:0;right:0;top:0;height:200%;background:var(--mote-v) 0 0/auto 25% repeat;opacity:.5;animation-name:lgmote;animation-duration:20s;animation-timing-function:linear;transition:opacity .8s var(--ezio)}
+.lg .lm.m2{background-size:auto 16.6667%;opacity:.28;animation-name:lgmote2;animation-duration:30s}
+.f-m .lg .lm{background-image:var(--mote-m)}.f-c .lg .lm{background-image:var(--mote-c)}.f-n .lg .lm{background-image:var(--mote-n)}
+@keyframes lgmote{from{transform:translate3d(0,0,0)}to{transform:translate3d(0,-50%,0)}}
+@keyframes lgmote2{from{transform:scaleX(-1) translate3d(0,0,0)}to{transform:scaleX(-1) translate3d(0,-50%,0)}}
+.lg .lgw{left:14%;right:14%;top:12%;bottom:22%;border-radius:50%;background:radial-gradient(closest-side,var(--glow),transparent);opacity:.14;animation-name:lgglow;animation-duration:6s;animation-direction:alternate;animation-timing-function:ease-in-out;transition:opacity .8s}
+@keyframes lgglow{from{opacity:.07;transform:scale(.92)}to{opacity:.22;transform:scale(1.06)}}
+.lg .lf{top:-10%;bottom:-10%;left:0;width:30%;background:linear-gradient(90deg,transparent,#ffe6f414 25%,#ffffff38 50%,#d8fff418 70%,transparent);animation-name:lgsheen;animation-duration:8s;animation-timing-function:var(--ezio)}
+@keyframes lgsheen{0%,60%{transform:translateX(-140%) skewX(-12deg)}100%{transform:translateX(440%) skewX(-12deg)}}
+/* video sits inside .lp: Ken Burns pauses where it is while the video shows, so still<->video crossfades line up exactly */
+.lg .lv{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block;opacity:0;transition:opacity .9s var(--ezio);background:transparent;pointer-events:none}
+.lg.vid .lv{opacity:.99}
+.lg.vid .lp{animation-play-state:paused}
+.lg.vid .lm{opacity:.26}.lg.vid .lm.m2{opacity:.14}.lg.vid .lgw{opacity:.08}
+/* gilded frame edge: breathing gold ring + two glints running along the top and bottom edges */
+.lge{position:absolute;inset:0;border-radius:inherit;pointer-events:none;z-index:6}
+.lge::before{content:"";position:absolute;inset:0;border-radius:inherit;box-shadow:inset 0 0 0 .12em #ffe2a2c0,inset 0 0 0 .26em #b0308a40,inset 0 0 .9em #ffb84a40,0 0 .9em #d060ff80;opacity:.4;animation:lgedge 6s ease-in-out var(--lgd,0s) infinite alternate}
+@keyframes lgedge{to{opacity:1}}
+.lge b{position:absolute;left:4%;top:0;width:36%;height:.17em;border-radius:1em;background:linear-gradient(90deg,transparent,#ffe7b0 35%,#fff 50%,#ffe7b0 65%,transparent);box-shadow:0 0 .45em #ffcf6aaa;opacity:0;animation:lgglint 8s var(--ezio) var(--lgd,0s) infinite}
+.lge b+b{top:auto;bottom:0;animation-direction:reverse;animation-delay:calc(var(--lgd,0s) - 4s)}
+@keyframes lgglint{0%,52%{transform:translateX(0);opacity:0}60%,88%{opacity:.95}100%{transform:translateX(158%);opacity:0}}
+.unit .lge{border-radius:6%}.unit .lge b{display:none}
+.unit .lge::before{box-shadow:inset 0 0 0 1.5px #ffe2a2b0,0 0 9px #d060ff90}
+/* animated gem on the Legendary set symbol: soft halo pulse + a four-point star glint */
+.r-L .set{animation:none}
+.card .ty .lgem{position:absolute;right:.5em;top:50%;width:1.6em;height:1.6em;margin-top:-.8em;pointer-events:none}
+.lgem::before{content:"";position:absolute;inset:-40%;border-radius:50%;background:radial-gradient(closest-side,#ffb0f2a0,#c040e040 55%,transparent);animation:gemglow 3s ease-in-out infinite alternate}
+@keyframes gemglow{from{opacity:.3;transform:scale(.8)}to{opacity:.95;transform:scale(1.1)}}
+.lgem b{position:absolute;left:38%;top:-12%;width:80%;height:80%;background:radial-gradient(ellipse 50% 6% at 50% 50%,#fff,#fff0),radial-gradient(ellipse 6% 50% at 50% 50%,#fff,#fff0),radial-gradient(closest-side,#fff 0,#ffe0f8a0 18%,transparent 40%);opacity:0;animation:gemspark 4s var(--ezio) infinite}
+@keyframes gemspark{0%,64%{transform:scale(.1) rotate(0);opacity:0}76%{transform:scale(1) rotate(40deg);opacity:1}100%{transform:scale(.1) rotate(90deg);opacity:0}}
+/* refined Legendary foil: faint diagonal prism plus a prismatic rim at the edges, static (tilt in zoom moves it) */
+.card.r-L .foil{opacity:1;background:linear-gradient(90deg,#ff9af036,transparent 7%,transparent 93%,#86fff036),linear-gradient(180deg,#fff0a83a,transparent 5%,transparent 95%,#a8bcff3a),linear-gradient(115deg,transparent 24%,#d4a8ff20 33%,#86fff020 41%,#fff0a820 48%,#ffa0c820 55%,#a8bcff20 62%,transparent 70%) calc(50% + var(--ox,0)*60%) calc(50% + var(--oy,0)*60%)/240% 240% no-repeat}
+#hand .card.r-L:not(.held) .foil::after{display:none}
+/* full-art text panel: dark glass with a gilded rule and a small diamond */
+.card.full .nm{box-shadow:0 -.08em 0 #ffd07040,0 .08em 0 #ffd07040}
+.card.full .tx{background:linear-gradient(180deg,#1a1020e8,#0a060ef4 40%,#050307f8)!important;box-shadow:0 0 0 1px #000,0 0 0 .1em #ffd07048,inset 0 .08em 0 #ffffff12,inset 0 0 1.2em #000b!important}
+.card.full .tx::before{content:"";position:absolute;left:14%;right:14%;top:0;height:.09em;background:linear-gradient(90deg,transparent,#c9a24a 20%,#fff1c0 50%,#c9a24a 80%,transparent);pointer-events:none}
+/* locked silhouettes are filtered: nothing may animate inside a filter (it re-renders the filter every frame) */
+.card.locked .lg,.card.locked .lge,.card.locked .lgem{display:none}
+/* Legendary units: no filter on art that holds video/animation (sleep tint is a sibling overlay instead), rectangular clip (no mask layer) */
+.unit .art.lgart,.unit.sleep .art.lgart{filter:none;border-radius:0}
+.unit .lsl{position:absolute;inset:0;z-index:3;background:#0a0610;opacity:0;transition:opacity .4s;pointer-events:none}
+.unit.sleep .lsl{opacity:.45}
+/* tiers: medium drops the second mote layer and per-unit extras; low has no Legendary motion at all */
+body.q-medium .lg .lm.m2,body.q-medium .unit .lg .lgw{display:none}
+/* no sheen sweep on small board units (a bright band crossing a 60 px art reads as a flash; caught by tests/flicker.py on High) */
+.unit .lg .lf{display:none}
+body.q-low .lg .lm,body.q-low .lg .lgw,body.q-low .lg .lf,body.q-low .lge b{display:none}
+body.q-low .lg i,body.q-low .lge::before,body.q-low .lgem::before{animation:none}
+body.q-low .lgem b{display:none}
+@media (prefers-reduced-motion:reduce){.lg i,.lge::before,.lge b,.lgem::before,.lgem b{animation:none!important}.lg .lm,.lg .lf,.lge b,.lgem b{display:none}}
+
+/* ===== v7.4 custom decks: deck list, hero picker, dialog ===== */
+.dsub{color:#a89c8c;font-size:12.5px;margin:-4px 0 10px;letter-spacing:.06em}
+#dlist{gap:10px}
+.drow{opacity:1;align-items:flex-start;cursor:default}
+.drow .ta{position:relative;width:64px;height:64px}
+.drow .emb{position:absolute;right:-6px;bottom:-6px;width:28px;height:28px;border-radius:50%;display:grid;place-items:center;background:radial-gradient(circle at 40% 35%,#2a2228,#060406);box-shadow:0 0 0 1.5px #000,0 0 0 3px var(--f3)}
+.drow .emb svg{width:19px;height:19px;filter:none}
+.dmeta{flex:1;min-width:0}
+.dmeta b{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.dv.ok{color:#a8f090}.dv.no{color:#ffb070}
+.tile.drow.bad{opacity:1;filter:none;box-shadow:0 0 0 1px #000 inset,0 0 0 2px #5a3a28 inset,0 6px 14px #000c}
+.dact{display:flex;flex-wrap:wrap;gap:5px;margin-top:8px}
+.dact .btn{font-size:11.5px;padding:.4em .75em}
+.btn.danger{color:#ffb0a8;box-shadow:0 0 0 1px #000,0 0 0 2px #8a2a2a inset}
+.btn.danger:not(.ghost){background:linear-gradient(180deg,#5a1414,#2a0606)}
+.dk0{text-align:center;font-size:13px;padding:18px 6px}
+.tile.mine small em{color:#ffb070;font-style:normal}
+.tile.bad{opacity:.45;filter:saturate(.5)}
+#bname{cursor:pointer}#bname i{font-style:normal;font-size:.8em;opacity:.65}
+.hpick{display:flex;align-items:center;gap:4px}
+.hpick span{font-family:var(--serif);font-size:12px;letter-spacing:.14em;color:#c8b8a0;text-transform:uppercase;margin-right:2px}
+.hpick button{display:flex;align-items:center;gap:3px;padding:2px 6px 2px 3px;border-radius:2px;background:#0a0809;box-shadow:0 0 0 1px #3a3028 inset;color:#a89a88;font-size:11px}
+.hpick button svg{width:18px;height:18px;filter:none}
+.hpick button em{font-style:normal}
+.hpick button.on{background:#2a0a10;color:#f4e4cc;box-shadow:0 0 0 1px #c8a070 inset,0 0 10px var(--glow)}
+@media (max-width:400px){.hpick button em{display:none}.hpick button{padding:3px 5px}}
+body.land .hpick button em{display:none}
+#dlg{position:fixed;inset:0;z-index:150;display:none;align-items:center;justify-content:center;background:#000a;padding:16px}
+#dlg.on{display:flex}
+#dlg .dbox{width:min(92vw,360px);padding:18px 16px 14px;border-radius:4px;background:linear-gradient(180deg,#120c0ef4,#060405f8),var(--panel) center/cover;box-shadow:0 0 0 1px #000,0 0 0 2px #6a5440 inset,0 12px 40px #000;text-align:center}
+#dlg b{display:block;font-family:var(--serif);font-weight:400;letter-spacing:.14em;font-size:17px;color:#f0e4d0;text-shadow:0 0 12px #a0102a}
+#dlg p{color:#b8aa96;font-size:13px;margin:10px 0 0}
+#dlg input{width:100%;margin-top:12px;padding:.55em .7em;font:inherit;font-size:16px;color:#f4e8d4;background:#050304;border:0;border-radius:2px;box-shadow:0 0 0 1px #000,0 0 0 2px #4a3e30 inset;outline:none}
+#dlg input:focus{box-shadow:0 0 0 1px #000,0 0 0 2px #c8a070 inset}
+#dlg .rowb{margin-top:14px}
+body.land #mydecks #dlist{grid-template-columns:1fr 1fr;width:min(100%,900px)}
+body.land .tile.drow{flex-direction:row;text-align:left;padding:8px}
+body.land #mydecks .scroll{padding-top:max(8px,env(safe-area-inset-top))}body.land #mydecks h2{margin:4px 0}
+
+/* ===== v7.4 text auto-fit (d.js fitEl, RENDERING_RULES.md §9): base size x --fit, set once per text+box size ===== */
+.card .nm span{font-size:calc(1.12em*var(--fit,1))}
+.card.full .nm span{font-size:calc(1.2em*var(--fit,1))}
+/* v9.7 faction title faces: card names + legendary cinematic use each faction's own typeface (falls back to --serif offline) */
+.f-c{--fname:"Cinzel Decorative",var(--serif);--fnw:700;--fnls:.02em;--fncol:#f4b8ac}
+.f-m{--fname:"Jacquard 24",var(--serif);--fnw:400;--fnls:.01em;--fnsz:1.18;--fncol:#b4ecea}
+.f-v{--fname:"Metamorphous",var(--serif);--fnw:400;--fnls:.02em;--fncol:#d6c0f6}
+.card .nm span{font-family:var(--fname,var(--serif));font-weight:var(--fnw,700);letter-spacing:var(--fnls,.03em);font-size:calc(1.12em*var(--fnsz,1)*var(--fit,1));color:var(--fncol,#f2e6d2)}
+.card.full .nm span{font-size:calc(1.2em*var(--fnsz,1)*var(--fit,1))}
+#cin .cname b{font-family:var(--fname,var(--serif));font-weight:var(--fnw,400);letter-spacing:.08em;color:var(--fncol,#fff2dc)}
+.card .nm span.fit2{white-space:normal;line-height:.94;text-align:center;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;text-overflow:clip;letter-spacing:0}
+.card .ty span{font-size:calc(1em*var(--fit,1))}
+.tile b[data-fit],.dmeta b{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-size:calc(16px*var(--fit,1))}
+.tile .tmeta{min-width:0;flex:1}
+#bname{display:flex;align-items:center;justify-content:center;gap:.3em;min-width:0}
+#bname span{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:calc(1em*var(--fit,1))}
+#bname i{flex:none}
+#bname span.fit2,.tile b.fit2,.dmeta b.fit2{white-space:normal;line-height:1.02;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;text-overflow:clip}
+
+/* ===== v8: softer holo (user: "a little better", still a touch of Legendary flicker on the phone).
+   Foil, prismatic rim, frame glints and gem lit ~35% lower; sweeps wider-edged and slower. Durations still divide LGP=240 s.
+   Small cards (hand, board units, collection/builder grids) drop the drifting mote layers, the Ken Burns drift, the frame glints
+   and the gem star: on a 60-150 px card they are barely visible but each one is a composited layer that moves every frame.
+   Zoom, the pack reveal, the cinematic and full-size sheets keep everything. Keyframes are redefined under the same names. ===== */
+.card .foil{opacity:.065}
+.card.r-L .foil{opacity:.64}
+.card .foil::after{width:56%;background:linear-gradient(90deg,transparent,#e8d8ff16 30%,#ffffff26 50%,#d0fff416 70%,transparent)}
+.card.r-L .foil::after{background:linear-gradient(90deg,transparent,#ffd8f420 25%,#ffffff34 50%,#d8fff020 75%,transparent)}
+#hand .card.held .foil::after,#zoom .foil::after,.pfront .foil::after,#sheet .foil::after{animation-duration:9s}
+#hand .card.r-L .foil::after,#zoom .r-L .foil::after,.pfront .r-L .foil::after,#sheet .r-L .foil::after{animation-duration:8s}
+@keyframes fsw{0%,50%{transform:translateX(-150%) skewX(-18deg)}100%{transform:translateX(260%) skewX(-18deg)}}
+#zoom .foil .fsh{opacity:.55}
+.lg .lf{opacity:.62;animation-duration:12s}
+.lge::before{opacity:.26;animation-duration:8s}
+@keyframes lgedge{to{opacity:.64}}
+.lge b{animation-duration:12s;box-shadow:0 0 .4em #ffcf6a66}
+.lge b+b{animation-delay:calc(var(--lgd,0s) - 6s)}
+@keyframes lgglint{0%,50%{transform:translateX(0);opacity:0}62%,86%{opacity:.6}100%{transform:translateX(158%);opacity:0}}
+.lgem::before{animation-duration:4s}
+@keyframes gemglow{from{opacity:.2;transform:scale(.84)}to{opacity:.6;transform:scale(1.06)}}
+.lgem b{animation-duration:6s}
+@keyframes gemspark{0%,64%{transform:scale(.1) rotate(0);opacity:0}78%{transform:scale(.9) rotate(40deg);opacity:.65}100%{transform:scale(.1) rotate(90deg);opacity:0}}
+/* small sizes: static still + glow only */
+#hand .lg .lm,.unit .lg .lm,#cgrid .lg .lm,#bgrid .lg .lm,#hand .lge b,#cgrid .lge b,#bgrid .lge b,#hand .lgem b,.unit .lgem b,#cgrid .lgem b,#bgrid .lgem b{display:none}
+#hand .lg .lp,.unit .lg .lp,#cgrid .lg .lp,#bgrid .lg .lp{animation:none;transform:none}

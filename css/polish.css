@@ -1,0 +1,98 @@
+/* ===== v1.8 polish: display type, holofoil tuning, cosmetic-variant effects, Madness spike, low Sanity,
+   legendary landing, end-of-match sequence. Transform/opacity animations only (RENDERING_RULES.md). ===== */
+
+/* ---- display typeface for titles, headings and buttons (card names use the faction faces) ---- */
+:root{--disp:"IM Fell English SC",var(--serif)}
+.btn,h1,h2,h3,.tile b,#banner,.bhead b,.bdh,.pack b,#ovrw .earn,.hpick span,#dlg b,.qt b,.scroll h3,.hero .hn,#endfx .ef-t b{font-family:var(--disp)}
+
+/* ---- holofoil: about 20% softer ---- */
+.card .foil{opacity:.052}
+.card.r-L .foil{opacity:.52}
+.card .foil::after{opacity:.8}
+#zoom .foil .fsh{opacity:.44}
+#zoom .glare{opacity:.8}
+
+/* ---- cosmetic variants (Gilded, Crimson, Void, Prismatic): a living effect on top of the static frame.
+   Animated only where you look at a card (zoom, pack reveal, hand); everywhere else it is a still frame. ---- */
+.card.vr .vfr{overflow:hidden}
+.card.vr .vfr::before,.card.vr .vfr::after{content:"";position:absolute;pointer-events:none;animation-play-state:paused}
+:is(#zoom,.pfront,#hand,#sheet) .card.vr .vfr::before,:is(#zoom,.pfront,#hand,#sheet) .card.vr .vfr::after{animation-play-state:running}
+
+/* Gilded: a gold glint sweeps across the card and fine gold dust rises through it */
+.card.vr-gild .vfr::after{top:-12%;bottom:-12%;left:0;width:48%;background:linear-gradient(100deg,transparent 18%,#ffe9a838 40%,#fff8e090 50%,#ffe9a838 60%,transparent 82%);transform:translateX(-140%) skewX(-14deg);animation:hsGild 5.6s cubic-bezier(.45,0,.25,1) infinite}
+.card.vr-gild .vfr::before{inset:-25% 0 0;opacity:.9;background:radial-gradient(circle at 14% 78%,#ffe7a8 0 .06em,transparent .13em),radial-gradient(circle at 31% 92%,#fff2c8 0 .05em,transparent .11em),radial-gradient(circle at 52% 70%,#ffd98a 0 .07em,transparent .14em),radial-gradient(circle at 70% 88%,#ffe7a8 0 .05em,transparent .12em),radial-gradient(circle at 86% 74%,#fff2c8 0 .06em,transparent .13em),radial-gradient(circle at 42% 98%,#ffd98a 0 .05em,transparent .11em),radial-gradient(circle at 63% 60%,#fff2c8 0 .04em,transparent .1em);animation:hsDust 6.5s linear infinite}
+@keyframes hsGild{0%,52%{transform:translateX(-140%) skewX(-14deg)}84%,100%{transform:translateX(320%) skewX(-14deg)}}
+@keyframes hsDust{0%{transform:translateY(8%);opacity:0}18%{opacity:.95}80%{opacity:.8}100%{transform:translateY(-22%);opacity:0}}
+
+/* Crimson: the frame beats like a heart; a slow red sheen runs down the card */
+.card.vr-crimson .vfr::before{inset:0;border-radius:inherit;box-shadow:inset 0 0 1.1em .25em #ff1030b0,inset 0 0 0 .2em #ff4060aa;opacity:.15;animation:hsBeat 2.6s ease-in-out infinite}
+.card.vr-crimson .vfr::after{left:-10%;right:-10%;top:0;height:40%;background:linear-gradient(180deg,transparent,#ff203026 45%,#ff6070 50%,#ff203026 55%,transparent);opacity:.35;transform:translateY(-120%);animation:hsSheen 7s ease-in-out infinite}
+@keyframes hsBeat{0%,100%{opacity:.12}10%{opacity:.85}20%{opacity:.3}30%{opacity:.7}55%{opacity:.12}}
+@keyframes hsSheen{0%,40%{transform:translateY(-120%)}85%,100%{transform:translateY(300%)}}
+
+/* Void: stars inside the frame twinkle out of step with each other */
+.card.vr-void .vfr::before,.card.vr-void .vfr::after{inset:0}
+.card.vr-void .vfr::before{background:radial-gradient(circle at 9% 22%,#fff 0 .05em,transparent .11em),radial-gradient(circle at 90% 12%,#e0d0ff 0 .06em,transparent .13em),radial-gradient(circle at 7% 56%,#fff 0 .04em,transparent .1em),radial-gradient(circle at 93% 48%,#c8b0ff 0 .05em,transparent .12em),radial-gradient(circle at 12% 90%,#e0d0ff 0 .05em,transparent .11em),radial-gradient(circle at 88% 82%,#fff 0 .06em,transparent .13em),radial-gradient(circle at 50% 4%,#c8b0ff 0 .04em,transparent .1em);animation:hsTw 3.2s ease-in-out infinite}
+.card.vr-void .vfr::after{background:radial-gradient(circle at 18% 8%,#fff 0 .04em,transparent .1em),radial-gradient(circle at 80% 30%,#fff 0 .05em,transparent .11em),radial-gradient(circle at 5% 38%,#d8c8ff 0 .05em,transparent .12em),radial-gradient(circle at 95% 66%,#fff 0 .04em,transparent .1em),radial-gradient(circle at 22% 96%,#fff 0 .05em,transparent .11em),radial-gradient(circle at 70% 95%,#d8c8ff 0 .04em,transparent .1em),radial-gradient(ellipse at 50% 50%,transparent 62%,#6020ff22 100%);animation:hsTw 4.4s ease-in-out -2.1s infinite}
+@keyframes hsTw{0%,100%{opacity:.25}50%{opacity:1}}
+
+/* Prismatic: a rainbow sheen drifts slowly across the whole card */
+.card.vr-prism .vfr::after{inset:-60%;background:linear-gradient(115deg,transparent 32%,#ff9af02e 39%,#86fff02e 44%,#fff0a836 50%,#ffa0c82e 56%,#a8bcff2e 61%,transparent 68%);animation:hsPrism 6.5s ease-in-out infinite alternate}
+.card.vr-prism .vfr::before{inset:0;background:radial-gradient(circle at 6% 6%,#fff 0 .06em,transparent .16em),radial-gradient(circle at 94% 94%,#fff 0 .06em,transparent .16em),radial-gradient(circle at 94% 6%,#fff8 0 .05em,transparent .12em),radial-gradient(circle at 6% 94%,#fff8 0 .05em,transparent .12em);animation:hsTw 2.4s ease-in-out infinite}
+@keyframes hsPrism{from{transform:translate(-22%,-14%)}to{transform:translate(22%,14%)}}
+
+body.q-low .card.vr .vfr::before,body.q-low .card.vr .vfr::after{animation:none}
+body.q-low .card.vr-gild .vfr::after,body.q-low .card.vr-crimson .vfr::after{display:none}
+
+/* ---- Madness: a dark flash on every spike, and the vignette closes in like a heartbeat at 7+ ---- */
+#madk{position:absolute;inset:0;pointer-events:none;z-index:55;opacity:0;background:radial-gradient(ellipse 80% 70% at 50% 50%,transparent 25%,#1a0024c8 70%,#000 100%)}
+#madk.on{animation:hsMadSpike .95s ease-out}
+@keyframes hsMadSpike{0%{opacity:0;transform:scale(1.18)}16%{opacity:.9;transform:scale(1)}100%{opacity:0;transform:scale(1.05)}}
+#match:is([data-mz="7"],[data-mz="8"]) #madv{animation:hsCloseIn 2.2s ease-in-out infinite}
+#match:is([data-mz="9"],[data-mz="10"]) #madv{animation:hsCloseIn 1.5s ease-in-out infinite}
+@keyframes hsCloseIn{0%,100%{transform:scale(1)}12%{transform:scale(.93)}24%{transform:scale(.985)}36%{transform:scale(.95)}60%{transform:scale(1)}}
+
+/* ---- low Sanity: red edges pulse (8 or less), faster at 4 or less ---- */
+#lowv{position:absolute;inset:0;pointer-events:none;z-index:54;opacity:0;background:radial-gradient(ellipse 85% 75% at 50% 55%,transparent 55%,#7a0010aa 90%,#3a0006 100%);transition:opacity .8s}
+#match.lowsan #lowv{opacity:.55;animation:hsLow 2.4s ease-in-out infinite}
+#match.lowsan2 #lowv{opacity:.85;animation-duration:1.3s}
+@keyframes hsLow{0%,100%{transform:scale(1.04)}14%{transform:scale(1)}28%{transform:scale(1.03)}40%{transform:scale(1.005)}}
+
+body.q-low #madv,body.q-low #lowv{animation:none!important}
+
+/* ---- legendary landing: a ring of light pulses out from the unit as it lands ---- */
+.unit .lgring{position:absolute;inset:-18%;border-radius:50%;pointer-events:none;z-index:-1;background:radial-gradient(closest-side,transparent 55%,var(--glow) 70%,transparent 100%);opacity:0;animation:hsRing 2.4s ease-out}
+@keyframes hsRing{0%{opacity:0;transform:scale(.4)}12%{opacity:1}100%{opacity:0;transform:scale(2.4)}}
+
+/* ---- end of match ---- */
+.hero .av{position:relative}
+.hero .hcrk{position:absolute;inset:-6%;border-radius:50%;background-size:100% 100%;pointer-events:none;opacity:0;transform:scale(.6);animation:hsCrack .35s cubic-bezier(.2,1.4,.4,1) forwards}
+@keyframes hsCrack{to{opacity:1;transform:scale(1)}}
+.hero.hsdead .av{animation:hsBreak 1.6s ease-in .3s forwards}
+@keyframes hsBreak{0%{transform:none;opacity:1}8%{transform:translate(-3px,1px) rotate(-3deg)}16%{transform:translate(3px,-1px) rotate(2deg)}24%{transform:none}100%{transform:scale(.82) rotate(6deg);opacity:.25}}
+.hero.hswin{z-index:2}
+.hero.hswin .av{animation:hsRise 1.8s ease-out forwards}
+@keyframes hsRise{0%{transform:none}30%{transform:scale(1.12)}100%{transform:scale(1.06)}}
+
+#endfx{position:fixed;inset:0;z-index:96;pointer-events:none;display:none}
+#endfx.on{display:block}
+#endfx .ef-l,#endfx .ef-v{position:absolute;inset:-30%;opacity:0}
+#endfx.win .ef-l{background:radial-gradient(circle at var(--ex,50%) var(--ey,30%),#fff6dc 0,#ffd27a90 10%,#c0803030 32%,transparent 58%);animation:hsFlash 2s ease-out .35s forwards}
+#endfx.win .ef-v{background:radial-gradient(ellipse at 50% 45%,#ffe8b818,#00000080 75%);animation:hsFade 1.8s ease-out .5s forwards}
+#endfx.lose .ef-l{background:radial-gradient(circle at var(--ex,50%) var(--ey,70%),transparent 0 14%,#2a0006d0 36%,#000 62%);transform:scale(2.6);animation:hsIris 2s cubic-bezier(.5,0,.3,1) .3s forwards}
+#endfx.draw .ef-l{background:#000;animation:hsFade 2s ease-in .2s forwards}
+@keyframes hsFlash{0%{opacity:0;transform:scale(.6)}18%{opacity:1;transform:scale(1)}100%{opacity:.55;transform:scale(1.15)}}
+@keyframes hsIris{0%{opacity:0;transform:scale(2.6)}25%{opacity:1}100%{opacity:1;transform:scale(1)}}
+@keyframes hsFade{from{opacity:0}to{opacity:1}}
+#endfx .ef-t{position:absolute;left:0;right:0;top:44%;transform:translateY(-50%);text-align:center;padding:0 max(16px,env(safe-area-inset-left,0px));opacity:0;animation:hsTitle 1.6s ease-out .75s forwards}
+#endfx .ef-t b{display:block;font-weight:400;font-size:clamp(26px,7.5vw,58px);letter-spacing:.14em;line-height:1.1;color:#f4e6cc;text-shadow:0 0 18px #000,0 2px 0 #000}
+#endfx.win .ef-t b{color:#fff0cc;text-shadow:0 0 2px #fff,0 0 24px #ffb040,0 0 60px #c06010,0 2px 0 #000}
+#endfx.lose .ef-t b{color:#e8c8c8;text-shadow:0 0 22px #a0101e,0 0 50px #400006,0 2px 0 #000}
+#endfx .ef-t small{display:block;margin-top:10px;font-family:var(--serif);font-style:italic;font-size:clamp(13px,3.6vw,18px);color:#cbbfae;letter-spacing:.04em}
+@keyframes hsTitle{0%{opacity:0;transform:translateY(-40%) scale(1.08)}100%{opacity:1;transform:translateY(-50%) scale(1)}}
+#endfx.out{animation:hsOut .6s ease-in forwards}
+@keyframes hsOut{to{opacity:0}}
+#endfx.low .ef-l,#endfx.low .ef-v,#endfx.low .ef-t{animation-duration:.4s;animation-delay:0s}
+@media (prefers-reduced-motion:reduce){
+ .card.vr .vfr::before,.card.vr .vfr::after,#madv,#lowv,#madk.on,.unit .lgring{animation:none!important}
+ #endfx .ef-l,#endfx .ef-v,#endfx .ef-t{animation-duration:.3s!important;animation-delay:0s!important}}
