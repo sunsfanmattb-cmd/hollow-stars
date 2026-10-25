@@ -13,12 +13,10 @@ with sync_playwright() as p:
             pg.evaluate(f"setQuality('high');startMatch(prebuilt('{f}'),'c',{{first:0}});UI.busy=false;G.p[0].board=['{f}5','{f}4'].map(id=>{{const u=mkUnit(G,0,id);u.ready=true;return u}});G.p[1].board=['c6','c2','c7'].map(id=>mkUnit(G,1,id));renderMatch()")
             pg.wait_for_function('window.__hs.B3.on&&window.__hs.B3.frames>3', timeout=20000)
             pg.wait_for_timeout(800)
-            st = pg.evaluate("[window.__hs.B3.on,window.__hs.B3.frames,window.__hs.B3.toys.map(t=>t.k),document.hidden,BAT.idle,BAT.hid,Object.keys(window.__hs.B3.tex),window.__hs.B3.ok,cur,!!window.__hs.B3.gl]")
+            st = pg.evaluate("[window.__hs.B3.on,window.__hs.B3.frames,document.hidden,BAT.idle,BAT.hid,Object.keys(window.__hs.B3.tex),window.__hs.B3.ok,cur,!!window.__hs.B3.gl]")
+            # a Guard minion must show its Guard frame on the 3D table
+            pg.evaluate("(()=>{const u=mkUnit(G,0,'v6');u.k=[...u.k,'guard'];G.p[0].board.push(u);renderMatch()})()");pg.wait_for_timeout(300)
             pg.screenshot(path=f'{out}/{tag}-{f}.png')
-            # tap the first toy
-            T = pg.evaluate("window.__hs.B3.toys.map(t=>[t.x,t.y])")
-            if T:
-                pg.evaluate(f"window.__hs.b3Tap({T[0][0]},{T[0][1]})"); pg.wait_for_timeout(700); pg.screenshot(path=f'{out}/{tag}-{f}-tap.png')
             print(tag, f, st)
             pg.close()
     b.close()

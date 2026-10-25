@@ -6,8 +6,6 @@ body.b3d[data-scr=match] #b3th{display:block}
 /* the painted 2D board under the canvas is no longer seen in a match: don't composite it */
 body.b3d[data-scr=match] #pbg{visibility:hidden}
 
-/* raised tokens: a thick base edge and a lit top bevel; the table draws the real (soft, moving) shadow */
-body.b3d .unit{box-shadow:0 0 0 1px #000,0 0 0 2.5px var(--f3),0 2px 0 2.5px #0b0709,0 4px 0 2.5px #060405,0 5px 0 2.5px #000}
-body.b3d .unit::before{content:"";position:absolute;inset:0;border-radius:inherit;pointer-events:none;z-index:3;background:linear-gradient(160deg,#ffffff1f,#0000 28%,#0000 70%,#0000004d)}
+/* minions keep their own frame styling (Guard border, ready glow, selection, target ring); the table draws their shadow */
 /* cards have thickness: a layered edge that shows as they tilt and swing while dragged */
 #ghost .card,#ghost.card{box-shadow:1px 1px 0 #2a2018,2px 2px 0 #1d160f,3px 3px 0 #120d09,0 18px 30px #000a}
