@@ -106,7 +106,9 @@ orient=function(e){if(e.gamma==null||e.beta==null)return;ZT.ev++;const a=scrAngl
  const dt=Math.max(1,Math.min(100,now-S.t));S.t=now;S.x=S.fx(x,dt);S.y=S.fy(y,dt);
  if(!ZT.base||ZT.base.a!==a)ZT.base={x:S.x,y:S.y,a};const kb=1-Math.exp(-dt/4000);ZT.base.x+=(S.x-ZT.base.x)*kb;ZT.base.y+=(S.y-ZT.base.y)*kb;
  const map=v=>{const m=Math.abs(v);return m<.6?0:Math.tanh(Math.sign(v)*(m-.6)/20)};
- ZT.sens=now;if(now-ZT.fing>600){ZT.tx=map(S.x-ZT.base.x);ZT.ty=map(S.y-ZT.base.y)}ztKick()};
+ ZT.sens=now;if(now-ZT.fing>600){const nx=map(S.x-ZT.base.x),ny=map(S.y-ZT.base.y);
+  /* v2.0 settle: hand tremor below ~0.35 deg no longer moves the card, so held-still text and art stop crawling */
+  if(Math.abs(nx-ZT.tx)+Math.abs(ny-ZT.ty)>.027||Math.abs(nx)+Math.abs(ny)<.004){ZT.tx=nx;ZT.ty=ny}}ztKick()};
 ztFrame=function(t){ZT.raf=0;const c=ZT.c;if(!c||!c.isConnected){ZT.c=null;ZT.lt=0;return}
  const now=t||performance.now(),dt=ZT.lt?Math.max(1,Math.min(64,now-ZT.lt)):16;ZT.lt=now;
  const k=1-Math.exp(-dt/(now-ZT.fing<600?55:120));ZT.x+=(ZT.tx-ZT.x)*k;ZT.y+=(ZT.ty-ZT.y)*k;

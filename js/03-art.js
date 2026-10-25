@@ -125,7 +125,7 @@ const SPEC={v1:'spawn@void',v2:'eye@debris',v3:'eyes@flesh',v4:'leech@void',v5:'
  m1:'drone@hull',m2:'shield,drone@hull',m3:'swarm@debris',m4:'cross,drone@hull',m5:'ship@debris',m6:'lantern,drone@hull',m7:'human@hull',m8:'turret@debris',m9:'ark@planet',m10:'circuit,beam@hull',m11:'beam@void',m12:'vent@hull',m13:'circuit@hull',
  c1:'robed@altar',c2:'robed,blood@altar',c3:'flesh@flesh',c4:'spores@flesh',c5:'knife,robed@altar',c6:'golem@flesh',c7:'spores,robed@altar',c8:'flesh,maw@flesh',c9:'mouths,eyes@flesh',c10:'knife,blood@altar',c11:'blood,eyes@flesh',c12:'crowd,blood@altar',c13:'star,robed@altar',
  n1:'beacon@planet',n2:'human@debris',n3:'human@hull',n4:'warden@hull',n5:'beacon@debris',n6:'ship@void',tD:'drone@hull',tS:'human@hull'};
-const ART={},ARTV='hs7',VIDV='hs8';
+const ART={},ARTV='hs7',VIDV='hs9';
 try{for(let i=localStorage.length-1;i>=0;i--){const k=localStorage.key(i);if(/^hs\d+:/.test(k))localStorage.removeItem(k)}}catch(e){}
 const mkc=(W,H)=>{const c=document.createElement('canvas');c.width=W;c.height=H;return c};
 function paint(key,f,spec,W=336,H=252){if(ART[key])return ART[key];

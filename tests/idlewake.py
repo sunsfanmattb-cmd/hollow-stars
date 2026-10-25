@@ -5,7 +5,7 @@ from playwright.sync_api import sync_playwright
 SC = {'title': "show('title')", 'collection': "show('coll')", 'match (idle turn)': "window.__hs.demo()", 'decks': "show('mydecks')"}
 def measure(b, path, setup):
     ctx = b.new_context(viewport={'width': 412, 'height': 860}, device_scale_factor=2.6, is_mobile=True, has_touch=True)
-    pg = ctx.new_page(); pg.goto(pathlib.Path(path).resolve().as_uri()); pg.wait_for_timeout(1200)
+    pg = ctx.new_page(); pg.goto(path if path.startswith('http') else pathlib.Path(path).resolve().as_uri()); pg.wait_for_timeout(1200)
     pg.evaluate("setQuality('high');for(const id of COL)COLL.own[id]=Math.max(COLL.own[id]||0,1);saveColl()")
     pg.evaluate(setup); pg.wait_for_timeout(6000)
     tf = tempfile.mktemp(suffix='.json')

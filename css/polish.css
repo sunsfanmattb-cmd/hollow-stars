@@ -109,3 +109,12 @@ body.zmod .screen.on .card *,body.zmod .screen.on .card *::before,body.zmod .scr
 /* screen shake moves an existing layer instead of creating (and destroying) one each time, which repainted the whole board */
 #match.on,#pstage{will-change:transform}
 body.cinhold #match *,body.cinhold #match *::before,body.cinhold #match *::after{animation-play-state:paused!important}
+
+/* ===== v2.0 shimmer fix (tests/flickermap.py) =====
+   On phones, fine detail that moves by fractions of a pixel is resampled differently every frame and sparkles.
+   The sources on cards: the slow Ken Burns zoom on Legendary art, the tiny drifting motes, and the rotating
+   cost-gem swirl (which also used a blend mode). The art now holds still and sharp; glow, sheen, edge glints
+   and the video loops keep it alive. */
+.lg .lp{animation:none!important;transform:none!important}
+.lg .lm{display:none!important}
+.cr::before{animation:none!important;mix-blend-mode:normal;opacity:.55}
