@@ -136,18 +136,19 @@ U('c32','Crown of Ten Thousand Teeth','c',8,6,6,'drain','L','crown','End of your
 U('n9','Void-Salvager','n',2,2,2,'salvage','C','salvager','','His eyes went black on the third wreck. He kept the helmet.',PK());
 U('n10','The Starving Navigator','n',3,2,3,'','U','navigator','When it arrives, draw 2 cards. You gain 2 Madness.','He charts stars that are not there. They are getting closer.',PK({play:(g,pi)=>{draw(g,pi,2);addMad(g,pi,2)}}));
 U('n11','Witness of the Hollow Star','n',4,3,5,'','R','witness','When it arrives, the enemy gains Madness equal to yours (max 3).','The star in her visor has an eye. It saw her first.',PK({play:(g,pi)=>addMad(g,1-pi,Math.min(3,g.p[pi].mad))}));
-// ---- v9 booster-pack cards: new keywords (Echo, Devour, Corrupt, Ward). Art is reused from existing cards (ai:) ----
-const V9C=(ai,o={})=>Object.assign({pk:1,ai,v9:1},o);
-U('v33','Echo of the Drowned','v',2,2,2,'phase echo','U','drowned','','She surfaces twice. Only one of her is breathing.',V9C('v22'));
-U('v34','The Maw That Remembers','v',5,4,5,'devour','R','maw','','It keeps every crew it swallows. On quiet nights you can hear them taking roll.',V9C('v7',{dread:1}));
-S('v35','Blackwater Rot','v',2,'U','ruin','Deal 2 damage to a unit. If it survives, it permanently loses 2 Attack.','The water does not drown you. It teaches your muscles to forget.',V9C('v19',{tg:'unit',cast:(g,pi,T)=>{hurt(g,T,2);if(T.k==='u'&&T.u.h>0)T.u.a=Math.max(0,T.u.a-2)}}));
-U('m33','Ward-Lattice Drone','m',2,1,3,'ward','C','drone','','Its shield remembers the shape of the last thing that tried to kill it.',V9C('m1'));
-S('m34','Rust Psalm','m',3,'U','jammer','Echo. Enemy units permanently lose 1 Attack.','A maintenance hymn, broadcast on every channel. The machines are listening. So is the rust.',V9C('m19',{cast:(g,pi)=>{for(const q of E(g,pi).board)if(q.a>0){q.a--;fx(g,{k:'cor',id:'u'+q.uid})}}}));
-U('m35','Scrap-Maw Excavator','m',4,3,4,'devour salvage','U','hauler','','It was built to clear wreckage. It no longer checks whether the wreckage is still moving.',V9C('m18'));
-U('c33','Rot-Tongue Preacher','c',3,2,4,'corrupt drain','U','robed','','Every word she speaks is a wound that refuses to close.',V9C('c7'));
-U('c34','Gutter Hound','c',2,2,2,'devour','C','hound','','Fed on scraps from the feast. It has started to prefer the guests.',V9C('c25'));
+// ---- v9 booster-pack cards: new keywords (Echo, Devour, Corrupt, Ward). Own art since batch 10; ai (reused painting) only where none exists yet ----
+const V9C=(ai,o={})=>Object.assign({pk:1,v9:1},ai?{ai}:{},o);
+U('v33','Echo of the Drowned','v',2,2,2,'phase echo','U','drowned','','She surfaces twice. Only one of her is breathing.',V9C(0));
+U('v34','The Maw That Remembers','v',5,4,5,'devour','R','maw','','It keeps every crew it swallows. On quiet nights you can hear them taking roll.',V9C(0,{dread:1}));
+S('v35','Blackwater Rot','v',2,'U','ruin','Deal 2 damage to a unit. If it survives, it permanently loses 2 Attack.','The water does not drown you. It teaches your muscles to forget.',V9C(0,{tg:'unit',cast:(g,pi,T)=>{hurt(g,T,2);if(T.k==='u'&&T.u.h>0)T.u.a=Math.max(0,T.u.a-2)}}));
+U('m33','Ward-Lattice Drone','m',2,1,3,'ward','C','drone','','Its shield remembers the shape of the last thing that tried to kill it.',V9C(0));
+S('m34','Rust Psalm','m',3,'U','jammer','Echo. Enemy units permanently lose 1 Attack.','A maintenance hymn, broadcast on every channel. The machines are listening. So is the rust.',V9C(0,{cast:(g,pi)=>{for(const q of E(g,pi).board)if(q.a>0){q.a--;fx(g,{k:'cor',id:'u'+q.uid})}}}));
+U('m35','Scrap-Maw Excavator','m',4,3,4,'devour salvage','U','hauler','','It was built to clear wreckage. It no longer checks whether the wreckage is still moving.',V9C(0));
+U('c33','Rot-Tongue Preacher','c',3,2,4,'corrupt drain','U','robed','','Every word she speaks is a wound that refuses to close.',V9C(0));
+U('c34','Gutter Hound','c',2,2,2,'devour','C','hound','','Fed on scraps from the feast. It has started to prefer the guests.',V9C(0));
 S('c35','Second Supper','c',1,'C','banquet','Echo. Give a friendly unit +1/+1 and Devour.','There is always room for another course. There is always another course.',V9C('c26',{tg:'friendlyUnit',cast:(g,pi,T)=>{buff(T.u,1,1);if(!T.u.k.includes('devour'))T.u.k.push('devour');fx(g,{k:'buff',id:'u'+T.u.uid})}}));
-U('n12','Warded Survivor','n',3,2,3,'guard ward','C','human','','She wears the last working shield on the station. She has not taken it off in a year.',V9C('n4'));
+U('n12','Warded Survivor','n',3,2,3,'guard ward','C','human','','She wears the last working shield on the station. She has not taken it off in a year.',V9C(0));
+U('n13','The Pathless','n',7,5,7,'phase','L','human','When it arrives, draw a card. Start of your turn: remove 1 of your Madness and the enemy gains 1 Madness.','It walks a road no one built, toward a star no one can see. The road follows it.',PK({play:(g,pi)=>draw(g,pi,1),start:(g,pi)=>{addMad(g,pi,-1);addMad(g,1-pi,1)}}));
 U('tD','Drone','m',1,1,1,'','T','drone','','A drone of the dead fleet. It runs a maintenance cycle on whatever is left.');
 U('tS','Survivor','n',1,1,2,'guard','T','human','','Someone who got out. They stopped asking out of what.');
 U('tC','Spawnling','c',1,1,1,'','T','spawnling','','Born hungry from an open wound. It already knows your name.');

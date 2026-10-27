@@ -121,6 +121,7 @@ c33:'Every word the Preacher speaks leaves a wound that will not close. Her serm
 c34:'The Gutter Hound eats from under the Banquet table. Lately, it has started eating from the chairs.',
 c35:'There is always room for another course. The Communion ensures there is always another course.',
 n12:'She found the last working shield on the station and has not taken it off in a year. Not to sleep. Not to eat.',
+n13:'No survey has found where the Pathless began. Crews who cross its road say the nightmares stop afterwards. Someone else\'s begin.',
 tD:'Drones of the dead fleet. They run maintenance cycles on whatever remains, including the crews.',
 tS:'Survivors. They got out. They stopped asking what they got out of.',
 tC:'Spawnlings are born hungry from open wounds. They already know their parent\'s name, and yours.'};
