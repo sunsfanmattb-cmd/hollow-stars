@@ -148,7 +148,7 @@ U('c33','Rot-Tongue Preacher','c',3,2,4,'corrupt drain','U','robed','','Every wo
 U('c34','Gutter Hound','c',2,2,2,'devour','C','hound','','Fed on scraps from the feast. It has started to prefer the guests.',V9C(0));
 S('c35','Second Supper','c',1,'C','banquet','Echo. Give a friendly unit +1/+1 and Devour.','There is always room for another course. There is always another course.',V9C('c26',{tg:'friendlyUnit',cast:(g,pi,T)=>{buff(T.u,1,1);if(!T.u.k.includes('devour'))T.u.k.push('devour');fx(g,{k:'buff',id:'u'+T.u.uid})}}));
 U('n12','Warded Survivor','n',3,2,3,'guard ward','C','human','','She wears the last working shield on the station. She has not taken it off in a year.',V9C(0));
-U('n13','The Pathless','n',7,5,7,'phase','L','human','When it arrives, draw a card. Start of your turn: remove 1 of your Madness and the enemy gains 1 Madness.','It walks a road no one built, toward a star no one can see. The road follows it.',PK({play:(g,pi)=>draw(g,pi,1),start:(g,pi)=>{addMad(g,pi,-1);addMad(g,1-pi,1)}}));
+U('n13','The Pathless','n',7,5,7,'phase','L','human','When it arrives, draw a card. Start of your turn: move 1 of your Madness to the enemy.','It walks a road no one built, toward a star no one can see. The road follows it.',PK({play:(g,pi)=>draw(g,pi,1),start:(g,pi)=>{if(g.p[pi].mad>0){addMad(g,pi,-1);addMad(g,1-pi,1)}}}));
 U('tD','Drone','m',1,1,1,'','T','drone','','A drone of the dead fleet. It runs a maintenance cycle on whatever is left.');
 U('tS','Survivor','n',1,1,2,'guard','T','human','','Someone who got out. They stopped asking out of what.');
 U('tC','Spawnling','c',1,1,1,'','T','spawnling','','Born hungry from an open wound. It already knows your name.');
