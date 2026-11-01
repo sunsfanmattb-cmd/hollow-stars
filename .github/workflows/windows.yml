@@ -1,0 +1,46 @@
+# Builds the Windows installer and publishes it as a GitHub release; installed copies update themselves from these releases.
+# Release a new version: change "version" in windows/package.json (e.g. 2.6.0) and merge it to main. The build publishes the
+# release and its v2.6.0 tag. A pushed v* tag or a manual run from the Actions tab also works.
+name: Windows release
+on:
+  push:
+    branches: [main]
+    paths: ['windows/package.json']
+    tags: ['v*']
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Version to build (e.g. 2.6.0)'
+        required: true
+permissions:
+  contents: write
+jobs:
+  windows:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: Version
+        shell: bash
+        run: |
+          cd windows
+          V="${{ github.event.inputs.version }}"
+          [ -z "$V" ] && [ "${GITHUB_REF_TYPE}" = "tag" ] && V="${GITHUB_REF_NAME#v}"
+          [ -n "$V" ] && npm version "$V" --no-git-tag-version --allow-same-version
+          node -p "'Building ' + require('./package.json').version"
+      - name: Copy the game into the app
+        shell: bash
+        run: |
+          mkdir -p windows/game
+          cp -r index.html css js art windows/game/
+          cp windows/build/icon.png windows/game/icon.png
+      - name: Install
+        working-directory: windows
+        run: npm install --no-audit --no-fund
+      - name: Build and publish
+        working-directory: windows
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: npx electron-builder --win nsis --x64 --publish always
