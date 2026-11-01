@@ -4,6 +4,7 @@
   "version": "2.5.0",
   "description": "Hollow Stars - a cosmic horror card game",
   "author": "Matthew Bowling",
+  "homepage": "https://github.com/sunsfanmattb-cmd/hollow-stars",
   "main": "main.js",
   "private": true,
   "scripts": {
@@ -22,11 +23,25 @@
     "appId": "com.sunsfanmattb.hollowstars",
     "productName": "Hollow Stars",
     "copyright": "Copyright 2026 Matthew Bowling",
-    "directories": { "output": "dist", "buildResources": "build" },
-    "files": ["main.js", "package.json", "game/**/*"],
+    "directories": {
+      "output": "dist",
+      "buildResources": "build"
+    },
+    "files": [
+      "main.js",
+      "package.json",
+      "game/**/*"
+    ],
     "asar": true,
     "win": {
-      "target": [{ "target": "nsis", "arch": ["x64"] }],
+      "target": [
+        {
+          "target": "nsis",
+          "arch": [
+            "x64"
+          ]
+        }
+      ],
       "icon": "build/icon.ico",
       "artifactName": "HollowStars-${version}-Setup.${ext}"
     },
@@ -41,6 +56,13 @@
       "uninstallerIcon": "build/icon.ico",
       "deleteAppDataOnUninstall": false
     },
-    "publish": [{ "provider": "github", "owner": "sunsfanmattb-cmd", "repo": "hollow-stars", "releaseType": "release" }]
+    "publish": [
+      {
+        "provider": "github",
+        "owner": "sunsfanmattb-cmd",
+        "repo": "hollow-stars",
+        "releaseType": "release"
+      }
+    ]
   }
 }

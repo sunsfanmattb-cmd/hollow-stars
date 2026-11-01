@@ -3,13 +3,10 @@
 An Electron app around the same game files as the web and Android builds. The installer and its updates come from this
 repo's GitHub releases.
 
-**Release a new version:** bump nothing by hand, just push a tag:
-
-    git tag v2.6.0
-    git push origin v2.6.0
-
+**Release a new version:** set `"version"` in `windows/package.json` (e.g. `2.6.0`) and merge it to `main`.
 `.github/workflows/windows.yml` then builds `HollowStars-2.6.0-Setup.exe` on a Windows runner and publishes it (with the
-`latest.yml` update manifest) as the `v2.6.0` release. Installed games check for it at launch and every 4 hours, download it in
+`latest.yml` update manifest) as the `v2.6.0` release, creating the tag. Pushing a `v2.6.0` tag, or running the workflow
+from the Actions tab, does the same. Installed games check for it at launch and every 4 hours, download it in
 the background and offer to restart; otherwise it installs the next time the game is closed.
 
 - `main.js`: the window (remembers size and fullscreen; F11 or Alt+Enter toggles fullscreen), the updater.

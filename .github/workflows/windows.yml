@@ -1,9 +1,11 @@
 # Builds the Windows installer and publishes it as a GitHub release; installed copies update themselves from these releases.
-# Release a new version: push a tag like v2.6.0 (git tag v2.6.0 && git push origin v2.6.0). Or run it by hand from the
-# Actions tab with a version number.
+# Release a new version: change "version" in windows/package.json (e.g. 2.6.0) and merge it to main. The build publishes the
+# release and its v2.6.0 tag. A pushed v* tag or a manual run from the Actions tab also works.
 name: Windows release
 on:
   push:
+    branches: [main, windows-app]
+    paths: ['windows/package.json']
     tags: ['v*']
   workflow_dispatch:
     inputs:
@@ -23,8 +25,11 @@ jobs:
       - name: Version
         shell: bash
         run: |
-          V="${{ github.event.inputs.version }}"; [ -z "$V" ] && V="${GITHUB_REF_NAME#v}"
-          cd windows && npm version "$V" --no-git-tag-version --allow-same-version
+          cd windows
+          V="${{ github.event.inputs.version }}"
+          [ -z "$V" ] && [ "${GITHUB_REF_TYPE}" = "tag" ] && V="${GITHUB_REF_NAME#v}"
+          [ -n "$V" ] && npm version "$V" --no-git-tag-version --allow-same-version
+          node -p "'Building ' + require('./package.json').version"
       - name: Copy the game into the app
         shell: bash
         run: |
