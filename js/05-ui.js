@@ -8,7 +8,8 @@ const UI={sel:null,busy:false,auto:/[?&]auto=1/.test(location.search),speed:/[?&
 function layout(){const W=innerWidth,H=innerHeight,land=W>H*1.15;document.body.classList.toggle('land',land);let uw,hw,side=0;
  /* v9.1: match HUD scale (hero panels + turn controls). Desktop scales with the window; phones get a moderate fixed bump */
  const hzf=land?Math.round(Math.max(H<380?1:H<480?1.04:1.12,Math.min(2.4,W/1000,H/620))*100)/100:1.1;document.documentElement.style.setProperty('--hz',hzf);
- if(!land){uw=Math.min((W-16)/6.2,100,H*.1);hw=Math.min(W/3.7,150,H*.17)}else{side=Math.round(Math.max(176,Math.min(260*hzf,W*(hzf>1.2?.25:.22))));uw=Math.min((H-50)/4.6,(W-side-60)/6.4,130*hzf);hw=uw*1.2}
+ /* v2.3: board zoomed out a little (units ~12% smaller on desktop, hand ~20%): rows no longer touch and the hand clears the board */
+ if(!land){uw=Math.min((W-16)/6.5,96,H*.095);hw=Math.min(W/3.95,140,H*.158)}else{side=Math.round(Math.max(176,Math.min(260*hzf,W*(hzf>1.2?.25:.22))));uw=Math.min((H-40)/5.25,(W-side-60)/7.2,116*hzf);hw=uw*1.14}
  const st=document.documentElement.style;st.setProperty('--uw',uw+'px');st.setProperty('--uh',uw*1.34+'px');st.setProperty('--hw',hw+'px');st.setProperty('--hh',hw*1.4+'px');st.setProperty('--side',side+'px');const mz=Math.round(Math.max(1,Math.min(3,land?Math.min(W/1000,H/640):Math.min(W/760,H/1000)))*100)/100;st.setProperty('--dmz',mz);document.body.classList.toggle('dz',mz>1);UI.mz=mz;UI.hw=hw;UI.hh=hw*1.4;
  $('#bgrid').style.setProperty('--bw',Math.max(92,Math.min(130,(land?W*.62:W)/3.6))+'px');bgInit();teSize();if(SC.key)scene();if(G&&cur==='match')renderMatch()}
 addEventListener('resize',()=>{clearTimeout(UI.rt);UI.rt=setTimeout(layout,120)});
@@ -101,16 +102,24 @@ function syncBoard(box,list){const ex=new Map();for(const el of box.children)if(
  for(const u of list){let el=ex.get(u.uid);if(!el){el=unitEl(u);el.classList.add('enter');setTimeout(()=>el.classList.remove('enter'),520)}keep.add(el);
   while(curEl&&curEl.classList.contains('dying')&&curEl!==el)curEl=curEl.nextElementSibling;if(el!==curEl)box.insertBefore(el,curEl);else curEl=curEl.nextElementSibling;updUnit(el,u)}
  for(const[k,el]of ex)if(!keep.has(el)){const hp=el.querySelector('.hp');if(hp){hp.style.setProperty('--p','0%');hp.querySelector('b').textContent=0}el.classList.add('dying');el.classList.remove('sel','tgt','ready');setTimeout(()=>el.remove(),760)}}
-function updUnit(e,u){const d=C[u.id],a=e.querySelector('.atk'),h=e.querySelector('.hp');a.querySelector('b').textContent=u.a;a.classList.toggle('up',u.a>d.a);a.classList.toggle('dn',u.a<d.a);h.querySelector('b').textContent=Math.max(0,u.h);h.classList.toggle('hurt',u.h<u.mh);
- const pct=u.h<=0?0:Math.max(8,Math.min(100,u.h/Math.max(1,u.mh)*100));h.style.setProperty('--p',pct.toFixed(1)+'%');h.dataset.p=pct.toFixed(1);if(e._h!==undefined&&u.h<e._h){restartCls(h,'drain');clearTimeout(h._t);h._t=setTimeout(()=>h.classList.remove('drain'),1100);if(u.h>0)dropFx(h)}else if(e._h!==undefined&&u.h>e._h)dropFx(h,1);e._h=u.h;
+function updUnit(e,u){const d=C[u.id],a=e._a||(e._a=e.querySelector('.atk')),h=e._hp||(e._hp=e.querySelector('.hp'));const sk=u.a+'|'+u.h+'|'+u.mh;if(e._sk!==sk){e._sk=sk;a.querySelector('b').textContent=u.a;a.classList.toggle('up',u.a>d.a);a.classList.toggle('dn',u.a<d.a);h.querySelector('b').textContent=Math.max(0,u.h);h.classList.toggle('hurt',u.h<u.mh);
+ const pct=u.h<=0?0:Math.max(8,Math.min(100,u.h/Math.max(1,u.mh)*100));h.style.setProperty('--p',pct.toFixed(1)+'%');h.dataset.p=pct.toFixed(1)}if(e._h!==undefined&&u.h<e._h){restartCls(h,'drain');clearTimeout(h._t);h._t=setTimeout(()=>h.classList.remove('drain'),1100);if(u.h>0)dropFx(h)}else if(e._h!==undefined&&u.h>e._h)dropFx(h,1);e._h=u.h;
  const ks=u.k.join();if(e.dataset.k!==ks){e.dataset.k=ks;e.querySelector('.kws').innerHTML=u.k.filter(k=>ICO[k]&&k!=='guard').map(svgI).join('')}
- e.classList.toggle('guard',u.k.includes('guard'));e.classList.toggle('phase',u.k.includes('phase'));e.classList.toggle('sleep',u.o===G.cur&&!u.ready&&!G.over);
- e.classList.toggle('ready',u.o===0&&G.cur===0&&!G.p[0].ai&&!G.over&&canAtk(u));e.classList.toggle('sel',UI.sel?.k==='u'&&UI.sel.uid===u.uid)}
-function syncHand(){const box=$('#hand'),hand=G.p[0].hand,ex=new Map();for(const el of box.children)ex.set(+el.dataset.h,el);const keep=new Set();
- const n=hand.length,W=box.clientWidth||innerWidth,hw=UI.hw,rmax=n>1?Math.min(3.2,15/n)*(n-1)/2*Math.PI/180:0,gap=n>1?Math.min(hw*1.04,(W-hw-28-(document.body.classList.contains('dz')?UI.hh*Math.sin(rmax)+16:0))/(n-1)):0,x0=(W-(hw+gap*(n-1)))/2;
+ const st=(u.k.includes('guard')?1:0)|(u.k.includes('phase')?2:0)|(u.o===G.cur&&!u.ready&&!G.over?4:0)|(u.o===0&&G.cur===0&&!G.p[0].ai&&!G.over&&canAtk(u)?8:0)|(UI.sel?.k==='u'&&UI.sel.uid===u.uid?16:0);
+ if(e._st!==st){e._st=st;e.classList.toggle('guard',!!(st&1));e.classList.toggle('phase',!!(st&2));e.classList.toggle('sleep',!!(st&4));e.classList.toggle('ready',!!(st&8));e.classList.toggle('sel',!!(st&16))}}
+/* v2.3 smooth combat: the hand is re-laid out only when something about it changed, its width comes from a ResizeObserver
+   (reading clientWidth here forced a full synchronous layout in the middle of every attack = the stutter), and each card's
+   position/class is written only when it differs from what it already has (no needless style invalidation or transitions). */
+const HAND={w:0,key:''};
+function handW(){if(!HAND.ro){const b=$('#hand');HAND.ro=new ResizeObserver(es=>{const w=Math.round(es[0].contentRect.width);if(w&&w!==HAND.w){HAND.w=w;HAND.key='';if(G&&cur==='match')syncHand()}});HAND.ro.observe(b);HAND.w=b.clientWidth}return HAND.w||innerWidth}
+function syncHand(){const box=$('#hand'),hand=G.p[0].hand,my=G.cur===0&&!G.p[0].ai&&!G.over,W=handW(),dz=document.body.classList.contains('dz'),sel=UI.sel?.k==='h'?UI.sel.uid:0;
+ const key=W+'|'+UI.hw+'|'+dz+'|'+sel+'|'+(my?G.p[0].flux+'|'+G.p[0].board.length+'|'+G.p[1].board.length:'-')+'|'+hand.map(c=>c.uid).join(',');if(key===HAND.key&&box.childElementCount===hand.length)return;HAND.key=key;
+ const ex=new Map();for(const el of box.children)ex.set(+el.dataset.h,el);const keep=new Set();
+ const n=hand.length,hw=UI.hw,rmax=n>1?Math.min(3.2,15/n)*(n-1)/2*Math.PI/180:0,gap=n>1?Math.min(hw*1.04,(W-hw-28-(dz?UI.hh*Math.sin(rmax)+16:0))/(n-1)):0,x0=(W-(hw+gap*(n-1)))/2;
  hand.forEach((c,i)=>{let el=ex.get(c.uid);if(!el){el=cardEl(c.id);el.dataset.h=c.uid;if(c.echo){el.classList.add('echo');el.insertAdjacentHTML('beforeend','<i class="ech">ECHO</i>')}el.classList.add('drawn');box.appendChild(el);setTimeout(()=>el.classList.remove('drawn'),600)}keep.add(el);
-  const off=i-(n-1)/2;el.style.left=x0+i*gap+'px';el.style.top=(4+Math.min(12,off*off*.5)).toFixed(1)+'px';el.style.rotate=(n>1?off*Math.min(3.2,15/n):0).toFixed(2)+'deg';el.style.zIndex=i+1;el.style.setProperty('--i',i);
-  el.classList.toggle('can',G.cur===0&&!G.p[0].ai&&!G.over&&canPlay(G,0,c));el.classList.toggle('sel',UI.sel?.k==='h'&&UI.sel.uid===c.uid)});
+  const off=i-(n-1)/2,L=(x0+i*gap).toFixed(1)+'px',T=(4+Math.min(12,off*off*.5)).toFixed(1)+'px',R=(n>1?off*Math.min(3.2,15/n):0).toFixed(2)+'deg',z=String(i+1);
+  if(el._L!==L){el._L=L;el.style.left=L}if(el._T!==T){el._T=T;el.style.top=T}if(el._R!==R){el._R=R;el.style.rotate=R}if(el._z!==z){el._z=z;el.style.zIndex=z;el.style.setProperty('--i',i)}
+  const can=my&&canPlay(G,0,c),sl=sel===c.uid;if(el._can!==can){el._can=can;el.classList.toggle('can',can)}if(el._sel!==sl){el._sel=sl;el.classList.toggle('sel',sl)}});
  for(const[k,el]of ex)if(!keep.has(el))el.remove()}
 function selTargets(){const s=UI.sel;if(!s||!G)return[];if(s.k==='h'){const c=G.p[0].hand.find(x=>x.uid===s.uid);if(!c)return[];const d=C[c.id];return d.tg?spellTargets(G,0,d.tg):[]}const u=findU(G,s.uid);return u&&canAtk(u)?atkTargets(G,0,u):[]}
 function hint(){if(!G)return'';if(G.over)return'';if(G.p[G.cur].ai)return G.cur===1?'The enemy stirs…':'Autopilot is thinking…';const s=UI.sel;
@@ -123,7 +132,14 @@ function renderMatch(){if(!G)return;overCheck();artPre([...G.p[0].hand.map(c=>c.
 function pvCalc(t){const s=UI.sel;try{const c=cloneG(G),ok=s.k==='u'?attack(c,0,s.uid,t):play(c,0,s.uid,t);if(!ok)return'';if(c.over)return c.winner===0?'LETHAL':'✖';if(t[0]==='h')return'';const tu=findU(G,+t.slice(1)),dies=!findU(c,+t.slice(1)),me=s.k==='u'&&!findU(c,s.uid);if(tu&&tu.o===0)return dies?'☠':'';return dies&&me?'☠ TRADE':dies?'☠':me?'✖':''}catch(e){return''}}
 function pvSync(on){const pv=new Map();if(on)for(const t of selTargets()){const el=tEl(t,1);if(el){const v=pvCalc(t);if(v)pv.set(el,v)}}for(const b of $$('.pvb'))if(pv.get(b.parentElement)!==b.textContent)b.remove();for(const[el,v]of pv)if(!el.querySelector(':scope>.pvb')){const b=document.createElement('i');b.className='pvb'+(v==='LETHAL'?' lethal':v==='✖'?' bad':'');b.textContent=v;el.appendChild(b)}}
 function tEl(t,box){if(t[0]==='h')return box?heroBox(+t[1]):heroBox(+t[1]).querySelector('.av');return document.querySelector(`.unit[data-u="${t.slice(1)}"]`)}
-function center(el){const r=el.getBoundingClientRect();return[r.left+r.width/2,r.top+r.height/2]}
+/* v2.3 smooth combat: positions are measured once per action, before any DOM is written (the layout is still clean, so this is
+   nearly free), and every effect of that action reads them from here. Before, each damage number, blood drop and shatter read its
+   own rect between DOM writes = several forced full layouts in one frame, which was the hitch on every hit. */
+const RC={m:new Map(),f:0};
+function rcSnap(force){if(RC.f&&!force)return;/* already measured this frame */RC.m.clear();for(const el of document.querySelectorAll('#opb>.unit,#myb>.unit,#oph,#myh,#oph .av,#myh .av,#oph .md,#myh .md,#opb>.unit .hp,#myb>.unit .hp,#hand'))RC.m.set(el,el.getBoundingClientRect());
+ if(!RC.f)RC.f=requestAnimationFrame(()=>{RC.f=0;RC.m.clear()})}
+function rectOf(el){return RC.m.get(el)||el.getBoundingClientRect()}
+function center(el){const r=rectOf(el);return[r.left+r.width/2,r.top+r.height/2]}
 function floatAt(el,txt,col,cls=''){if(!el)return;const[x,y]=center(el),d=document.createElement('div');d.className='fnum '+cls;d.style.setProperty('--rx',(Math.random()*30-15).toFixed(0)+'px');d.textContent=txt;d.style.color=col;d.style.left=x+'px';d.style.top=y+'px';document.body.appendChild(d);setTimeout(()=>d.remove(),1150)}
 function burstAt(el,col){if(!el)return;const[x,y]=center(el),d=document.createElement('div');d.className='burst';d.style.left=x+'px';d.style.top=y+'px';d.style.setProperty('--c',col);document.body.appendChild(d);setTimeout(()=>d.remove(),650)}
 function bump(el,c){if(!el)return;restartCls(el,c);clearTimeout(el['_b'+c]);el['_b'+c]=setTimeout(()=>el.classList.remove(c),420)}
@@ -143,18 +159,18 @@ function flushFx(){if(!G)return;BG.act=performance.now();batPoke();const L=G.fx;
  case'echoFade':break;
  case'die':deathFx(f);break;
  case'draw':if(f.pi===0)sfx('draw');break;
- case'play':{try{v9Fx(f)}catch(e){}const d=C[f.cid];sfx(d.t==='u'?'play':'spell');if(d.t==='u'){if(d.r==='L'&&!UI.cin&&!G.sim)lgCinema(f.cid,f.uid);else enterFx(f.uid)}break}
+ case'play':{try{v9Fx(f)}catch(e){}const d=C[f.cid];sfx(d.t==='u'?'play':'spell');if(d.t==='u'){if(d.r==='L'&&!UI.cin&&!G.sim)lgCinema(f.cid,f.uid);else{const u=f.uid;requestAnimationFrame(()=>enterFx(u))}}break}
  case'spellhit':burstAt(tEl(f.id),FCOL[f.f]);break;
- case'summon':enterFx(+f.id.slice(1));try{v9Fx(f)}catch(e){}break;
+ case'summon':{const u=+f.id.slice(1);requestAnimationFrame(()=>enterFx(u));try{v9Fx(f)}catch(e){}break}
  case'burn':toast((f.pi?'Enemy':'Your')+' hand is full: '+C[f.cid].n+' was burned');break;
  case'fatigue':toast((f.pi?'The enemy':'You')+' drew from an empty deck: the void gnaws ('+f.n+')');break;
  case'turn':if(f.pi===0&&!UI.auto)setTimeout(()=>{const h=$('#hand');restartCls(h,'cue');clearTimeout(h._cue);h._cue=setTimeout(()=>h.classList.remove('cue'),1400)},D(380));banner(f.pi===0&&!UI.auto?'YOUR TURN':f.pi===0?'AUTOPILOT':'ENEMY TURN',f.pi===0?'#7a5cff':'#ff3050');sfx(f.pi===0?'turn':'turnE');break}}}
 function banner(t,c){const b=$('#banner');b.textContent=t;b.style.setProperty('--bc',c);restartCls(b,'show')}
-function apply(fn){const r=fn();renderMatch();flushFx();overCheck();return r}
+function apply(fn){rcSnap();const r=fn();renderMatch();flushFx();overCheck();return r}
 /* end-of-match: queued once per game object (G.ovq), so a new match after Menu always gets its own victory/defeat screen */
 function overCheck(){const g=G;if(!g||g.ovq)return;if(!g.over)checkWin(g);if(!g.over)return;g.ovq=1;UI.overShown=1;setTimeout(async()=>{if(UI.cin)await UI.cin;if(G===g)gameOver()},D(1000))}
 const D=ms=>ms*UI.speed*1.2;/* v2.1: match pacing 20% slower at every speed setting */
-async function lunge(uid,tg,fn){const g=G,el=tEl('u'+uid),te=tEl(tg);if(el&&te){const[a,b]=center(el),[c,d]=center(te),dur=D(440),L=Math.min(70,Math.hypot(c-a,d-b)*.2);/* v2.0: attackers arc up off the table (lift L) and slam down; the 3D table keeps their shadow on the ground */el.style.zIndex=50;const lo=fxLow();el.animate(lo?[{transform:'none'},{transform:`translate(${(c-a)*.78}px,${(d-b)*.78}px) scale(1.12)`,offset:.5},{transform:'none'}]:[{transform:'none'},{transform:`translate(${(a-c)*.08}px,${(b-d)*.08-L*.3}px) scale(1.06) rotate(${c>a?-4:4}deg)`,offset:.22,easing:'cubic-bezier(.6,0,1,.6)'},{transform:`translate(${(c-a)*.82}px,${(d-b)*.82-L}px) scale(1.2)`,offset:.5,easing:'cubic-bezier(.5,0,1,.5)'},{transform:`translate(${(c-a)*.72}px,${(d-b)*.72}px) scale(1.04)`,offset:.62},{transform:'none'}],{duration:dur*(lo?1:1.15),easing:'ease-in-out'});await sleep(dur*(lo?.5:.63));if(G!==g||!G){el.style.zIndex='';return}/* v2.0: quit mid-lunge */apply(fn);await sleep(dur*.5);el.style.zIndex=''}else apply(fn)}
+async function lunge(uid,tg,fn){const g=G,el=tEl('u'+uid),te=tEl(tg);if(el&&te){rcSnap();const[a,b]=center(el),[c,d]=center(te),dur=D(440),L=Math.min(70,Math.hypot(c-a,d-b)*.2);UI.lg={uid,dx:c-a,dy:d-b,L,t0:performance.now(),dur:dur*(fxLow()?1:1.15),lo:fxLow()};/* v2.0: attackers arc up off the table (lift L) and slam down; the 3D table keeps their shadow on the ground */el.style.zIndex=50;const lo=fxLow();el.animate(lo?[{transform:'none'},{transform:`translate(${(c-a)*.78}px,${(d-b)*.78}px) scale(1.12)`,offset:.5},{transform:'none'}]:[{transform:'none'},{transform:`translate(${(a-c)*.08}px,${(b-d)*.08-L*.3}px) scale(1.06) rotate(${c>a?-4:4}deg)`,offset:.22,easing:'cubic-bezier(.6,0,1,.6)'},{transform:`translate(${(c-a)*.82}px,${(d-b)*.82-L}px) scale(1.2)`,offset:.5,easing:'cubic-bezier(.5,0,1,.5)'},{transform:`translate(${(c-a)*.72}px,${(d-b)*.72}px) scale(1.04)`,offset:.62},{transform:'none'}],{duration:dur*(lo?1:1.15),easing:'ease-in-out'});await sleep(dur*(lo?.5:.63));if(G!==g||!G){el.style.zIndex='';return}/* v2.0: quit mid-lunge */apply(fn);await sleep(dur*.5);el.style.zIndex='';UI.lg=null}else apply(fn)}
 async function preview(cid,ms){const p=$('#preview');p.innerHTML='';p.appendChild(cardEl(cid));p.style.setProperty('--pd',ms+'ms');restartCls(p,'show');await sleep(ms*.7)}
 async function runAI(){if(UI.aiRun)return;UI.aiRun=true;UI.busy=true;renderMatch();const g0=G;
  while(G===g0&&!G.over&&G.p[G.cur].ai){const pi=G.cur;await sleep(D(650));
@@ -165,7 +181,7 @@ async function runAI(){if(UI.aiRun)return;UI.aiRun=true;UI.busy=true;renderMatch
  if(G===g0){UI.aiRun=false;UI.busy=false;renderMatch()}}/* startMatch resets aiRun for a new match; releasing it here could let two AI loops run */
 function setSel(s){UI.sel=s;renderMatch()}
 async function humanPlay(uid,tg){if(UI.busy||G.cur!==0)return;UI.sel=null;const ok=apply(()=>play(G,0,uid,tg));if(!ok){sfx('err');return}if(UI.cin){UI.busy=true;renderMatch();const g=G;await UI.cin;if(G===g){UI.busy=false;renderMatch()}}}
-async function humanAtk(uid,tg){if(UI.busy||G.cur!==0)return;UI.sel=null;UI.busy=true;renderMatch();await lunge(uid,tg,()=>attack(G,0,uid,tg));UI.busy=false;renderMatch()}
+async function humanAtk(uid,tg){if(UI.busy||G.cur!==0)return;rcSnap();UI.sel=null;UI.busy=true;renderMatch();await lunge(uid,tg,()=>attack(G,0,uid,tg));UI.busy=false;renderMatch()}
 $('#endt').onclick=()=>{if(!G||G.cur!==0||UI.busy||G.over||G.p[0].ai)return;sfx('endt');UI.sel=null;apply(()=>endTurn(G));runAI()};
 $('#quit').onclick=()=>{sfx('click');let back=G&&G.meta&&G.meta.mode==='camp'?'camp':'title';try{const b=v9Quit(G);if(b)back=b}catch(e){console.warn(e)}G=null;UI.aiRun=false;show(back)};
 function gameOver(){if(!G)return;cinSkip();const g=G,w=g.winner,me=w===0,ov=$('#over');g.ovq=1;UI.overShown=1;

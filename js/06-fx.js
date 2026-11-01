@@ -80,7 +80,7 @@ function dmgFx(f){const el=f.id[0]==='h'?heroBox(+f.id[1]):tEl(f.id);if(!el)retu
  const mag=Math.min(hero?16:9,(hero?5:1.5)+f.n*(hero?1.6:1));shake($('#match'),mag,hero?520:340);
  if(hero){bump(el,'heavy');if(!fxLow()){const h=$('#hflash');restartCls(h,'on')}sfx(+f.id[1]===0?'heroHitMe':'heroHit')}else sfx('hit'+(f.f||'n'))}
 /* ---------- unit enters the board: ripple across the mat ---------- */
-function enterFx(uid){const el=tEl('u'+uid);if(!el)return;const u=findU(G,uid),f=u?C[u.id].f:'n',[x,y]=center(el),r=el.getBoundingClientRect();
+function enterFx(uid){const el=tEl('u'+uid);if(!el)return;const u=findU(G,uid),f=u?C[u.id].f:'n',[x,y]=center(el),r=rectOf(el);
  const col={v:'#6affd0',m:'#ffb050',c:'#ff2a3a',n:'#e0d0a0'}[f];for(let i=0;i<nq(3);i++){const g=sp('rg',x,r.bottom-4,0,0,1.1+i*.2,innerWidth*.55,col);if(g){g.k=2.2-i*.5;g.vr=.32;g.a=.55-i*.12;g.dl=i*.12;g.add=1}}
  if(f==='m')for(let i=0;i<nq(14);i++){const a=rr(Math.PI,Math.PI*2),s=rr(120,380),p=sp('sp',x+rr(-r.width/2,r.width/2),r.bottom,Math.cos(a)*s,Math.sin(a)*s,rr(.2,.5),1.4,'#ffd080');if(p){p.add=1;p.g=600}}
  if(f==='c')for(let i=0;i<nq(12);i++){const a=rr(Math.PI*1.1,Math.PI*1.9),s=rr(100,300),p=sp('dr',x+rr(-r.width/2,r.width/2),r.bottom-6,Math.cos(a)*s,Math.sin(a)*s,rr(.4,.8),rr(1.4,3),'#7a0410');if(p){p.g=1000}}
@@ -90,7 +90,7 @@ function enterFx(uid){const el=tEl('u'+uid);if(!el)return;const u=findU(G,uid),f
 function artImg(id){let im=FX.img[id];if(!im){im=new Image();im.src=realArtS(id);FX.img[id]=im}return im}
 function crackLines(r){const cx=r.left+r.width*rr(.35,.65),cy=r.top+r.height*rr(.3,.6),L=[];for(let i=0;i<7;i++){let a=i/7*6.28+rr(-.3,.3),x=cx,y=cy;const l=[x,y];for(let k=0;k<5;k++){a+=rr(-.5,.5);const s=Math.max(r.width,r.height)*rr(.08,.16);x+=Math.cos(a)*s;y+=Math.sin(a)*s;l.push(x,y)}L.push(l)}return{L,cx,cy}}
 function deathFx(f){const el=document.querySelector(`.unit.dying[data-u="${f.id.slice(1)}"]`)||tEl(f.id);const id=f.cid||(el&&el.dataset.cid);if(!el||!id)return;
- const d=C[id],fac=d.f,tok=d.r==='T',r=el.getBoundingClientRect();sfx('die'+fac);
+ const d=C[id],fac=d.f,tok=d.r==='T',r=rectOf(el);sfx('die'+fac);
  if(fxLow()){el.classList.add('shatter');for(let i=0;i<nq(10);i++)sp('sm',r.left+rr(0,r.width),r.top+rr(0,r.height),0,-20,.8,14,fac==='c'?'#5a0208':'#3a3040');return}
  const{L,cx,cy}=crackLines(r);const ck=sp('ck',0,0,0,0,.34,2.2,fac==='m'?'#9ef8ff':fac==='v'?'#c890ff':'#ff4050');if(ck){ck.pts=L;ck.add=1}
  el.classList.add('cracking');setTimeout(()=>{el.classList.add('shatter');shatter(el,r,id,fac,tok,cx,cy)},150);shake($('#match'),tok?3:6,300)}
@@ -113,7 +113,7 @@ function shatter(el,r,id,fac,tok,cx,cy){const im=artImg(id),cols=tok?2:3,rows=to
  else for(let i=0;i<nq(16*k);i++)sp('sm',X+rr(-r.width/2,r.width/2),Y+rr(-r.height/2,r.height/2),rr(-15,15),rr(-50,-10),rr(.8,1.4),rr(14,24),'#6a6050')}
 /* ---------- blood drop: drip + splatter on damage, pulse on heal ---------- */
 function dropFx(h,heal){if(heal){restartCls(h,'refill');clearTimeout(h._r);h._r=setTimeout(()=>h.classList.remove('refill'),900);return}
- const r=h.getBoundingClientRect(),x=r.left+r.width/2,y=r.bottom-r.height*.12;for(let i=0;i<nq(7);i++){const p=sp('dr',x+rr(-3,3),y,rr(-70,70),rr(-120,20),rr(.4,.8),rr(1,2.4),'#a00818');if(p){p.g=1100;p.dl=i*.03}}
+ const r=rectOf(h),x=r.left+r.width/2,y=r.bottom-r.height*.12;for(let i=0;i<nq(7);i++){const p=sp('dr',x+rr(-3,3),y,rr(-70,70),rr(-120,20),rr(.4,.8),rr(1,2.4),'#a00818');if(p){p.g=1100;p.dl=i*.03}}
  const q=sp('pl',x,y+r.height*.45,0,0,1.1,r.width*.38,'#6a0410');if(q){q.a=.7;q.dl=.25}}
 /* ---------- madness escalation ---------- */
 const MZ={me:0,op:0,t:null,wn:0};
@@ -189,14 +189,14 @@ function ztFrame(t){ZT.raf=0;const c=ZT.c;if(!c||!c.isConnected){ZT.c=null;retur
 /* v9 battery: the deviceorientation listener is attached only while the zoom view is open (gyroOn/gyroOff) */
 /* ---------- pack opening ---------- */
 function packTearFx(){const el=$('#pwrap'),r=el.getBoundingClientRect(),x=r.left+r.width/2,y=r.top+r.height*.14;shake($('#pstage'),10,500);
- for(let i=0;i<nq(40);i++){const a=rr(0,7),s=rr(150,700),p=sp('sp',x+rr(-r.width/2,r.width/2),y,Math.cos(a)*s,Math.sin(a)*s,rr(.3,.8),rr(1,2.5),i%2?'#e0b0ff':'#ffffff');if(p){p.add=1;p.dr=2;p.g=300}}
- for(let i=0;i<nq(16);i++){const p=sp('as',x+rr(-r.width/2,r.width/2),y+rr(-6,6),rr(-200,200),rr(-420,-120),rr(.8,1.4),rr(3,7),'#3a2a48');if(p){p.g=900;p.k=rr(0,6)}}
- const fl=sp('fl',x,r.top+r.height/2,0,0,.6,r.width*1.4,'#c080ff');if(fl){fl.add=1;fl.a=.8}}
-function flipFx(s,rar){const r=s.getBoundingClientRect(),x=r.left+r.width/2,y=r.top+r.height/2,col={C:'#c8c8c8',U:'#4aa8e0',R:'#ffc850',L:'#ff6af0'}[rar]||'#ccc',n={C:6,U:14,R:26,L:60}[rar]||6;
- for(let i=0;i<nq(n);i++){const a=rr(0,7),sp_=rr(80,rar==='L'?900:420),p=sp('sp',x,y,Math.cos(a)*sp_,Math.sin(a)*sp_,rr(.3,.8),rr(1,2.4),i%3?col:'#ffffff');if(p){p.add=1;p.dr=2.2}}
- if(rar!=='C'){const fl=sp('fl',x,y,0,0,.6,r.width*(rar==='L'?3:1.4),col);if(fl){fl.add=1;fl.a=.7}}
+ for(let i=0;i<nq(40);i++){const a=rr(0,7),s=rr(150,700),p=sp('sp',x+rr(-r.width/2,r.width/2),y,Math.cos(a)*s,Math.sin(a)*s,rr(.3,.8),rr(1,2.5),i%2?'#a89880':'#d8ccb4');if(p){p.add=1;p.dr=2;p.g=300;p.a=.7}}
+ for(let i=0;i<nq(16);i++){const p=sp('as',x+rr(-r.width/2,r.width/2),y+rr(-6,6),rr(-200,200),rr(-420,-120),rr(.8,1.4),rr(3,7),'#1a1214');if(p){p.g=900;p.k=rr(0,6)}}
+ const fl=sp('fl',x,r.top+r.height/2,0,0,.6,r.width*1.2,'#8a3a1a');if(fl){fl.add=1;fl.a=.55}}
+function flipFx(s,rar){const r=s.getBoundingClientRect(),x=r.left+r.width/2,y=r.top+r.height/2,col={C:'#8a8478',U:'#6a9aa0',R:'#c09848',L:'#d8c070'}[rar]||'#8a8478',n={C:6,U:14,R:26,L:60}[rar]||6;
+ for(let i=0;i<nq(n);i++){const a=rr(0,7),sp_=rr(80,rar==='L'?900:420),p=sp('sp',x,y,Math.cos(a)*sp_,Math.sin(a)*sp_,rr(.3,.8),rr(1,2.4),i%3?col:'#e8dcc4');if(p){p.add=1;p.dr=2.2;p.a=.8}}
+ if(rar!=='C'){const fl=sp('fl',x,y,0,0,.6,r.width*(rar==='L'?2.4:1.2),col);if(fl){fl.add=1;fl.a=.45}}
  if(rar==='L'){shake($('#pstage'),11,320);const W=innerWidth,H=innerHeight;const nt=QL.q==='high'?6:4;for(let i=0;i<nt;i++){const a=i/nt*6.28,t=sp('te',x,y,0,0,1.1,18,'');if(t){t.x2=x+Math.cos(a)*W*.7;t.y2=y+Math.sin(a)*H*.6;t.k=i;t.dl=i*.03}}
-  const f2=sp('fl',x,y,0,0,1.1,Math.max(W,H)*.55,'#6affc0');if(f2){f2.add=1;f2.a=.35;f2.dl=.1}for(let i=0;i<(QL.q==='high'?2:1);i++){const g=sp('rg',x,y,0,0,1+i*.25,Math.max(W,H),'#ff9af0');if(g){g.k=4;g.add=1;g.dl=i*.15}}sfx('sting')}}
+  const f2=sp('fl',x,y,0,0,1.1,Math.max(W,H)*.5,'#6a1a10');if(f2){f2.add=1;f2.a=.4;f2.dl=.1}for(let i=0;i<(QL.q==='high'?2:1);i++){const g=sp('rg',x,y,0,0,1+i*.25,Math.max(W,H),'#c8a868');if(g){g.k=3;g.add=1;g.a=.5;g.dl=i*.15}}sfx('sting')}}
 /* ---------- living board (drawn on the background canvas, ~22 fps) ---------- */
 const LB={drips:[],pools:[],sparks:[],lamps:[[.064,.243],[.31,.083],[.041,.668],[.322,.911],[.674,.911],[.938,.217],[.945,.703],[.718,.052]],t:0};
 function livingBoard(x,t,W,H){if(!G||!BG.painted)return;const f=G.p[0].fac,low=fxLow(),land=isLand();BG.rip=BG.rip||[];
