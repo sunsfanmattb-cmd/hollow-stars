@@ -154,7 +154,7 @@ function tiltOff(){const el=TL.el;if(!el)return;el.style.transform='';el.style.r
    Transform-only (card rotate, art parallax, glare + foil light layers translate), one rAF loop that runs only while the view is open.
    Axes are remapped by screen orientation so it feels the same in portrait and landscape. (v7 drove a page-wide CSS var from the
    sensor at ~60 Hz, which restyled and repainted every card on screen: removed.) */
-const ZTMAX=13;const ZT={c:null,raf:0,tx:0,ty:0,x:0,y:0,base:null,sens:0,fing:0,ev:0};
+const ZTMAX=13,ZTSK=2.4;const ZT={c:null,raf:0,tx:0,ty:0,x:0,y:0,base:null,sens:0,fing:0,ev:0};
 function scrAngle(){const a=screen.orientation&&typeof screen.orientation.angle==='number'?screen.orientation.angle:(typeof window.orientation==='number'?window.orientation:0);return((a%360)+360)%360}
 function orient(e){if(e.gamma==null||e.beta==null)return;ZT.ev++;const a=scrAngle();let x,y;
  if(a===90){x=e.beta;y=-e.gamma}else if(a===270){x=-e.beta;y=e.gamma}else if(a===180){x=-e.gamma;y=-e.beta}else{x=e.gamma;y=e.beta}
@@ -168,10 +168,14 @@ function ztOpen(card){gyroOn();ZT.c=card;ZT.base=null;ZT.x=ZT.y=ZT.tx=ZT.ty=0;ZT
     transform animations (unbounded cull rect), so tilting never re-records paint; inline style.transform from JS re-painted the art,
     the lp layer and the card frame on every frame (tests/tiltprobe.py) */
  const A=ZT.an={},mk=(el,a,b)=>{if(!el)return null;const n=el.animate([{transform:a},{transform:b}],{duration:1000,fill:'both',composite:'add'});n.pause();n.currentTime=500;return n};
- card.style.transform='perspective(900px)';A.ry=mk(card,`rotateY(${-ZTMAX}deg)`,`rotateY(${ZTMAX}deg)`);A.rx=mk(card,`rotateX(${ZTMAX}deg)`,`rotateX(${-ZTMAX}deg)`);
+ /* v2.5: no perspective(). Any perspective makes the card's on-screen scale change with the angle, and Chrome then re-rasterises every
+    layer in the card (and its rounded-clip mask layers) again and again while it turns: the flicker players saw when tilting by finger
+    or gyroscope (probe/tilt.py: 24 whole-card repaints per pass with perspective, 0 without). The turn now reads from 2D cues - the
+    rotation's foreshortening plus a slight skew that leans the near edge in - with the art parallax and the moving light doing the depth. */
+ card.style.transform='none';A.ry=mk(card,`rotateY(${-ZTMAX}deg) skewY(${ZTSK}deg)`,`rotateY(${ZTMAX}deg) skewY(${-ZTSK}deg)`);A.rx=mk(card,`rotateX(${ZTMAX}deg) skewX(${-ZTSK*.7}deg)`,`rotateX(${-ZTMAX}deg) skewX(${ZTSK*.7}deg)`);
  const pa=card.querySelector('.lg')||card.querySelector('.ap');if(pa){pa.style.transform='scale(1.07)';A.ax=mk(pa,'translate3d(3.2%,0,0)','translate3d(-3.2%,0,0)');A.ay=mk(pa,'translate3d(0,2.4%,0)','translate3d(0,-2.4%,0)')}
- const gl=card.querySelector('.glare');A.gx=mk(gl,'translate3d(-37.6%,0,0)','translate3d(37.6%,0,0)');A.gy=mk(gl,'translate3d(0,-28%,0)','translate3d(0,28%,0)');
- const fs=card.querySelector('.fsh');A.fx=mk(fs,'translate3d(54%,0,0)','translate3d(-54%,0,0)');A.fy=mk(fs,'translate3d(0,30%,0)','translate3d(0,-30%,0)');ztKick()}
+ const gl=card.querySelector('.glare');A.gx=mk(gl,'translate3d(-44%,0,0)','translate3d(44%,0,0)');A.gy=mk(gl,'translate3d(0,-33%,0)','translate3d(0,33%,0)');
+ /* v2.5: the foil light is 1.9x the card (was 2.6x = 17 MB of GPU texture on a phone); same travel, larger percentages */const fs=card.querySelector('.fsh');A.fx=mk(fs,'translate3d(74%,0,0)','translate3d(-74%,0,0)');A.fy=mk(fs,'translate3d(0,41%,0)','translate3d(0,-41%,0)');ztKick()}
 function ztClose(){gyroOff();if(ZT.an)for(const k in ZT.an)ZT.an[k]&&ZT.an[k].cancel();ZT.an=null;ZT.c=null;ZT.base=null;if(ZT.raf){cancelAnimationFrame(ZT.raf);ZT.raf=0}}
 function ztFinger(nx,ny){if(!ZT.c)return;ZT.fing=performance.now();ZT.tx=nx;ZT.ty=ny;ztKick()}
 function ztKick(){if(!ZT.raf&&ZT.c&&!LG.rm.matches)ZT.raf=requestAnimationFrame(ztFrame)}
