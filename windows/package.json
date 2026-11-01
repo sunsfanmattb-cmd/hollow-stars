@@ -63,6 +63,9 @@
         "repo": "hollow-stars",
         "releaseType": "release"
       }
-    ]
+    ],
+    "releaseInfo": {
+      "releaseName": "Hollow Stars ${version}"
+    }
   }
 }

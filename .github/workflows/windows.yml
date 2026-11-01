@@ -4,7 +4,7 @@
 name: Windows release
 on:
   push:
-    branches: [main, windows-app]
+    branches: [main]
     paths: ['windows/package.json']
     tags: ['v*']
   workflow_dispatch:
