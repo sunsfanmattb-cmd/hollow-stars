@@ -1,0 +1,67 @@
+/* ===== v2.4: card character (js/15-cards.js, art/ui/cf_*.webp from tools/make_frames.py) =====
+   Performance budget: frames, trims, grain and corners are static paint. Only three things animate, and only where a card is
+   shown large (zoom, pack reveal, the hand card you hold or selected, the dragged card) - each is a single transform on its own small layer:
+   the rare border shimmer, the drifting particles, and the holographic sheen. The battery saver pauses them (body.idle). */
+:root{--cf-v:url(../art/ui/cf_v.webp);--cf-m:url(../art/ui/cf_m.webp);--cf-c:url(../art/ui/cf_c.webp);--cf-n:url(../art/ui/cf_n.webp)}
+.f-v{--cf:var(--cf-v);--pt:var(--pt-v)}.f-m{--cf:var(--cf-m);--pt:var(--pt-m)}.f-c{--cf:var(--cf-c);--pt:var(--pt-c)}.f-n{--cf:var(--cf-n);--pt:var(--pt-n)}
+
+/* ---- faction frame: the painted border carries the material, the bevel and the chipped corners (alpha) ---- */
+.card,.card.f-m{background:var(--cf) 0 0/100% 100% no-repeat;border-radius:calc(var(--cw)*.06);box-shadow:0 .45em 1.1em #000d}
+/* print grain over the whole face (art included), masked to the frame so the chips stay empty */
+.card::after{box-shadow:none;background:var(--grain-p) 0 0/6em 6em,linear-gradient(128deg,#ffffff10,transparent 28%,transparent 72%,#ffffff06);
+ -webkit-mask:var(--cf) 0 0/100% 100% no-repeat;mask:var(--cf) 0 0/100% 100% no-repeat;z-index:7}
+.unit{background:var(--cf) 0 0/100% 100% no-repeat,#050405}
+
+/* ---- rarity: commons plain; uncommons a thin pewter trim; rares a gold trim with a slow shimmer along it ---- */
+.card .rim{position:absolute;inset:1.3%;border-radius:calc(var(--cw)*.052);pointer-events:none;z-index:3;padding:.13em;overflow:hidden;
+ -webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);-webkit-mask-composite:xor;mask:linear-gradient(#000 0 0) content-box exclude,linear-gradient(#000 0 0)}
+.card.r-U .rim{background:linear-gradient(140deg,#e2e6e8,#6e767c 30%,#c4cacd 55%,#5a6064 80%,#b8bec2)}
+.card.r-R .rim{padding:.16em;background:linear-gradient(140deg,#fff0c0,#9a7024 28%,#e8c470 52%,#7a5418 78%,#f0d898)}
+.card.r-R .rim::after{content:"";position:absolute;left:50%;top:50%;width:200%;aspect-ratio:1;margin:-100% 0 0 -100%;
+ background:conic-gradient(from 0deg,transparent 0 78%,#fff8e000 80%,#fff8e0 86%,#fff8e000 92%,transparent 100%);transform:rotate(40deg)}
+:is(#zoom .card,.pfront .card,#sheet .card,#hand .card.held,#hand .card.sel).r-R .rim::after,#ghost.r-R .rim::after{animation:rimSweep 9s linear infinite;will-change:transform}
+@keyframes rimSweep{to{transform:rotate(400deg)}}
+
+/* ---- drifting particles in front: bubbles rise (Abyss), sparks fall (Derelict), ash falls (Communion), dust drifts (Wanderers) ---- */
+.card .cpt{position:absolute;inset:0;border-radius:inherit;overflow:hidden;pointer-events:none;z-index:6;display:none}
+.card .cpt>i{position:absolute;left:0;right:0;top:0;height:200%;background:var(--pt) 0 0/100% 50% repeat-y;opacity:.6}
+:is(#zoom .card,.pfront .card,#sheet .card,#hand .card.held,#hand .card.sel) .cpt,#ghost .cpt{display:block}
+:is(#zoom .card,.pfront .card,#sheet .card,#hand .card.held,#hand .card.sel) .cpt>i,#ghost .cpt>i{animation:ptRise 16s linear infinite;will-change:transform}
+:is(#zoom .card,.pfront .card,#sheet .card,#hand .card.held,#hand .card.sel):is(.f-m,.f-c) .cpt>i,#ghost:is(.f-m,.f-c) .cpt>i{animation-name:ptFall}
+:is(#zoom .card,.pfront .card,#sheet .card,#hand .card.held,#hand .card.sel).f-c .cpt>i{animation-duration:22s}
+:is(#zoom .card,.pfront .card,#sheet .card,#hand .card.held,#hand .card.sel).f-n .cpt>i{animation-duration:28s}
+@keyframes ptRise{from{transform:translateY(0)}to{transform:translateY(-50%)}}
+@keyframes ptFall{from{transform:translateY(-50%)}to{transform:translateY(0)}}
+/* Derelict warning lamps blink (painted on the frame at 20% / 80% of the top band) */
+:is(#zoom .card,.pfront .card,#sheet .card,#hand .card.held,#hand .card.sel).f-m .cpt::before,:is(#zoom .card,.pfront .card,#sheet .card,#hand .card.held,#hand .card.sel).f-m .cpt::after{content:"";position:absolute;top:1.3%;left:17.5%;width:5%;aspect-ratio:1;border-radius:50%;
+ background:radial-gradient(circle,#ff6a3a 0 20%,#ff3a1a66 42%,transparent 70%);animation:lampBlink 3.4s steps(1) infinite}
+:is(#zoom .card,.pfront .card,#sheet .card,#hand .card.held,#hand .card.sel).f-m .cpt::after{left:77.5%;background:radial-gradient(circle,#ffc040 0 20%,#ffa02066 42%,transparent 70%);animation-delay:-1.7s}
+@keyframes lampBlink{0%,62%{opacity:0}64%,74%{opacity:1}76%,100%{opacity:0}}
+
+/* ---- flavour text: old italic face, faded ink, set apart by a faint rule and the faction's mark ---- */
+.card .fl{align-self:stretch;position:relative;margin-top:.2em;padding-top:.32em;font-family:"IM Fell English",var(--serif);font-style:italic;font-size:.72em;line-height:1.22;letter-spacing:.01em;color:#a8977a;opacity:.85}
+.card .fl::before{content:"";position:absolute;top:0;left:30%;right:30%;height:1px;background:linear-gradient(90deg,transparent,#8a7a6080,transparent)}
+.card .fl span{display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;overflow:hidden;text-wrap:pretty}
+/* unit cards: the attack and health gems sit over the text box's bottom corners; keep the flavour between them */
+.card:not(.spell) .fl{padding-left:1.5em;padding-right:1.5em}
+.card .fl .sig{display:inline-block;width:.85em;height:.85em;margin:0 .3em -.1em 0;fill:var(--f2);opacity:.6;filter:none;float:none}
+/* very long rules text steps down a size so it never runs out of its box */
+.card.xlong .rt{font-size:.8em;line-height:1.14}
+.card.xxl .rt{font-size:.71em;line-height:1.1}
+
+/* ---- holographic foil (variant "holo"): rainbow diffraction across the whole card + fine glitter.
+   Tilting the card (zoom, dragging) shifts the bands; in the zoom / hand / pack the sheen also drifts slowly. ---- */
+.card.vr-holo .vfr{box-shadow:inset 0 0 0 .14em #eef4ff,inset 0 0 0 .28em #2a2440,inset 0 0 0 .34em #c8d8ffaa,inset 0 0 1.4em #9ab8ff40}
+.card.vr-holo .vfr::before{inset:-40%;opacity:.72;background:repeating-linear-gradient(115deg,#ff70b82a 0,#ffd2702a 4%,#80ffb82a 8%,#70c8ff2a 12%,#c890ff2a 16%,#ff70b82a 20%);
+ translate:calc(var(--ox,0)*14%) calc(var(--oy,0)*10%)}
+.card.vr-holo .vfr::after{inset:0;opacity:.42;background:radial-gradient(circle,#ffffffaa 0 .5px,transparent 1.2px) 0 0/.9em .9em,radial-gradient(circle,#d8f0ffaa 0 .5px,transparent 1.2px) .45em .45em/1.3em 1.3em}
+:is(#zoom .card,.pfront .card,#sheet .card,#hand .card.held,#hand .card.sel).vr-holo .vfr::before{animation:holoDrift 7s ease-in-out infinite alternate}
+@keyframes holoDrift{from{transform:translateX(-6%)}to{transform:translateX(6%)}}
+.card.vr-holo .nm span{color:#f0f4ff;text-shadow:0 0 .5em #a0c0ff,0 1px 0 #000}
+.pslot.holo-pull{animation:holoPull 1.4s ease-out}
+@keyframes holoPull{0%{transform:scale(1)}20%{transform:scale(1.12) rotate(-1.5deg)}100%{transform:none}}
+
+/* ---- quality / motion settings ---- */
+body.q-low .card .cpt,body.fxlow .card .cpt{display:none!important}
+body.q-low .card .rim::after,body.fxlow .card .rim::after,body.q-low .card.vr-holo .vfr::before{animation:none!important}
+@media (prefers-reduced-motion:reduce){.card .cpt>i,.card .rim::after,.card.vr-holo .vfr::before,.card.f-m .cpt::before,.card.f-m .cpt::after{animation:none!important}}

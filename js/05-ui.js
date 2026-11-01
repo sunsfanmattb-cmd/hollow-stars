@@ -33,8 +33,8 @@ function fitScan(root){for(const e of root.querySelectorAll('[data-fit]')){if(e.
 function fitRefresh(root=document){for(const e of root.querySelectorAll('[data-fit]'))if(e._fw)fitEl(e)}
 /* v9.7: names were measured in the fallback serif before the faction faces arrived; re-measure once they load */
 try{if(document.fonts){const rf=()=>{FIT.c.clear();fitRefresh()};document.fonts.ready.then(rf);document.fonts.addEventListener('loadingdone',rf)}}catch(e){}
-function cardEl(id,big){const d=C[id],e=document.createElement('div');e.className=`card f-${d.f} r-${d.r}${d.r==='L'?' full':''}${d.t==='s'?' spell':''}${cardText(d).replace(/<[^>]+>/g,'').length>46?' long':''}`;e.dataset.cid=id;
- e.innerHTML=`<div class="art" style="background-image:${artBG(id,big)}">${lgHTML(id,big)}</div>${costHTML(d.c)}<div class="nm"><span data-fit="nm">${d.n}</span></div><div class="ty">${sigHTML(d.f)}<span data-fit="ty">${d.t==='u'?FAC[d.f].s:'Rite'}</span>${setHTML(d.r)}${d.r==='L'?'<i class="lgem"><b></b></i>':''}</div><div class="tx"><div class="rt">${cardText(d)}</div>${d.fl?`<div class="fl">${d.fl}</div>`:''}</div>${d.t==='u'?'<i class="plq l"></i><i class="plq r"></i>'+atkHTML(d.f,d.a)+hpHTML(d.h):''}${d.r==='R'||d.r==='L'?'<i class="foil"></i>':''}${lgTrim(id)}`;{const vr=varShow(id);if(vr){e.classList.add('vr','vr-'+vr);e.insertAdjacentHTML('beforeend','<i class="vfr"></i>')}}lgReg(e);fitScan(e);return e}
+function cardEl(id,big){const d=C[id],e=document.createElement('div');e.className=`card f-${d.f} r-${d.r}${d.r==='L'?' full':''}${d.t==='s'?' spell':''}${(n=>n>125?' long xlong xxl':n>88?' long xlong':n>46?' long':'')(cardText(d).replace(/<[^>]+>/g,'').length)}`;e.dataset.cid=id;
+ e.innerHTML=`<div class="art" style="background-image:${artBG(id,big)}">${lgHTML(id,big)}</div>${costHTML(d.c)}<div class="nm"><span data-fit="nm">${d.n}</span></div><div class="ty">${sigHTML(d.f)}<span data-fit="ty">${d.t==='u'?FAC[d.f].s:'Rite'}</span>${setHTML(d.r)}${d.r==='L'?'<i class="lgem"><b></b></i>':''}</div><div class="tx"><div class="rt">${cardText(d)}</div>${d.fl?`<div class="fl"><span>${sigHTML(d.f)}${d.fl}</span></div>`:''}</div>${d.t==='u'?'<i class="plq l"></i><i class="plq r"></i>'+atkHTML(d.f,d.a)+hpHTML(d.h):''}${d.r==='R'||d.r==='L'?'<i class="foil"></i>':''}${d.r==='U'||d.r==='R'?'<i class="rim"></i>':''}${d.r!=='T'?'<i class="cpt"><i></i></i>':''}${lgTrim(id)}`;{const vr=varShow(id);if(vr){e.classList.add('vr','vr-'+vr);e.insertAdjacentHTML('beforeend','<i class="vfr"></i>')}}lgReg(e);fitScan(e);return e}
 /* ---- pick ---- */
 const SH={win:60,loss:25,pack:100,dup:{C:5,U:15,R:40,L:150},free:3};
 const maxC=id=>C[id].r==='L'?1:2;
@@ -121,15 +121,16 @@ function syncHand(){const box=$('#hand'),hand=G.p[0].hand,my=G.cur===0&&!G.p[0].
   if(el._L!==L){el._L=L;el.style.left=L}if(el._T!==T){el._T=T;el.style.top=T}if(el._R!==R){el._R=R;el.style.rotate=R}if(el._z!==z){el._z=z;el.style.zIndex=z;el.style.setProperty('--i',i)}
   const can=my&&canPlay(G,0,c),sl=sel===c.uid;if(el._can!==can){el._can=can;el.classList.toggle('can',can)}if(el._sel!==sl){el._sel=sl;el.classList.toggle('sel',sl)}});
  for(const[k,el]of ex)if(!keep.has(el))el.remove()}
-function selTargets(){const s=UI.sel;if(!s||!G)return[];if(s.k==='h'){const c=G.p[0].hand.find(x=>x.uid===s.uid);if(!c)return[];const d=C[c.id];return d.tg?spellTargets(G,0,d.tg):[]}const u=findU(G,s.uid);return u&&canAtk(u)?atkTargets(G,0,u):[]}
+function selTargets(){const s=UI.sel;if(!s||!G)return[];if(s.k==='h'){const c=G.p[0].hand.find(x=>x.uid===s.uid);if(!c)return[];const d=C[c.id];if(!d.tg)return[];return s.t1?cardTargets(G,0,d,1,s.t1):d.tg2?cardTargets(G,0,d,0).filter(a=>cardTargets(G,0,d,1,a).length):cardTargets(G,0,d,0)}const u=findU(G,s.uid);return u&&canAtk(u)?atkTargets(G,0,u):[]}
 function hint(){if(!G)return'';if(G.over)return'';if(G.p[G.cur].ai)return G.cur===1?'The enemy stirs…':'Autopilot is thinking…';const s=UI.sel;
- if(s?.k==='h'){const c=G.p[0].hand.find(x=>x.uid===s.uid),d=c&&C[c.id];if(d)return d.tg?'Choose a target for '+d.n:'Tap again or drag up to play '+d.n}
+ if(s?.k==='h'){const c=G.p[0].hand.find(x=>x.uid===s.uid),d=c&&C[c.id];if(d)return s.t1?'Now choose an enemy unit for '+d.n:needsTarget(G,0,d)?(d.tg2?'Choose a friendly unit to sacrifice':'Choose a target for '+d.n):'Tap again or drag up to play '+d.n}
  if(s?.k==='u')return'Choose what to attack · ☠ = it dies';if(legal(G,0).length)return'Your turn: drag or tap cards, tap units to attack';return'No moves left. End your turn.'}
 function renderMatch(){if(!G)return;overCheck();artPre([...G.p[0].hand.map(c=>c.id),...G.p[0].board.map(u=>u.id),...G.p[1].board.map(u=>u.id),'h'+G.p[0].fac,'h'+G.p[1].fac],1);renderHero(0);renderHero(1);syncBoard($('#opb'),G.p[1].board);syncBoard($('#myb'),G.p[0].board);syncHand();
  {const nt=new Map();for(const t of selTargets()){const el=tEl(t,1);if(el)nt.set(el,t[0]==='u'&&findU(G,+t.slice(1))?.o===0)}$$('.tgt').forEach(e=>{if(!nt.has(e))e.classList.remove('tgt','ftgt')});for(const[el,f]of nt){if(!el.classList.contains('tgt'))el.classList.add('tgt');el.classList.toggle('ftgt',f)}}
+ {const p1=UI.sel&&UI.sel.k==='h'&&UI.sel.t1;for(const e of $$('.pick1'))if(!p1||e!==tEl(p1,1))e.classList.remove('pick1');if(p1){const e=tEl(p1,1);if(e)e.classList.add('pick1')}}
  madSet();$('#hint').textContent=hint();const my=G.cur===0&&!G.p[0].ai&&!G.over;try{pvSync(my&&!!UI.sel)}catch(e){}const eb=$('#endt');eb.disabled=!my||UI.busy;eb.querySelector('span').textContent=my?'End Turn':'Enemy Turn';eb.classList.toggle('glow',my&&!legal(G,0).length);eb.classList.toggle('wait',my&&!!UI.busy)}
 /* v1.6 combat preview: play the selected attack/Rite on a cloned game and badge each target with the outcome */
-function pvCalc(t){const s=UI.sel;try{const c=cloneG(G),ok=s.k==='u'?attack(c,0,s.uid,t):play(c,0,s.uid,t);if(!ok)return'';if(c.over)return c.winner===0?'LETHAL':'✖';if(t[0]==='h')return'';const tu=findU(G,+t.slice(1)),dies=!findU(c,+t.slice(1)),me=s.k==='u'&&!findU(c,s.uid);if(tu&&tu.o===0)return dies?'☠':'';return dies&&me?'☠ TRADE':dies?'☠':me?'✖':''}catch(e){return''}}
+function pvCalc(t){const s=UI.sel;try{const c=cloneG(G),hc=s.k==='h'&&G.p[0].hand.find(x=>x.uid===s.uid);if(hc&&C[hc.id].tg2&&!s.t1)return'';const tt=s.t1?s.t1+'>'+t:t,ok=s.k==='u'?attack(c,0,s.uid,t):play(c,0,s.uid,tt);if(!ok)return'';if(c.over)return c.winner===0?'LETHAL':'✖';if(t[0]==='h')return'';const tu=findU(G,+t.slice(1)),dies=!findU(c,+t.slice(1)),me=s.k==='u'&&!findU(c,s.uid);if(tu&&tu.o===0)return dies?'☠':'';return dies&&me?'☠ TRADE':dies?'☠':me?'✖':''}catch(e){return''}}
 function pvSync(on){const pv=new Map();if(on)for(const t of selTargets()){const el=tEl(t,1);if(el){const v=pvCalc(t);if(v)pv.set(el,v)}}for(const b of $$('.pvb'))if(pv.get(b.parentElement)!==b.textContent)b.remove();for(const[el,v]of pv)if(!el.querySelector(':scope>.pvb')){const b=document.createElement('i');b.className='pvb'+(v==='LETHAL'?' lethal':v==='✖'?' bad':'');b.textContent=v;el.appendChild(b)}}
 function tEl(t,box){if(t[0]==='h')return box?heroBox(+t[1]):heroBox(+t[1]).querySelector('.av');return document.querySelector(`.unit[data-u="${t.slice(1)}"]`)}
 /* v2.3 smooth combat: positions are measured once per action, before any DOM is written (the layout is still clean, so this is
@@ -175,7 +176,7 @@ async function preview(cid,ms){const p=$('#preview');p.innerHTML='';p.appendChil
 async function runAI(){if(UI.aiRun)return;UI.aiRun=true;UI.busy=true;renderMatch();const g0=G;
  while(G===g0&&!G.over&&G.p[G.cur].ai){const pi=G.cur;await sleep(D(650));
   for(let n=0;n<40&&G===g0&&!G.over;n++){const a=aiChoose(G,pi);if(!a)break;
-   if(a.t==='play'){const c=G.p[pi].hand.find(x=>x.uid===a.uid);await preview(c.id,D(1100));if(G!==g0)break;if(a.tg){const te=tEl(a.tg,1);te&&te.classList.add('tgt');await sleep(D(250));if(G!==g0)break}apply(()=>play(G,pi,a.uid,a.tg));/* v2.0: the match may have been quit during the waits */if(UI.cin)await UI.cin}
+   if(a.t==='play'){const c=G.p[pi].hand.find(x=>x.uid===a.uid);await preview(c.id,D(1100));if(G!==g0)break;if(a.tg){for(const x of a.tg.split('>')){const te=tEl(x,1);te&&te.classList.add('tgt')}await sleep(D(250));if(G!==g0)break}apply(()=>play(G,pi,a.uid,a.tg));/* v2.0: the match may have been quit during the waits */if(UI.cin)await UI.cin}
    else await lunge(a.uid,a.tg,()=>attack(G,pi,a.uid,a.tg));await sleep(D(420))}
   if(G!==g0||G.over)break;await sleep(D(350));if(G!==g0)break;apply(()=>endTurn(G))}
  if(G===g0){UI.aiRun=false;UI.busy=false;renderMatch()}}/* startMatch resets aiRun for a new match; releasing it here could let two AI loops run */
@@ -212,7 +213,7 @@ document.addEventListener('pointerup',e=>{tiltOff();if(!P||e.pointerId!==P.id)re
 document.addEventListener('pointercancel',()=>{tiltOff();if(P){clearTimeout(P.lpT);if(P.drag)cancelDrag(P);P=null}});
 function startDrag(e){tiltOff();const el=P.el;if(!myTurn()||!el)return;
  if(el.dataset.h){const c=G.p[0].hand.find(x=>x.uid===+el.dataset.h);if(!c||!canPlay(G,0,c))return;P.drag='h';P.uid=c.uid;UI.sel={k:'h',uid:c.uid};renderMatch();
-  const g=el.cloneNode(true);g.id='ghost';g.classList.remove('sel','can','drawn');g.style.cssText='';document.body.appendChild(g);el.classList.add('out');P.g=g;if(!C[c.id].tg)$('#myb').classList.add('drop')}
+  const g=el.cloneNode(true);g.id='ghost';g.classList.remove('sel','can','drawn');g.style.cssText='';document.body.appendChild(g);el.classList.add('out');P.g=g;if(!needsTarget(G,0,C[c.id]))$('#myb').classList.add('drop')}
  else if(el.dataset.u){const u=findU(G,+el.dataset.u);if(!u||u.o!==0||!canAtk(u))return;P.drag='u';P.uid=u.uid;UI.sel={k:'u',uid:u.uid};renderMatch();const[a,b]=center(el);P.ax=a;P.ay=b;arrowTo(a,b,a,b);$('#arrow').style.display='block'}
  moveDrag(e)}
 function moveDrag(e){if(P.drag==='h'){P.g.style.left=e.clientX+'px';P.g.style.top=e.clientY+'px';if(!fxLow()){const v=Math.max(-1,Math.min(1,(e.clientX-P.lx)/14));P.vx=(P.vx||0)*.7+v*.3;P.lx=e.clientX;P.g.style.transform=`translate(-50%,-60%) scale(.95) perspective(700px) rotateY(${(P.vx*22).toFixed(1)}deg) rotate(${(-4+P.vx*8).toFixed(1)}deg)`;P.g.style.setProperty('--ox',P.vx.toFixed(2))}}else if(P.drag==='u')arrowTo(P.ax,P.ay,e.clientX,e.clientY,e)}
@@ -223,15 +224,15 @@ function cancelDrag(p){if(p.g)p.g.remove();$('#arrow').style.display='none';$('#
 function dropTarget(x,y){const el=document.elementFromPoint(x,y);if(!el)return null;const u=el.closest('.unit[data-u]:not(.dying)'),h=el.closest('[data-hero]');return u?'u'+u.dataset.u:h?'h'+h.dataset.hero:null}
 function endDrag(p,e){const x=e.clientX,y=e.clientY;cancelDrag(p);const tg=dropTarget(x,y);
  if(p.drag==='h'){const c=G.p[0].hand.find(q=>q.uid===p.uid);if(!c)return;const d=C[c.id];
-  if(d.tg){if(tg&&spellTargets(G,0,d.tg).includes(tg))humanPlay(c.uid,tg);else{sfx('err');UI.sel={k:'h',uid:c.uid};renderMatch()}}
+  if(needsTarget(G,0,d)){const ok=tg&&cardTargets(G,0,d,0).includes(tg);if(ok&&!d.tg2)humanPlay(c.uid,tg);else if(ok&&cardTargets(G,0,d,1,tg).length){UI.sel={k:'h',uid:c.uid,t1:tg};sfx('click');renderMatch()}else{if(tg)sfx('err');UI.sel={k:'h',uid:c.uid};if(d.t==='u')toast('Choose a target');renderMatch()}}
   else if(y<$('#hand').getBoundingClientRect().top-4||($('body').classList.contains('land')&&x>$('#hand').getBoundingClientRect().left&&y<$('#hand').getBoundingClientRect().top+10))humanPlay(c.uid)}
  else if(p.drag==='u'){if(tg&&atkTargets(G,0,findU(G,p.uid)).includes(tg))humanAtk(p.uid,tg);else if(tg)sfx('err')}}
 function tap(t){if(!G)return;if(!myTurn()){if(G.p[G.cur].ai&&!G.over&&t.closest('#match'))toast('Wait: the enemy is acting');return}
  const h=t.closest('#hand [data-h]'),u=t.closest('.unit[data-u]:not(.dying)'),hero=t.closest('[data-hero]');const ts=u?'u'+u.dataset.u:hero?'h'+hero.dataset.hero:null;const s=UI.sel;
  if(s&&s.k==='h'){const c=G.p[0].hand.find(x=>x.uid===s.uid),d=c&&C[c.id];if(d){
-   if(h&&+h.dataset.h===s.uid){if(!d.tg)humanPlay(c.uid);else{sfx('err');toast('Choose a target')}return}
-   if(d.tg&&ts&&spellTargets(G,0,d.tg).includes(ts)){humanPlay(c.uid,ts);return}
-   if(!d.tg&&!h&&t.closest('#match')&&!t.closest('#mid')){humanPlay(c.uid);return}}}
+   const need=needsTarget(G,0,d);if(h&&+h.dataset.h===s.uid){if(!need)humanPlay(c.uid);else{sfx('err');toast(s.t1?'Choose an enemy unit':'Choose a target')}return}
+   if(need&&ts&&selTargets().includes(ts)){if(d.tg2&&!s.t1){UI.sel={k:'h',uid:c.uid,t1:ts};sfx('click');renderMatch()}else humanPlay(c.uid,s.t1?s.t1+'>'+ts:ts);return}
+   if(!need&&!h&&t.closest('#match')&&!t.closest('#mid')){humanPlay(c.uid);return}}}
  if(s&&s.k==='u'&&ts&&selTargets().includes(ts)){humanAtk(s.uid,ts);return}
  if(h){const c=G.p[0].hand.find(x=>x.uid===+h.dataset.h);if(c&&canPlay(G,0,c)){sfx('click');setSel({k:'h',uid:c.uid})}else{sfx('err');toast(C[c.id].c>G.p[0].flux?'Not enough Flux':'Cannot play that now');setSel(null)}return}
  if(u){const v=findU(G,+u.dataset.u);if(v&&v.o===0){if(canAtk(v)){sfx('click');setSel(s&&s.k==='u'&&s.uid===v.uid?null:{k:'u',uid:v.uid})}else{toast(v.atk?'Already attacked this turn':v.a<=0?'It has no attack':'It needs a turn to wake (no Swift)');setSel(null)}return}

@@ -10,8 +10,8 @@
 const TLOG={list:[],max:30,show:8,next:null,pin:-1,el:null,pop:null,hov:-1,ht:0};
 
 /* ---- attribution: mark which card's ability produced the effects that follow ---- */
-for(const id in C){const d=C[id];for(const w of['start','end','death'])if(typeof d[w]==='function'){const f=d[w];
- d[w]=function(g,pi,u){fx(g,{k:'src',w,uid:u?u.uid:0,cid:id,o:pi});try{return f.apply(this,arguments)}finally{fx(g,{k:'srcEnd'})}}}}
+for(const id in C){const d=C[id];for(const w of['start','end','death','ally'])if(typeof d[w]==='function'){const f=d[w];
+ d[w]=function(g,pi,u){fx(g,{k:'src',w:w==='ally'?'death':w,uid:u?u.uid:0,cid:id,o:pi});try{return f.apply(this,arguments)}finally{fx(g,{k:'srcEnd'})}}}}
 
 /* ---- glyphs (24x24, single path, filled) ---- */
 const TL_ICO={
@@ -30,7 +30,7 @@ function tlWho(pre,id){if(!G)return null;if(id[0]==='h'){const pi=+id[1];return{
 function tlRecord(pre,fxl,hint){if(!G||!fxl||!fxl.length)return;const out=[],allB=[];let main=null,cur=null,stack=[];
  const bucket=(k,pi,cid,tg,w)=>({k,pi,cid,tg,w,res:new Map(),pl:[{mad:0,draw:0,heal:0,sum:[]},{mad:0,draw:0,heal:0,sum:[]}],turn:G.turn,hits:0});
  const play=fxl.find(f=>f.k==='play');
- if(play){const d=C[play.cid];main=bucket(d.t==='s'?'rite':'play',play.pi,play.cid,play.tg||null);if(play.e)main.echo=1}
+ if(play){const d=C[play.cid];main=bucket(d.t==='s'?'rite':'play',play.pi,play.cid,play.tg?play.tg.split('>').pop():null);if(play.e)main.echo=1}
  else if(hint&&hint.k==='atk'){const a=pre.get(hint.uid);if(a)main=bucket('atk',a.o,a.cid,hint.tg)}
  cur=main;if(main)allB.push(main);
  const row=(b,id)=>{let r=b.res.get(id);if(!r){const w=tlWho(pre,id);if(!w)return null;r={...w,dmg:0,heal:0,died:0,buff:[0,0],ward:0,cor:0,blight:0,sac:0,sum:0};b.res.set(id,r)}return r};
