@@ -20,41 +20,69 @@ function pvGlyph(R){const p=[];const n=2+Math.floor(R()*3);for(let i=0;i<n;i++){
 function pvRing(n,r,seed,size){const R=pvRng(seed);let g='';for(let i=0;i<n;i++){const a=i/n*360;g+=`<path transform="rotate(${a.toFixed(2)} 100 100) translate(${(100-size*5/10).toFixed(2)} ${(100-r-size*7/10).toFixed(2)}) scale(${(size/10).toFixed(3)})" d="${pvGlyph(R)}"/>`}
  return `<svg viewBox="0 0 200 200" aria-hidden="true"><circle cx="100" cy="100" r="${(r+size*.95).toFixed(1)}" class="rl"/><circle cx="100" cy="100" r="${(r-size*.85).toFixed(1)}" class="rl"/><g class="gl">${g}</g></svg>`}
 const PV_TRI='<svg viewBox="-60 -60 120 120" aria-hidden="true"><g stroke-linejoin="round"><path d="M0-50L43.3 25H26L0-20-9.3-4z" class="t1"/><path d="M43.3 25L-43.3 25-34.6 10H17.3L8.7-5z" class="t2"/><path d="M-43.3 25L0-50 8.7-35-25.9 25H-17.3z" class="t3"/></g></svg>';
-const PV_EYE='<svg viewBox="0 0 200 120" aria-hidden="true"><defs><radialGradient id="pvIr" cx="50%" cy="50%" r="50%"><stop offset="0" stop-color="#fff7d0"/><stop offset=".25" stop-color="#e8c060"/><stop offset=".6" stop-color="#8a2ac0"/><stop offset="1" stop-color="#1a0630"/></radialGradient></defs><path d="M6 60Q100-14 194 60Q100 134 6 60z" fill="#08020c" stroke="#c8a0ff" stroke-width="2"/><g class="ei"><circle cx="100" cy="60" r="34" fill="url(#pvIr)"/><ellipse cx="100" cy="60" rx="5" ry="27" fill="#000"/><circle cx="90" cy="48" r="5" fill="#fff" opacity=".7"/></g></svg>';
+/* v2.3: the eye in the rift is wet and wrong, not a cartoon: yellowed bloodshot sclera, a fibrous sickly-amber iris, a slit pupil */
+const PV_EYE='<svg viewBox="0 0 200 120" aria-hidden="true"><defs><radialGradient id="pvSc" cx="50%" cy="50%" r="55%"><stop offset="0" stop-color="#6a5a40"/><stop offset=".6" stop-color="#3a2a1a"/><stop offset="1" stop-color="#0a0504"/></radialGradient><radialGradient id="pvIr" cx="50%" cy="50%" r="50%"><stop offset="0" stop-color="#d8b860"/><stop offset=".35" stop-color="#9a7020"/><stop offset=".75" stop-color="#4a2a08"/><stop offset="1" stop-color="#120802"/></radialGradient><clipPath id="pvEc"><path d="M8 60Q100-6 192 60Q100 126 8 60z"/></clipPath></defs><path d="M8 60Q100-6 192 60Q100 126 8 60z" fill="url(#pvSc)"/><g clip-path="url(#pvEc)" stroke="#6a0a0a" stroke-width="1.1" fill="none" opacity=".7"><path d="M10 60c20-4 30 6 46 2M190 58c-18-6-30 4-48 0M30 40c12 8 20 6 32 14M168 82c-14-6-22-2-34-12M24 80c14-6 24 0 36-6"/></g><g class="ei"><circle cx="100" cy="60" r="31" fill="url(#pvIr)"/><g stroke="#2a1404" stroke-width=".8" opacity=".6">'+Array.from({length:24},(_,i)=>{const a=i/24*6.283;return`<path d="M${(100+Math.cos(a)*9).toFixed(1)} ${(60+Math.sin(a)*9).toFixed(1)}L${(100+Math.cos(a)*30).toFixed(1)} ${(60+Math.sin(a)*30).toFixed(1)}"/>`}).join('')+'</g><ellipse cx="100" cy="60" rx="4" ry="24" fill="#000"/><ellipse cx="92" cy="49" rx="4" ry="2.5" fill="#e8dcc0" opacity=".35"/></g><path d="M8 60Q100-6 192 60" fill="none" stroke="#1a0c08" stroke-width="5"/><path d="M8 60Q100 126 192 60" fill="none" stroke="#1a0c08" stroke-width="3"/></svg>';
 const PV_LINES=['IT WAS NEVER SEALED','THE CARDS DREAM OF YOU','COUNT THE STARS. NOW COUNT AGAIN','WHAT IS INSIDE IS ALSO OUTSIDE','DO NOT LOOK DIRECTLY','SOMETHING IS COUNTING BACK','THE PACK REMEMBERS YOUR HANDS','YOU HAVE OPENED THIS BEFORE'];
 const PV_RUNE='ᚠᚢᚦᚨᚱᚲᚷᚹᚺᚾᛁᛃᛇᛈᛉᛊᛏᛒᛖᛗᛚᛜᛞᛟ⍙⍜⌇⟟⟒⏃⋏⎍⌰⟊';
 
 function pvBuild(){const st=$('#pstage');if(!st||$('#pvoid'))return;
- st.insertAdjacentHTML('afterbegin',`<canvas id="pvoid"></canvas><div id="pvsig"><i class="r r1">${pvRing(28,62,7,9)}</i><i class="r r2">${pvRing(20,44,19,8)}</i><i class="r r3">${pvRing(12,27,41,7)}</i><i class="tri">${PV_TRI}</i></div><i id="pveye">${PV_EYE}</i><i id="pvflash"></i>`);
+ st.insertAdjacentHTML('afterbegin',`<i id="pvbg"></i><canvas id="pvoid"></canvas><div id="pvsig"><i class="r r1">${pvRing(28,62,7,9)}</i><i class="r r2">${pvRing(20,44,19,8)}</i><i class="r r3">${pvRing(12,27,41,7)}</i><i class="tri">${PV_TRI}</i></div><i id="pveye">${PV_EYE}</i><i id="pvflash"></i>`);
  const w=$('#pwrap');if(w&&!$('#pvcry'))w.insertAdjacentHTML('afterend','<div id="pvcry" aria-live="off"></div>');
  PV.cv=$('#pvoid');PV.x=PV.cv.getContext('2d')}
 
-/* ---- the void canvas ---- */
+/* ---- the void canvas (v2.3) ----
+   A transparent layer over the painted backdrop (art/ui/void.webp): drifting ash, the rift's living edge (a ragged black mouth with an
+   uneven ember rim over the painted limbs), and the watchers - faint eyes in the dark that open when the pack is torn, follow the
+   cards, and all stare when a Legendary turns over. Low resolution (the GPU scales it up), at most 30 fps, asleep with the battery saver. */
 function pvSize(){const d=Math.min(1,(devicePixelRatio||1))*.5;PV.w=Math.ceil(innerWidth*d);PV.h=Math.ceil(innerHeight*d);PV.s=d;PV.cv.width=PV.w;PV.cv.height=PV.h;
- const n=fxLow()?60:qv().n>.7?170:110,R=Math.max(PV.w,PV.h)*.75;PV.stars=[];for(let i=0;i<n;i++)PV.stars.push(pvStar(R*Math.sqrt(Math.random())));
- PV.neb=[];for(let i=0;i<4;i++)PV.neb.push({a:Math.random()*7,r:R*(.25+Math.random()*.4),sz:R*(.45+Math.random()*.35),c:['#5a1a8a','#0a5a6a','#6a0a3a','#2a3a8a'][i],w:(Math.random()<.5?-1:1)*(.03+Math.random()*.05)})}
-function pvStar(r){return{r,a:Math.random()*Math.PI*2,z:.3+Math.random()*.7,c:Math.random()<.6?'#e8dcff':Math.random()<.5?'#8affe0':'#ffb0e8',pr:r,pa:0}}
-function pvDraw(t){const x=PV.x,W=PV.w,H=PV.h,cx=W/2,cy=H*.46,dt=Math.min(.06,(t-(PV.lt||t))/1000)||.033,el=(t-PV.mt)/1000,m=PV.mode,R=Math.max(W,H)*.75;PV.lt=t;
- x.globalCompositeOperation='source-over';x.fillStyle=m==='burst'?'rgba(2,0,6,.2)':'rgba(2,0,6,.42)';x.fillRect(0,0,W,H);
- x.globalCompositeOperation='lighter';
- for(const n of PV.neb){n.a+=n.w*dt*(m==='burst'?6:1);const nx=cx+Math.cos(n.a)*n.r*.6,ny=cy+Math.sin(n.a)*n.r*.35,g=x.createRadialGradient(nx,ny,0,nx,ny,n.sz);g.addColorStop(0,n.c+'26');g.addColorStop(1,n.c+'00');x.fillStyle=g;x.fillRect(nx-n.sz,ny-n.sz,n.sz*2,n.sz*2)}
- const burst=m==='burst'&&el<1.4,surge=m==='surge'&&el<2;
- for(const s of PV.stars){s.pr=s.r;s.pa=s.a;
-  const w=(.5+30/(s.r+12))*(surge?3:1);s.a+=w*dt;
-  if(burst){s.r+=(260+s.r*2.4)*dt*s.z}else{s.r-=(6+s.r*.06)*dt*(surge?4:1)*(.6+s.z)}
-  if(s.r<3||s.r>R*1.1){Object.assign(s,pvStar(burst?2+Math.random()*10:R*(.8+Math.random()*.3)));continue}
-  const sx=cx+Math.cos(s.a)*s.r,sy=cy+Math.sin(s.a)*s.r*.62,px=cx+Math.cos(s.pa)*s.pr,py=cy+Math.sin(s.pa)*s.pr*.62,al=Math.min(1,s.r/40)*s.z;
-  x.strokeStyle=s.c;x.globalAlpha=al*(burst?.95:.85);x.lineWidth=s.z*(burst?1.3:1);x.beginPath();x.moveTo(px,py);x.lineTo(sx,sy);x.stroke()}
- x.globalAlpha=1;
- /* the rift: a black hole with a breathing rim */
- const rr=Math.min(W,H)*(m==='burst'?.07+Math.min(.12,el*.25):m==='surge'?.12:.055)*(1+Math.sin(t/700)*.06);
- const g=x.createRadialGradient(cx,cy,rr*.6,cx,cy,rr*2.6);g.addColorStop(0,'#c8a0ff90');g.addColorStop(.35,'#6a2ac040');g.addColorStop(1,'#00000000');x.fillStyle=g;x.beginPath();x.arc(cx,cy,rr*2.6,0,7);x.fill();
- x.globalCompositeOperation='source-over';x.fillStyle='#000';x.beginPath();x.ellipse(cx,cy,rr,rr*.92,0,0,7);x.fill();
- if(m!=='drift'&&el>2.2)PV.mode='drift'}
+ const n=fxLow()?28:qv().n>.7?80:52,R=Math.max(PV.w,PV.h)*.75;PV.stars=[];for(let i=0;i<n;i++)PV.stars.push(pvMote(R*(.15+.85*Math.sqrt(Math.random()))));
+ /* watchers: seeded positions on a ring outside the card area; more on wide screens */
+ const Rg=pvRng(613),W=PV.w,H=PV.h,cx=W/2,cy=H*.46,ne=fxLow()?5:W>H?11:8;PV.eyes=[];
+ for(let i=0,t=0;i<ne&&t<400;t++){const a=Rg()*6.283,rx=W*(.3+Rg()*.24),ry=H*(.32+Rg()*.2),x=cx+Math.cos(a)*rx,y=cy+Math.sin(a)*ry;
+  if(x<10||x>W-10||y<10||y>H-10)continue;if(Math.abs(x-cx)<W*.36&&Math.abs(y-cy)<H*.24)continue;if(PV.eyes.some(e=>Math.hypot(e.x-x,e.y-y)<Math.min(W,H)*.13))continue;
+  PV.eyes.push({x,y,s:Math.min(W,H)*(.014+Rg()*.014),rot:(Rg()-.5)*.5,op:0,to:i<1?.22:0,bl:0,nb:2+Rg()*6,lx:0,ly:0,ph:Rg()*6,w:i});i++}
+}
+function pvMote(r){return{r,a:Math.random()*Math.PI*2,z:.3+Math.random()*.7,c:Math.random()<.7?'#8a8078':Math.random()<.5?'#6a5a7a':'#7a4a3a',pr:r,pa:0}}
+function pvEye(x,e,t,fx,fy,glare){const k=e.op*(1-e.bl);if(k<.02)return;const s=e.s,w=s*2.1,h=s*k*.95;x.save();x.translate(e.x,e.y);x.rotate(e.rot);
+ /* lids */x.beginPath();x.moveTo(-w,0);x.quadraticCurveTo(0,-h*1.6,w,0);x.quadraticCurveTo(0,h*1.6,-w,0);x.closePath();
+ x.globalAlpha=Math.min(1,.42+glare*.38)*Math.min(1,e.op*1.3);x.fillStyle=glare?'#2e2a20':'#16120e';x.fill();x.save();x.clip();
+ const dx=fx-e.x,dy=fy-e.y,L=Math.hypot(dx,dy)||1;e.lx+=((dx/L)*s*.55-e.lx)*.08;e.ly+=((dy/L)*s*.3-e.ly)*.08;
+ const ix=e.lx+Math.sin(t/1700+e.ph)*s*.08,iy=e.ly,ir=s*.62,g=x.createRadialGradient(ix,iy,0,ix,iy,ir);
+ g.addColorStop(0,glare?'#d8d0a8':'#6a6450');g.addColorStop(.55,glare?'#8a7a48':'#3e3a2c');g.addColorStop(1,'#0e0c08');x.fillStyle=g;x.beginPath();x.arc(ix,iy,ir,0,7);x.fill();
+ x.fillStyle='#000';x.beginPath();x.ellipse(ix,iy,s*.09*(glare?.6:1),ir*.82,0,0,7);x.fill();x.restore();
+ x.globalAlpha*=.8;x.strokeStyle='#050302';x.lineWidth=Math.max(1,s*.14);x.beginPath();x.moveTo(-w,0);x.quadraticCurveTo(0,-h*1.6,w,0);x.stroke();
+ if(glare){x.globalCompositeOperation='lighter';x.globalAlpha=.07*e.op;const gg=x.createRadialGradient(ix,iy,0,ix,iy,s*2.6);gg.addColorStop(0,'#d8b060');gg.addColorStop(1,'#d8b06000');x.fillStyle=gg;x.fillRect(ix-s*2.6,iy-s*2.6,s*5.2,s*5.2);x.globalCompositeOperation='source-over'}
+ x.restore()}
+/* the rift's ragged outline: several sine octaves + a slow jagged term, so its silhouette is never a clean oval */
+const pvQ=(a,t)=>1+.11*Math.sin(a*5+t/900)+.07*Math.sin(a*11-t/600)+.05*Math.sin(a*3+t/2300)+.05*Math.sin(a*17+t/400)*Math.sin(a*2-t/1700);
+function pvDraw(t){const x=PV.x,W=PV.w,H=PV.h,cx=W/2,cy=H*.46,dt=Math.min(.06,(t-(PV.lt||t))/1000)||.033,el=(t-PV.mt)/1000,m=PV.mode,R=Math.max(W,H)*.75,mn=Math.min(W,H);PV.lt=t;
+ x.globalCompositeOperation='source-over';x.globalAlpha=1;x.clearRect(0,0,W,H);
+ const burst=m==='burst'&&el<1.6,surge=m==='surge'&&el<2.6,born=$('#pstage').classList.contains('vborn');
+ /* the rift's mouth: ragged, breathing, wider when it tears and when something old comes out */
+ const open=burst?Math.min(1,el/.25)*(1-Math.max(0,el-.6)/1):surge?Math.sin(Math.min(1,el/2.6)*Math.PI):0,r0=mn*(.088+open*.03)*(1+Math.sin(t/1400)*.03);
+ /* a soft ragged pool of dark over the painted rift (no hard silhouette: a solid disc with lines around it read as a bug) */
+ {const g=x.createRadialGradient(cx,cy,r0*.35,cx,cy,r0*1.35);g.addColorStop(0,'rgba(0,0,0,.95)');g.addColorStop(.55,'rgba(0,0,0,.75)');g.addColorStop(1,'rgba(0,0,0,0)');x.fillStyle=g;x.beginPath();for(let i=0;i<=72;i++){const a=i/72*6.283,q=pvQ(a,t)*1.3;x.lineTo(cx+Math.cos(a)*r0*q,cy+Math.sin(a)*r0*q*.94)}x.fill()}
+ /* ember rim: short uneven arcs, brightest where the noise peaks; sickly gold for a Legendary */
+ x.globalCompositeOperation='lighter';x.lineCap='round';const rc=surge?'#d8b860':'#a03418';
+ for(let i=0;i<36;i++){const a=i/36*6.283,v=.5+.5*Math.sin(a*7+t/700)*Math.sin(a*3-t/1300+1.7),al=Math.max(0,v-.35)*(.5+open*.9);if(al<.03)continue;
+  const q=pvQ(a,t);x.globalAlpha=al;x.strokeStyle=rc;x.lineWidth=1+v*1.4;x.beginPath();x.arc(cx,cy,r0*q*1.02,a,a+.16);x.stroke()}
+ x.globalCompositeOperation='source-over';x.strokeStyle='#000';
+ /* ash: drifts and sinks toward the rift; blown out when it tears; pulled in hard for a Legendary */
+ x.globalAlpha=1;for(const s of PV.stars){s.pr=s.r;s.pa=s.a;s.a+=(.04+6/(s.r+40))*dt*(surge?3:1);
+  if(burst&&el<.9){s.r+=(180+s.r*1.6)*dt*s.z}else{s.r-=(2+s.r*.018)*dt*(surge?5:1)*(.5+s.z)}
+  if(s.r<r0*.8||s.r>R*1.1){Object.assign(s,pvMote(burst?r0+Math.random()*20:R*(.6+Math.random()*.45)));continue}
+  const sx=cx+Math.cos(s.a)*s.r,sy=cy+Math.sin(s.a)*s.r*.62+Math.sin(t/900+s.z*9)*1.5,al=Math.min(1,(s.r-r0)/(mn*.12))*s.z*.5;
+  x.globalAlpha=al;x.fillStyle=s.c;if(burst&&el<.9){x.strokeStyle=s.c;x.lineWidth=s.z;x.beginPath();x.moveTo(cx+Math.cos(s.pa)*s.pr,cy+Math.sin(s.pa)*s.pr*.62);x.lineTo(sx,sy);x.stroke()}else x.fillRect(sx,sy,s.z*1.6,s.z*1.6)}
+ /* shockwave when it tears: one pale ring, low */
+ if(burst&&el<1.1){x.globalCompositeOperation='lighter';x.globalAlpha=.32*(1-el/1.1);x.strokeStyle='#c8b8a0';x.lineWidth=2;x.beginPath();x.ellipse(cx,cy,r0+el*mn*.9,(r0+el*mn*.9)*.7,0,0,7);x.stroke();x.globalCompositeOperation='source-over'}
+ /* the watchers */
+ const fp=PV.focus||{x:cx,y:cy},glare=surge?1:0;for(const e of PV.eyes){const want=surge?1:burst||born?(e.w%3===0?0:e.w%2?.45:.7):e.to;e.op+=(want-e.op)*Math.min(1,dt*(burst||surge?5:.8));
+  e.nb-=dt;if(e.nb<0&&!surge){e.bl=1;e.nb=3+Math.random()*7}if(e.bl>0)e.bl=Math.max(0,e.bl-dt*5);pvEye(x,e,t,fp.x,fp.y,glare)}
+ x.globalAlpha=1;if(m!=='drift'&&el>2.8){PV.mode='drift';PV.focus=null}}
 function pvLoop(t){PV.raf=0;if(!PV.on)return;if(BAT.idle||BAT.hid||document.hidden){PV.paused=1;return}pvDraw(t);
  const iv=1000/(fxLow()?20:30);PV.tm=setTimeout(()=>{PV.tm=0;if(PV.on&&!PV.raf)PV.raf=requestAnimationFrame(pvLoop)},iv-8)}
 function pvKick(){if(PV.on&&!PV.raf&&!PV.tm){PV.paused=0;PV.raf=requestAnimationFrame(pvLoop)}}
-function pvStart(){pvBuild();if(!PV.cv)return;PV.on=1;PV.mode='drift';PV.mt=performance.now();PV.lt=0;pvSize();PV.x.fillStyle='#030008';PV.x.fillRect(0,0,PV.w,PV.h);pvKick();pvCryStart();pvHum(1)}
+function pvStart(){pvBuild();if(!PV.cv)return;PV.on=1;PV.mode='drift';PV.mt=performance.now();PV.lt=0;pvSize();PV.x.clearRect(0,0,PV.w,PV.h);pvKick();pvCryStart();pvHum(1)}
 function pvStop(){PV.on=0;clearTimeout(PV.tm);PV.tm=0;if(PV.raf)cancelAnimationFrame(PV.raf);PV.raf=0;pvCryStop();pvHum(0)}
 function pvMode(m){PV.mode=m;PV.mt=performance.now();pvKick()}
 
@@ -87,7 +115,7 @@ function pvBirth(){const st=$('#pstage'),sr=st.getBoundingClientRect(),cx=sr.lef
  $$('#prow .pslot').forEach((s,i)=>{const r=s.getBoundingClientRect();s.style.setProperty('--dx',(cx-(r.left+r.width/2)).toFixed(0)+'px');s.style.setProperty('--dy',(cy-(r.top+r.height/2)).toFixed(0)+'px');s.classList.add('born');setTimeout(()=>sfx('voidDeal'),120+i*130)});
  st.classList.add('vborn')}
 {const f0=flip;flip=function(s){const was=s&&s.classList.contains('up');const r=f0.apply(this,arguments);if(!s||was)return r;const st=$('#pstage'),rar=C[PO.res[+s.dataset.i].id].r;
-  if(rar==='L'){st.classList.remove('vlegend');void st.offsetWidth;st.classList.add('vlegend');pvMode('surge');hap('legend');setTimeout(()=>sfx('voidLegend'),180);setTimeout(()=>st.classList.remove('vlegend'),3200)}
+  if(rar==='L'){st.classList.remove('vlegend');void st.offsetWidth;st.classList.add('vlegend');{const r=s.getBoundingClientRect();PV.focus={x:(r.left+r.width/2)*PV.s,y:(r.top+r.height/2)*PV.s}}pvMode('surge');hap('legend');setTimeout(()=>sfx('voidLegend'),180);setTimeout(()=>st.classList.remove('vlegend'),3200)}
   else if(rar==='R'){restartCls(st,'vrare');hap('hitBig');setTimeout(()=>sfx('voidRare'),120);setTimeout(()=>st.classList.remove('vrare'),1600)}
   else hap('drop');return r}}
 {const d=$('#pdone'),d0=d&&d.onclick;if(d&&d0)d.onclick=function(e){pvStop();$('#pstage').classList.remove('vborn','vtear','vrare','vlegend');return d0.call(this,e)}}

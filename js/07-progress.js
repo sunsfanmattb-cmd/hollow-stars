@@ -21,9 +21,10 @@ const myDeck=()=>{const d=dkGet(UI.deck);return d&&dkCheck(d).ok?dkDeck(d):prebu
 const deckLabel=k=>{if(k==='gaunt')return'Gauntlet';const d=dkGet(k);return d?d.name:FAC[['v','m','c'].includes(k)?k:'v'].hero};
 
 /* ---------------- cosmetics: ~3% of pack cards come as a variant. CSS-only static frames (no images, no animation, no blend) ---------------- */
-const VARS=['gild','crimson','void','prism'],VARN={gild:'GILDED',crimson:'CRIMSON FRAME',void:'VOID FRAME',prism:'PRISMATIC'},VARP=.03;
+/* v2.4: 'holo' is the chase variant: a full holographic print, rarer than the frames (rolled first, HOLOP per pack card, ~1 in 25 packs) */
+const VARS=['gild','crimson','void','prism','holo'],VARN={gild:'GILDED',crimson:'CRIMSON FRAME',void:'VOID FRAME',prism:'PRISMATIC',holo:'HOLOGRAPHIC'},VARP=.03,HOLOP=.008;
 let VARR=Math.random;
-function varRoll(id){if(!C[id]||!C[id].pk)return null;return VARR()<VARP?VARS[Math.min(3,Math.floor(VARR()*4))]:null}
+function varRoll(id){if(!C[id]||!C[id].pk)return null;if(VARR()<HOLOP)return'holo';return VARR()<VARP?VARS[Math.min(3,Math.floor(VARR()*4))]:null}
 function varAdd(id,v){collMig();const a=COLL.var[id]||(COLL.var[id]=[]);if(!a.includes(v))a.push(v)}
 const varHas=id=>(COLL.var&&COLL.var[id])||[];
 function varShow(id){const s=COLL.show&&COLL.show[id];return s&&varHas(id).includes(s)&&owned(id)?s:null}
