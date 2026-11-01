@@ -105,9 +105,16 @@ function b3Lights(t){const W=B3.W,H=B3.H,f=B3.fac,L=[],sp=B3.spot||{A:[0,0],B:[0
 const B3_AMB={v:[.3,.38,.48],m:[.44,.47,.5],c:[.4,.26,.25],n:[.34,.33,.3]},B3_FOG={v:[.03,.12,.15],m:[.08,.09,.1],c:[.14,.01,.02],n:[.08,.07,.06]};
 
 /* ---------- tokens (minions, dragged card) -> shadow rects ---------- */
-function b3ReadToks(){const L=[];const add=(el,elev)=>{const r=el.getBoundingClientRect();if(r.width<4)return;L.push({x:r.left+r.width/2,y:r.top+r.height/2,w:r.width,h:r.height,e:elev})};
- for(const el of document.querySelectorAll('#myb .unit,#opb .unit')){if(L.length>=11)break;const bw=el._bw||(el._bw=el.offsetWidth),sc=el.getBoundingClientRect().width/(bw||1);const e=Math.max(0,(sc-1)/.2)*(B3.lunge&&+el.dataset.u===B3.lunge.uid?B3.lunge.L:0);add(el,e)}
- const g=$('#ghost');if(g)add(g,70);B3.toks=L}
+/* v2.3: unit rects are read only when the layout changed (tokDirty), never per frame. During an attack the attacker's shadow
+   follows the lunge's own keyframe path (UI.lg) instead of measuring the animated element every frame, which forced style and
+   layout on the main thread for the whole attack and fought the impact frame for time. */
+function b3ReadToks(){const L=[];const add=(el,elev,uid)=>{const r=rectOf(el);if(r.width<4)return;L.push({x:r.left+r.width/2,y:r.top+r.height/2,w:r.width,h:r.height,e:elev,uid,bx:r.left+r.width/2,by:r.top+r.height/2,bw:r.width,bh:r.height})};
+ for(const el of document.querySelectorAll('#myb>.unit:not(.dying),#opb>.unit:not(.dying)')){if(L.length>=11)break;add(el,0,+el.dataset.u)}
+ const g=$('#ghost');if(g)add(g,70,0);B3.toks=L}
+const B3_LK=[[0,0,0,1],[.22,-.08,-.3,1.06],[.5,.82,-1,1.2],[.62,.72,0,1.04],[1,0,0,1]],B3_LKlo=[[0,0,0,1],[.5,.78,0,1.12],[1,0,0,1]];
+function b3LungeTok(now){const lg=UI.lg;if(!lg)return;const o=B3.toks.find(t=>t.uid===lg.uid);if(!o)return;const u=Math.max(0,Math.min(1,(now-lg.t0)/lg.dur)),K=lg.lo?B3_LKlo:B3_LK;
+ let i=0;while(i<K.length-2&&u>K[i+1][0])i++;const a=K[i],b=K[i+1],k=(u-a[0])/(b[0]-a[0]||1),e=k<.5?2*k*k:1-Math.pow(-2*k+2,2)/2,m=(j)=>a[j]+(b[j]-a[j])*e;
+ const sc=m(3);o.x=o.bx+lg.dx*m(1);o.y=o.by+lg.dy*m(1)+lg.L*m(2);o.w=o.bw*sc;o.h=o.bh*sc;o.e=Math.max(0,(sc-1)/.2)*lg.L;o.y-=o.e*0}
 function b3ShadowUniforms(){const n=B3.toks.length,tk=new Float32Array(48),ts=new Float32Array(48),L=B3.lights;
  for(let i=0;i<n;i++){const o=B3.toks[i];let dx=0,dy=0,ws=0;for(const l of L){if(l[2]>400)continue;const vx=o.x-l[0],vy=o.y-l[1],d=Math.hypot(vx,vy)+1,w=l[3]/(1+d*d*.00004);dx+=vx/d*w;dy+=vy/d*w;ws+=w}
   const k=ws>0?1/ws:0,off=7+o.e*.55,gy=o.e;tk.set([o.x,o.y+gy,o.w*.92,o.h*.92],i*4);ts.set([dx*k*off,dy*k*off+5,11+o.e*.35,Math.max(.3,.78-o.e*.004)],i*4)}
@@ -122,7 +129,7 @@ function b3CamOffset(now){const c=B3.cam;if(!c)return{z:1,x:0,y:0,p:0};const u=(
 
 /* ---------- draw ---------- */
 function b3Draw(now){const gl=B3.gl,W=B3.W,H=B3.H,T=B3.tex[B3.key];if(!gl||!T)return;const t=(now-B3.t0)/1000,dt=Math.min(.1,(now-(B3.last||now))/1000)||.016;B3.last=now;B3.frames++;
- if(B3.tokDirty||now<B3.act){b3ReadToks();B3.tokDirty=0}
+ if(B3.tokDirty){b3ReadToks();B3.tokDirty=0}b3LungeTok(now);
  b3Lights(t);
  const co=b3CamOffset(now),fov=30*Math.PI/180,D=(H/2)/Math.tan(fov/2);
  const eye=[W/2+co.x,H/2+co.y+H*co.p,D*co.z],P=M4.persp(fov,W/H,D*.3,D*2),V=M4.look(eye,[W/2+co.x*.8,H/2+co.y*.8,0],[0,1,0]);
