@@ -84,6 +84,3 @@ function aiChoose(g,pi,raw){const A=legal(g,pi);if(!A.length)return null;const d
  rnd=sr;return best}
 function aiTurnSync(g){const pi=g.cur;for(let n=0;n<40&&!g.over;n++){const a=aiChoose(g,pi);if(!a)break;act(g,pi,a)}if(!g.over)endTurn(g)}
 function simulate(f0,f1,first){const g=newGame(typeof f0==='string'?prebuilt(f0):f0,typeof f1==='string'?prebuilt(f1):f1,{ai:[1,1],sim:1,first});for(let n=0;n<300&&!g.over;n++)aiTurnSync(g);return{winner:g.winner,turns:g.turn,reason:g.reason,san:g.p.map(p=>p.san),mad:g.p.map(p=>p.mad),over:g.over}}
-/* Hollow Stars. RENDERING RULES: read /RENDERING_RULES.md before changing card visuals, animations, video or art.
-   (transform/opacity only, no blend modes or animated filters, no class toggling mid-animation or DOM rebuilds, video rules,
-   layer budget, image sizes, text auto-fit; new cards must pass tests/cardcheck.py, tests/paintprobe.py and tests/flicker.py) */

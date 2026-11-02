@@ -15,6 +15,7 @@
 <link rel="stylesheet" href="css/v24.css">
 <link rel="stylesheet" href="css/v25.css">
 <link rel="stylesheet" href="css/v26.css">
+<link rel="stylesheet" href="css/v27.css">
 </head><body>
 <div id="pbg"><i class="pl"></i><i class="pg"></i><i class="th"></i><i class="pd"></i></div><canvas id="bg"></canvas><div id="fog"><i class="f1"></i><i class="f2"></i></div><div id="vig"></div><div id="grain"></div>
 <button id="mute" aria-label="Toggle sound"></button>
@@ -60,9 +61,9 @@
 <div id="settings"><div class="sbox"><h2>SETTINGS</h2><div class="orn"></div><label>Volume <input type="range" id="sVol" min="0" max="100" value="80"></label><label>Mute sound <input type="checkbox" id="sMute"></label><label><span>Quality<small id="sQn"></small></span><select id="sQ"><option value="auto">Auto</option><option value="high">High</option><option value="medium">Medium</option><option value="low">Low (reduce effects)</option></select></label><label><span>Game speed<small>animations and enemy turns</small></span><select id="sSpd"><option value="1">Normal</option><option value="0.6">Fast</option><option value="0.35">Very fast</option></select></label><p class="bnote">Battery saver is always on: effects pause after 10 s without input and everything stops in the background.</p><button class="btn sm ghost" id="sCos">Card Backs &amp; Board Themes</button><div class="ssave"><span>Save data<small>Copy a backup code to move or restore your progress</small></span><div><button class="btn sm ghost" id="sBack">Back up</button><button class="btn sm ghost" id="sRest">Restore</button></div></div><input type="file" id="sFile" accept=".hssave,.txt,text/plain" hidden><div class="rowb"><button class="btn" id="sClose">Close</button></div></div></div>
 <div id="banner"></div><div id="preview"></div><div id="zoom"></div><div id="kwtip"></div><div id="toast"></div><div id="dlg" role="dialog" aria-modal="true"><div class="dbox"><b id="dlgT"></b><p id="dlgX"></p><input id="dlgI" maxlength="24" autocomplete="off" enterkeyhint="done" spellcheck="false"><div class="rowb"><button class="btn sm ghost" id="dlgNo">Cancel</button><button class="btn sm" id="dlgOk">OK</button></div></div></div>
 <div id="over"><div class="ovbg"></div><div class="ovbox"><div class="ovsig"></div><h2 id="ovt"></h2><p id="ovp"></p><div id="ovrw"></div><div id="ovx"></div><button class="btn" id="ovk" hidden><span>Open a Pack</span></button><div class="rowb"><button class="btn ghost" id="ovm">Menu</button><button class="btn ghost" id="ovr">Play again</button></div></div></div>
-/* Hollow Stars. RENDERING RULES: read /RENDERING_RULES.md before changing card visuals, animations, video or art.
+/* Hollow Stars. RENDERING RULES: read /RENDERING_RULES.md before changing card visuals, animations, video, art or menus.
    (transform/opacity only, no blend modes or animated filters, no class toggling mid-animation or DOM rebuilds, video rules,
-   layer budget, image sizes, text auto-fit; new cards must pass tests/cardcheck.py, tests/paintprobe.py and tests/flicker.py) */
+   layer budget, image sizes, text auto-fit; check changes with the tests listed in its section 12) */
 <script src="js/00-econ.js"></script>
 <script src="js/00-save.js"></script>
 <script src="js/01-core.js"></script>
@@ -82,4 +83,5 @@
 <script src="js/14-turnlog.js"></script>
 <script src="js/15-cards.js"></script>
 <script src="js/16-store.js"></script>
+<script src="js/17-intro.js"></script>
 </body></html>

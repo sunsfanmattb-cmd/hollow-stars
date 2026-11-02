@@ -4,3 +4,4 @@ keystore.properties
 *.apk
 __pycache__/
 shots/
+tools/.css_dedupe.json

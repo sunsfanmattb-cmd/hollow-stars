@@ -119,7 +119,7 @@ function pvBirth(){const st=$('#pstage'),sr=st.getBoundingClientRect(),cx=sr.lef
   else if(rar==='R'){restartCls(st,'vrare');hap('hitBig');setTimeout(()=>sfx('voidRare'),120);setTimeout(()=>st.classList.remove('vrare'),1600)}
   else hap('drop');return r}}
 {const d=$('#pdone'),d0=d&&d.onclick;if(d&&d0)d.onclick=function(e){pvStop();$('#pstage').classList.remove('vborn','vtear','vrare','vlegend');return d0.call(this,e)}}
-{const s0=show;show=function(id){if(id!=='packs'&&PV.on){pvStop();const st=$('#pstage');if(st)st.classList.remove('vborn')}return s0.apply(this,arguments)}}
+onShow(id=>{if(id!=='packs'&&PV.on){pvStop();const st=$('#pstage');if(st)st.classList.remove('vborn')}},true);
 document.addEventListener('pointerdown',()=>{if(PV.on&&PV.paused)setTimeout(pvKick,0)},true);
 addEventListener('resize',()=>{if(PV.on)pvSize()});
 document.addEventListener('visibilitychange',()=>{if(document.hidden)pvHum(0);else if(PV.on){pvHum(1);pvKick()}});

@@ -74,12 +74,10 @@ $('#stRestore').onclick=async()=>{sfx('click');const n=await restorePurchases();
 for(const id of['#bStore','#pStore'])$(id).hidden=!storeOpen();
 $('#bStore').onclick=()=>{sfx('click');show('store')};$('#pStore').onclick=()=>{sfx('click');show('store')};
 
-/* ---- packs screen: rules line and shard price from ECON ---- */
+/* packs screen: rules line and shard price from ECON (called by renderPacks) */
 function packRules(){const E=ECON.pack,M=ECON.match;$('#prules').textContent=`Each pack: 3 Common · 1 Uncommon · 1 Rare (${oPct(E.legChance)} chance of a Legendary, guaranteed every ${E.legPity} packs). Wins pay ${M.win} Shards, losses ${M.loss}, and your first win each day ${M.firstWin} more. Extra copies become Shards.`;
  $('#pBuy').textContent=`Buy · ${E.price}◆`}
-{const r0=renderPacks;renderPacks=function(){const r=r0.apply(this,arguments);try{packRules()}catch(e){}return r}}
-{const s0=show;show=function(id){if(id!=='store'&&$('#odds').classList.contains('on'))modalClose();const r=s0.apply(this,arguments);if(id==='store')try{renderStore()}catch(e){console.warn('store',e)}return r}}
-{const b0=badges;badges=function(){const r=b0.apply(this,arguments);const b=$('#bgSt');if(b){const n=COLL.ent&&COLL.ent.pickL>0;b.textContent=n?'!':'';b.classList.toggle('on',!!n)}return r}}
+onShow(id=>{if(id!=='store'&&$('#odds').classList.contains('on'))modalClose()},true);onShow(id=>{if(id==='store')renderStore()});
 
 /* ---- settings: backup code / restore ---- */
 const isApp=!!(window.Capacitor&&window.Capacitor.isNativePlatform&&window.Capacitor.isNativePlatform());

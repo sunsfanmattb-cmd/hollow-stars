@@ -8,7 +8,6 @@ var QL;QL={rm:matchMedia('(prefers-reduced-motion: reduce)'),mobile:/Android|iPh
 function qDefault(){return QL.mobile?'medium':'high'}
 const QLV={high:{n:.55,shake:.7,fxd:1.5,bgd:1.25,bgfps:30,vid:2},medium:{n:.3,shake:.45,fxd:1,bgd:1,bgfps:15,vid:1},low:{n:.15,shake:0,fxd:1,bgd:.75,bgfps:8,vid:0}};
 const qv=()=>QLV[QL.q]||QLV.medium;
-const FXQ={rm:QL.rm,get low(){return QL.q==='low'},set low(v){setQuality(v?'low':'auto')}};
 const fxLow=()=>QL.q==='low'||QL.rm.matches;
 function qApply(){const b=document.body;for(const k of['high','medium','low'])b.classList.toggle('q-'+k,QL.q===k);b.classList.toggle('fxlow',fxLow());
  if(FX.cv)fxSize();if(typeof bgInit==='function'&&BG.cv)bgInit();VID.max=qv().vid;if(typeof madSet==='function'&&G){MZ.me=-1;madSet()}const s=$('#sQ');if(s)s.value=QL.pref;const n=$('#sQn');if(n)n.textContent=QL.pref==='auto'?'Auto · now '+QL.q[0].toUpperCase()+QL.q.slice(1):''}
@@ -59,7 +58,6 @@ function drawP(x,p,u){switch(p.t){
 /* ---------- screen shake (WAAPI transform, decays) ---------- */
 function shake(el,mag,ms=260){ms=Math.min(ms,320);if(!el||fxLow()||mag<=0)return;mag*=qv().shake;const k=[];for(let i=0;i<=8;i++){const f=(1-i/8)*mag;k.push({transform:i===8?'none':`translate(${rr(-f,f).toFixed(1)}px,${rr(-f,f).toFixed(1)}px) rotate(${rr(-f,f)*.08}deg)`})}el.animate(k,{duration:ms,easing:'ease-out'})}
 /* ---------- combat impacts ---------- */
-const FAC_HIT={v:'#2a0838',m:'#9ef8ff',c:'#8a0414',n:'#d8c8a0'};
 function impact(f,x,y,ax,ay,n,hero){const dx=x-ax,dy=y-ay,L=Math.hypot(dx,dy)||1,ux=dx/L,uy=dy/L,big=hero?1.6:1,cnt=k=>nq((k+n*3)*big);
  f=f||'n';
  if(f==='v'){if(ax||ay){const t=sp('te',ax,ay,0,0,.55,9*big,'');if(t){t.x2=x;t.y2=y;t.k=Math.random()*6}}
@@ -217,7 +215,6 @@ function livingBoard(x,t,W,H){if(!G||!BG.painted)return;const f=G.p[0].fac,low=f
  x.globalCompositeOperation='lighter';for(const p of BG.rip){const a=(t-p.t)/(p.amb?2600:1500);if(a>1){p.dead=1;continue}const col={v:'#6affd0',m:'#ffb050',c:'#ff2a3a',n:'#e0d0a0'}[p.f]||'#fff';x.globalAlpha=(1-a)*(p.amb?.12:.35);x.strokeStyle=col;x.lineWidth=p.amb?1:2;
   for(let k=0;k<(p.amb?2:3);k++){const rr_=(a*(p.amb?.25:.7)*W)*(1-k*.18);if(rr_<=0)continue;x.beginPath();ell(x,p.x,p.y,rr_,rr_*.4,0,0,7);x.stroke()}}BG.rip=BG.rip.filter(p=>!p.dead);x.globalCompositeOperation='source-over';x.globalAlpha=1}
 /* ---------- settings ---------- */
-function setFx(low){setQuality(low?'low':'auto')}
 function settingsOpen(){{const sp=$('#sSpd');if(sp){const v=String(UI.speed);sp.value=[...sp.options].some(o=>o.value===v)?v:'1'}}$('#sVol').value=Math.round(AU.vol*100);$('#sQ').value=QL.pref;$('#sMute').checked=AU.mute;qApply();$('#settings').classList.add('on')}
 fxInit();qApply();QL.rm.addEventListener&&QL.rm.addEventListener('change',()=>setQuality(QL.pref));
 $('#tset').onclick=()=>{sfx('click');settingsOpen()};$('#mset').onclick=()=>{sfx('click');settingsOpen()};$('#sClose').onclick=()=>{sfx('click');$('#settings').classList.remove('on')};
@@ -225,7 +222,7 @@ $('#settings').addEventListener('click',e=>{if(e.target.id==='settings')$('#sett
 $('#sVol').addEventListener('input',e=>{auInit();AU.vol=+e.target.value/100;localStorage.setItem('hsVol',AU.vol.toFixed(2));auVol()});
 $('#sQ').addEventListener('change',e=>{sfx('click');setQuality(e.target.value)});$('#sSpd').addEventListener('change',e=>{sfx('click');UI.speed=+e.target.value||1;try{localStorage.setItem('hsSpd',String(UI.speed))}catch(x){}});$('#sMute').addEventListener('change',e=>{auInit();AU.mute=e.target.checked;localStorage.setItem('hsMute',AU.mute?'1':'0');updMute()});
 $('#cin').addEventListener('pointerdown',e=>{e.stopPropagation();cinSkip()},true);
-Object.assign(window.__hs,{gyroOn,gyroOff,qKick,ZTMAX,sfx,SFX,auVol,vidReady,ZT,ztOpen,ztClose,ztFinger,scrAngle,FX,FXQ,QL,qv,setQuality,qApply,fxLow,setFx,MZ,madSet,whisper,lgCinema,CIN,cinSkip,impact,deathFx,dropFx,tiltHeld,tiltOff,TL,orient,LB,AU,shake});
+Object.assign(window.__hs,{gyroOn,gyroOff,qKick,ZTMAX,sfx,SFX,auVol,vidReady,ZT,ztOpen,ztClose,ztFinger,scrAngle,FX,QL,qv,setQuality,qApply,fxLow,MZ,madSet,whisper,lgCinema,CIN,cinSkip,impact,deathFx,dropFx,tiltHeld,tiltOff,TL,orient,LB,AU,shake});
 /* v7.3 keyword tooltip: tap/hover a keyword icon on a unit (long-press still opens the full card) */
 (function(){const tip=$('#kwtip');let tt=0;function show(sv){const k=sv.dataset.k||sv.dataset.kw;if(!k||!KW[k])return;tip.innerHTML=`<b>${KW[k][0]}</b> · ${KW[k][1]}`;const r=sv.getBoundingClientRect();
   tip.style.left=Math.max(118,Math.min(innerWidth-118,r.left+r.width/2))+'px';tip.style.top=Math.max(40,r.top)+'px';tip.classList.add('on');clearTimeout(tt);tt=setTimeout(()=>tip.classList.remove('on'),1800)}

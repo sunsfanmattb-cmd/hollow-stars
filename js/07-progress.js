@@ -204,10 +204,11 @@ $('#craft').addEventListener('click',async e=>{const id=CF.id;if(!id)return;cons
  else if(t.dataset.vr!==undefined){varSet(id,t.dataset.vr||null);sfx('click');renderColl()}});
 
 /* ---------------- hub, badges, quick-play difficulty ---------------- */
-function badges(){const q=qClaimable(),p=COLL.packs,set=(id,n)=>{const b=$(id);if(!b)return;const t=n>0?String(n):'';if(b.textContent!==t)b.textContent=t;b.classList.toggle('on',n>0)};set('#bgQ',q);set('#bgPk',p);try{set('#bgW',weekClaimable()?1:0);set('#bgA',achNew())}catch(e){}}
+function badges(){const q=qClaimable(),p=COLL.packs,set=(id,n)=>{const b=$(id);if(!b)return;const t=n>0?String(n):'';if(b.textContent!==t)b.textContent=t;b.classList.toggle('on',n>0)};set('#bgQ',q);set('#bgPk',p);{const b=$('#bgSt');if(b){const n=COLL.ent&&COLL.ent.pickL>0;b.textContent=n?'!':'';b.classList.toggle('on',!!n)}}try{set('#bgW',weekClaimable()?1:0);set('#bgA',achNew())}catch(e){}}
 function renderPdif(){const b=$('#pdif');if(b)b.innerHTML=Object.keys(DIFS).map(k=>`<button data-pd="${k}" class="${V8.dif===k?'on':''}">${DIFS[k].n}</button>`).join('')+`<small>${DIFS[V8.dif].d}</small>`}
 $('#pdif').addEventListener('click',e=>{const b=e.target.closest('[data-pd]');if(!b)return;V8.dif=b.dataset.pd;saveV8();sfx('click');renderPdif()});
 function v8Show(id){try{if(id==='title')badges();if(id==='camp')renderCamp();if(id==='quests')renderQuests();if(id==='stats')renderStats();if(id==='pick')renderPdif();if(id==='coll')craftSync()}catch(e){console.warn('v8 screen',e)}}
+onShow(v8Show);
 $('#bCamp').onclick=()=>{sfx('click');show('camp')};$('#bQuest').onclick=()=>{sfx('click');show('quests')};$('#bStats').onclick=()=>{sfx('click');show('stats')};
 loginCheck();questsToday();badges();
 Object.defineProperty(window.__hs,'V8',{get(){return V8},set(v){V8=v8Mig(v)},configurable:true});

@@ -1,7 +1,10 @@
 'use strict';
 /* ================= SCREENS ================= */
 let cur='title';
-function show(id){cur=id;if(id!=='match'){document.body.classList.remove('mzhi');cinSkip()}setTimeout(auMood,0);$$('.screen').forEach(s=>s.classList.toggle('on',s.id===id));hideZoom();scene();if(id==='pick')renderPick();if(id==='builder')renderBuilder(1);if(id==='mydecks')renderDecks();if(id==='packs')renderPacks();if(id==='coll')renderColl();v8Show(id);try{v9Show(id)}catch(e){console.warn('v9 screen',e)}batPoke()}
+/* other files react to screen changes with onShow(fn): fn(id, prev) runs after the switch; onShow(fn, true) runs just before it */
+const SHOWH={pre:[],post:[]};
+const onShow=(fn,pre)=>SHOWH[pre?'pre':'post'].push(fn);
+function show(id){const prev=cur;for(const f of SHOWH.pre)try{f(id,prev)}catch(e){console.warn('show',e)}cur=id;if(id!=='match'){document.body.classList.remove('mzhi');cinSkip()}setTimeout(auMood,0);$$('.screen').forEach(s=>s.classList.toggle('on',s.id===id));hideZoom();scene();if(id==='pick')renderPick();if(id==='builder')renderBuilder(1);if(id==='mydecks')renderDecks();if(id==='packs')renderPacks();if(id==='coll')renderColl();batPoke();for(const f of SHOWH.post)try{f(id,prev)}catch(e){console.warn('show',e)}}
 $$('[data-back]').forEach(b=>b.addEventListener('click',()=>{sfx('click');show('title')}));
 $('#bPlay').onclick=()=>{sfx('click');show('pick')};$('#bBuild').onclick=()=>{sfx('click');show('mydecks')};$('#bHow').onclick=()=>{sfx('click');show('howto')};$('#bPacks').onclick=()=>{sfx('click');show('packs')};$('#bColl').onclick=()=>{sfx('click');show('coll')};
 const UI={sel:null,busy:false,auto:/[?&]auto=1/.test(location.search),speed:/[?&]fast=1/.test(location.search)?.12:(()=>{try{const v=+localStorage.getItem('hsSpd');return v>0&&v<=1?v:1}catch(e){return 1}})(),hw:100,hh:140,deck:'v',opp:'r'};
@@ -295,7 +298,7 @@ function openPack(){const P=COLL.pity,E=ECON.pack;if(!packTake())return null;con
  const ri=ECON.pack.slots.lastIndexOf('R');if(forceL&&!ids.some(id=>C[id].r==='L')){ids=ids.slice();ids[ri]=rollPack(Math.random,1)[ri]}
  const res=grant(ids,undefined,P.H+1>=E.holoPity?ri:-1);P.L=res.some(o=>C[o.id].r==='L')?0:P.L+1;P.H=res.some(o=>o.vr==='holo')?0:P.H+1;saveColl();return res}
 function renderPacks(){$('#pshards').textContent=COLL.shards;$('#pcount').textContent=COLL.packs;$('#pOpen').disabled=COLL.packs<=0;$('#pBuy').disabled=COLL.shards<SH.pack;
- const own=PACK.filter(id=>owned(id)).length;$('#pown').textContent=`${own}/${PACK.length} pack cards discovered`;$('#psealed').classList.toggle('none',COLL.packs<=0)}
+ const own=PACK.filter(id=>owned(id)).length;$('#pown').textContent=`${own}/${PACK.length} pack cards discovered`;$('#psealed').classList.toggle('none',COLL.packs<=0);packRules()}
 $('#pBuy').onclick=()=>{if(!buyPackShards()){sfx('err');return}sfx('heal');renderPacks()};
 const PO={res:null,stage:0};
 $('#pOpen').onclick=()=>startOpen();$('#psealed').onclick=()=>startOpen();
@@ -327,6 +330,3 @@ $('#howtx').innerHTML=`<p>You are a mind adrift in the dark between stars. Break
 <p><b>Keywords</b></p><div class="kwl">${Object.keys(KW).map(k=>`<span class="ki">${svgI(k)}</span><span><b>${KW[k][0]}</b>: ${KW[k][1]}</span>`).join('')}</div>
 <p><b>Factions</b></p><ul><li><b>The Abyss</b> (violet): ${FAC.v.d}</li><li><b>The Derelict</b> (cyan): ${FAC.m.d}</li><li><b>The Red Communion</b> (crimson): ${FAC.c.d}</li><li><b>Wanderers</b> (grey) are neutral crew that fit any deck.</li></ul>
 <p><b>Reading a card:</b></p><div class="demo">${costHTML(3)}<span>Flux cost</span>${atkHTML('v',4)}${atkHTML('m',2)}${atkHTML('c',3)}${atkHTML('n',1)}<span>Attack (icon per faction)</span>${hpHTML(2,40)}<span>Health: the blood drains as it is wounded</span></div><p><b>Rarity gems:</b> grey Common, blue Uncommon, gold Rare, prismatic Legendary. Custom decks hold up to 2 copies of a card (1 of a Legendary).</p>`;
-/* Hollow Stars. RENDERING RULES: read /RENDERING_RULES.md before changing card visuals, animations, video or art.
-   (transform/opacity only, no blend modes or animated filters, no class toggling mid-animation or DOM rebuilds, video rules,
-   layer budget, image sizes, text auto-fit; new cards must pass tests/cardcheck.py, tests/paintprobe.py and tests/flicker.py) */

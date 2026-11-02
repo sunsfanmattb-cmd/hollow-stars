@@ -9,7 +9,7 @@
 .card,.card.f-m{background:var(--cf) 0 0/100% 100% no-repeat;border-radius:calc(var(--cw)*.06);box-shadow:0 .45em 1.1em #000d}
 /* print grain over the whole face (art included), masked to the frame so the chips stay empty */
 .card::after{box-shadow:none;background:var(--grain-p) 0 0/6em 6em,linear-gradient(128deg,#ffffff10,transparent 28%,transparent 72%,#ffffff06);
- -webkit-mask:var(--cf) 0 0/100% 100% no-repeat;mask:var(--cf) 0 0/100% 100% no-repeat;z-index:7}
+ z-index:7}
 .unit{background:var(--cf) 0 0/100% 100% no-repeat,#050405}
 
 /* ---- rarity: commons plain; uncommons a thin pewter trim; rares a gold trim with a slow shimmer along it ---- */
@@ -23,7 +23,7 @@
 @keyframes rimSweep{to{transform:rotate(400deg)}}
 
 /* ---- drifting particles in front: bubbles rise (Abyss), sparks fall (Derelict), ash falls (Communion), dust drifts (Wanderers) ---- */
-.card .cpt{position:absolute;inset:0;border-radius:inherit;overflow:hidden;pointer-events:none;z-index:6;display:none}
+.card .cpt{position:absolute;overflow:hidden;pointer-events:none;z-index:6;display:none}
 .card .cpt>i{position:absolute;left:0;right:0;top:0;height:200%;background:var(--pt) 0 0/100% 50% repeat-y;opacity:.6}
 :is(#zoom .card,.pfront .card,#sheet .card,#hand .card.held,#hand .card.sel) .cpt,#ghost .cpt{display:block}
 :is(#zoom .card,.pfront .card,#sheet .card,#hand .card.held,#hand .card.sel) .cpt>i,#ghost .cpt>i{animation:ptRise 16s linear infinite;will-change:transform}

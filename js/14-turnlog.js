@@ -114,6 +114,6 @@ function tlPlace(){if(!TLOG.el||cur!=='match')return;const land=document.body.cl
 {const l0=lunge;lunge=function(uid,tg){TLOG.next={k:'atk',uid,tg};return l0.apply(this,arguments)}}
 {const s0=startMatch;startMatch=function(){tlBuild();tlReset();const r=s0.apply(this,arguments);requestAnimationFrame(tlPlace);return r}}
 {const l0=layout;layout=function(){const r=l0.apply(this,arguments);if(TLOG.el)requestAnimationFrame(tlPlace);return r}}
-{const s0=show;show=function(id){if(id!=='match')tlClose();return s0.apply(this,arguments)}}
+onShow(id=>{if(id!=='match')tlClose()},true);
 
 Object.assign(window.__hs,{TLOG,tlRecord,tlOpen,tlClose,tlPlace});

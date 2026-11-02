@@ -208,9 +208,6 @@ function parchURL(){const S=256,cv=mkc(S,S),x=cv.getContext('2d'),R=rng(4242);x.
  for(let i=0;i<900;i++){x.strokeStyle=`rgba(${R()<.5?'90,64,40':'0,0,0'},${.05+R()*.12})`;x.lineWidth=.5+R();const px=R()*S,py=R()*S,a=(R()-.5)*.6;x.beginPath();x.moveTo(px,py);x.lineTo(px+Math.cos(a)*(4+R()*16),py+Math.sin(a)*(2+R()*6));x.stroke()}return cv.toDataURL('image/jpeg',.8)}
 function moteURL(f){const S=128,cv=mkc(S,S),x=cv.getContext('2d'),R=rng(hash('mote'+f)),P=PAL[f];/* v7.4: wraps at the edges so the drifting tile is seamless; a few warm embers among the faction motes */
  for(let i=0;i<12;i++){const px=R()*S,py=R()*S,r=1.2+R()*2.8,col=R()<.25?'#ffb060':R()<.6?P.a:P.g;for(const dx of[-S,0,S])for(const dy of[-S,0,S]){const X=px+dx,Y=py+dy;if(X<-r*4||X>S+r*4||Y<-r*4||Y>S+r*4)continue;glow(x,X,Y,r*3.5,col,.55);x.fillStyle='rgba(255,250,235,.85)';x.beginPath();x.arc(X,Y,r*.45,0,7);x.fill()}}return cv.toDataURL()}
-/* Hollow Stars. RENDERING RULES: read /RENDERING_RULES.md before changing card visuals, animations, video or art.
-   (transform/opacity only, no blend modes or animated filters, no class toggling mid-animation or DOM rebuilds, video rules,
-   layer budget, image sizes, text auto-fit; new cards must pass tests/cardcheck.py, tests/paintprobe.py and tests/flicker.py) */
 /* ===== ART v5: detailed horror portraits ===== */
 const LT={m8:[.75,-.05,1.3],v18:[.6,.1,1.6],v16:[.85,0,1.5],v8:[.8,-.1,1.25],c18:[.3,0,1.2],n6:[.9,-.1,1.3],m23:[.9,-.1,1.2]};// painter -> [lightX, lightY, exposure]
 const lerp=(a,b,t)=>a+(b-a)*t;
@@ -783,6 +780,3 @@ function cardBackURL(){const W=200,H=280,cv=mkc(W,H),x=cv.getContext('2d'),R=rng
  x.save();x.translate(W/2,H/2);for(let i=0;i<16;i++){x.rotate(TAU/16);x.strokeStyle='rgba(180,140,230,.12)';x.lineWidth=1;x.beginPath();x.moveTo(0,20);x.lineTo(0,H*.6);x.stroke()}x.restore();
  x.strokeStyle='#5a4a3a';x.lineWidth=5;x.strokeRect(6,6,W-12,H-12);x.strokeStyle='#000';x.lineWidth=2;x.strokeRect(12,12,W-24,H-24);x.strokeStyle='rgba(200,170,120,.45)';x.lineWidth=1;x.strokeRect(16,16,W-32,H-32);
  for(const[cx,cy]of[[16,16],[W-16,16],[16,H-16],[W-16,H-16]]){x.fillStyle='#c8a070';x.save();x.translate(cx,cy);x.rotate(Math.PI/4);x.fillRect(-4,-4,8,8);x.restore()}return cv.toDataURL('image/jpeg',.85)}
-/* Hollow Stars. RENDERING RULES: read /RENDERING_RULES.md before changing card visuals, animations, video or art.
-   (transform/opacity only, no blend modes or animated filters, no class toggling mid-animation or DOM rebuilds, video rules,
-   layer budget, image sizes, text auto-fit; new cards must pass tests/cardcheck.py, tests/paintprobe.py and tests/flicker.py) */

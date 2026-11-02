@@ -29,7 +29,7 @@ function createWindow() {
   win = new BrowserWindow({
     ...b, minWidth: 960, minHeight: 600, show: false, backgroundColor: '#000000', title: 'Hollow Stars',
     icon: path.join(__dirname, 'game', 'icon.png'), autoHideMenuBar: true,
-    webPreferences: { contextIsolation: true, nodeIntegration: false, sandbox: true, spellcheck: false, backgroundThrottling: true }
+    webPreferences: { contextIsolation: true, nodeIntegration: false, sandbox: true, spellcheck: false, backgroundThrottling: true, autoplayPolicy: 'no-user-gesture-required' }
   });
   Menu.setApplicationMenu(null);
   if (st.max) win.maximize();

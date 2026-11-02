@@ -323,7 +323,6 @@ const ACH=[
  ['echo','Resonant','Play 10 Echo copies.',()=>AC('echo')>=10,{sh:40}],
  ['kw4','Fluent in Ruin','Play a card with each new keyword: Echo, Devour, Corrupt and Ward.',()=>['echo','devour','corrupt','ward'].every(k=>AC('k_'+k)>=1),{sh:40}],
  ['dk5','Five Doctrines','Build 5 custom decks.',()=>DK.decks.length>=5,{sh:40}]];
-const ACHI=Object.fromEntries(ACH.map(a=>[a[0],a]));
 const achNew=()=>Math.max(0,Object.keys(V9.ach.got).length-(V9.ach.seen||0));
 /* v2.6: store cosmetics (CB/TH entries with st:1) are owned through a purchase entitlement, COLL.ent['back:<id>'] / ['theme:<id>'] */
 const cosHas=(kind,id)=>!!((kind==='back'?CB:TH)[id]&&(id==='veil'||id==='none'||(COLL.ent&&COLL.ent[kind+':'+id])||ACH.some(a=>V9.ach.got[a[0]]&&a[4][kind]===id)));
@@ -355,6 +354,7 @@ function v9OverHTML(g,x){if(!x)return'';let h='';const m=g.meta||{};
 function v9Quit(g){if(!g||!g.meta)return null;const md=g.meta.mode;if(md==='gaunt'){if(!g.over&&gtRun()){gtResult(g,'l');saveV9()}return'gaunt'}if(md==='week')return'weekly';return null}
 {const c0=craft;craft=function(id){const r=c0(id);if(r&&r.ok){ctr('craft');saveV9();achCheck()}return r}}
 function v9Show(id){if(id==='gaunt')renderGaunt();if(id==='weekly')renderWeekly();if(id==='codex'){if(V9.codex.nw){V9.codex.nw=0;saveV9()}renderCodex()}if(id==='ach')renderAch();if(id==='title'){achCheck();badges()}}
+onShow(v9Show);
 $('#bGaunt').onclick=()=>{sfx('click');show('gaunt')};$('#bWeek').onclick=()=>{sfx('click');show('weekly')};$('#bCodex').onclick=()=>{sfx('click');show('codex')};$('#bAch').onclick=()=>{sfx('click');show('ach')};
 $('#sCos').onclick=()=>{sfx('click');$('#settings').classList.remove('on');UX.achTab='cos';show('ach')};
 cosApply();weekState();achCheck(1);badges();

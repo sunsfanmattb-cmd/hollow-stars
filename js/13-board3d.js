@@ -163,7 +163,7 @@ function b3Start(){if(!b3Want()){b3Stop();return}if(!b3Init())return;const f=G&&
 function b3Stop(keep){B3.on=0;if(B3.raf)cancelAnimationFrame(B3.raf);if(B3.tm)clearTimeout(B3.tm);B3.raf=B3.tm=0;document.body.classList.remove('b3d');}
 
 /* ---------- hooks ---------- */
-{const s0=show;show=function(id){const r=s0.apply(this,arguments);if(id==='match')setTimeout(b3Start,30);else if(B3.on)b3Stop();return r}}
+onShow(id=>{if(id==='match')setTimeout(b3Start,30);else if(B3.on)b3Stop()});
 {const r0=renderMatch;renderMatch=function(){const r=r0.apply(this,arguments);if(B3.on){B3.tokDirty=1;b3Kick()}return r}}
 {const l0=lunge;lunge=function(uid,tg){if(B3.on){const a=tEl('u'+uid),b=tEl(tg);if(a&&b){const[x1,y1]=center(a),[x2,y2]=center(b);B3.lunge={uid,L:Math.min(70,Math.hypot(x2-x1,y2-y1)*.2)}}B3.act=Math.max(B3.act,performance.now()+D(900));b3Kick()}
  const p=l0.apply(this,arguments);return p&&p.then?p.then(v=>{B3.lunge=null;B3.tokDirty=1;b3Kick();return v}):p}}
