@@ -1,0 +1,71 @@
+{
+  "name": "hollow-stars",
+  "productName": "Hollow Stars",
+  "version": "2.5.0",
+  "description": "Hollow Stars - a cosmic horror card game",
+  "author": "Matthew Bowling",
+  "homepage": "https://github.com/sunsfanmattb-cmd/hollow-stars",
+  "main": "main.js",
+  "private": true,
+  "scripts": {
+    "start": "electron .",
+    "dist": "electron-builder --win nsis --x64 --publish never",
+    "release": "electron-builder --win nsis --x64 --publish always"
+  },
+  "dependencies": {
+    "electron-updater": "^6.3.9"
+  },
+  "devDependencies": {
+    "electron": "^33.4.11",
+    "electron-builder": "^25.1.8"
+  },
+  "build": {
+    "appId": "com.sunsfanmattb.hollowstars",
+    "productName": "Hollow Stars",
+    "copyright": "Copyright 2026 Matthew Bowling",
+    "directories": {
+      "output": "dist",
+      "buildResources": "build"
+    },
+    "files": [
+      "main.js",
+      "package.json",
+      "game/**/*"
+    ],
+    "asar": true,
+    "win": {
+      "target": [
+        {
+          "target": "nsis",
+          "arch": [
+            "x64"
+          ]
+        }
+      ],
+      "icon": "build/icon.ico",
+      "artifactName": "HollowStars-${version}-Setup.${ext}"
+    },
+    "nsis": {
+      "oneClick": false,
+      "perMachine": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true,
+      "shortcutName": "Hollow Stars",
+      "installerIcon": "build/icon.ico",
+      "uninstallerIcon": "build/icon.ico",
+      "deleteAppDataOnUninstall": false
+    },
+    "publish": [
+      {
+        "provider": "github",
+        "owner": "sunsfanmattb-cmd",
+        "repo": "hollow-stars",
+        "releaseType": "release"
+      }
+    ],
+    "releaseInfo": {
+      "releaseName": "Hollow Stars ${version}"
+    }
+  }
+}

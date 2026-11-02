@@ -1,0 +1,47 @@
+/* ===== v2.8: start-up intro, the cathedral (js/17-intro.js). transform/opacity keyframes only, on one 3.2 s timeline;
+   each moving part is its own small layer. The menus keep their plain fade (the v2.7 warp is gone). ===== */
+#intro{position:fixed;inset:0;z-index:300;background:radial-gradient(ellipse 70% 60% at 50% 46%,#0a0605 0,#000 70%);overflow:hidden;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4.5vh;
+ cursor:pointer;touch-action:none;animation:inEnd 3.2s linear both}
+#intro.out{animation:inOut .4s ease-out both}
+@keyframes inEnd{0%,86%{opacity:1}100%{opacity:0}}
+@keyframes inOut{from{opacity:1}to{opacity:0}}
+#intro .in-dust{position:absolute;inset:-20% 0;background:var(--mote-n) 0 0/110px 110px;opacity:0;animation:inDust 3.2s linear both}
+@keyframes inDust{0%,15%{opacity:0;transform:translateY(0)}45%{opacity:.09}80%{opacity:.07}100%{opacity:0;transform:translateY(-6%)}}
+#intro .in-g{position:relative;width:min(62vw,320px,46vh);aspect-ratio:200/316;animation:inGone 3.2s linear both}
+@keyframes inGone{0%,82%{opacity:1}91%,100%{opacity:0}}
+/* warm candlelight behind the stone */
+#intro .in-lt{position:absolute;left:-55%;right:-55%;top:-10%;bottom:-70%;background:radial-gradient(ellipse 50% 41% at 50% 54%,#5a2c0c 0,#2a1206 38%,#0000 70%);opacity:0;animation:inLight 3.2s ease-out both}
+@keyframes inLight{0%,10%{opacity:0}45%{opacity:.9}62%{opacity:.75}78%{opacity:.85}89%,100%{opacity:0}}
+/* the arch, revealed from the floor up as the light climbs */
+#intro .in-arch{position:absolute;inset:0;overflow:hidden}
+#intro .in-svg{position:absolute;inset:0;width:100%;height:100%;filter:drop-shadow(0 0 6px #c8822a40)}
+#intro .in-cover{position:absolute;left:-10%;right:-10%;top:-30%;height:160%;background:linear-gradient(to top,#0000 0,#000 24%,#000 100%);transform:none;animation:inCover 3.2s cubic-bezier(.45,.05,.3,1) both}
+@keyframes inCover{0%,16%{transform:none}56%,100%{transform:translateY(-102%)}}
+/* the sigil settles into the rose window */
+#intro .in-sig{position:absolute;left:50%;top:38%;width:30%;aspect-ratio:1;margin:-15% 0 0 -15%;background:var(--packsig) center/contain no-repeat;filter:drop-shadow(0 0 10px #a0102a90);
+ opacity:0;transform:scale(1.14);animation:inSig 3.2s cubic-bezier(.2,.7,.2,1) both}
+@keyframes inSig{0%,38%{opacity:0;transform:scale(1.14)}62%{opacity:.95;transform:scale(1)}80%{opacity:.95}88%,100%{opacity:.3;transform:scale(.98)}}
+/* candles: they catch, flicker, then gutter */
+#intro .in-c{position:absolute;bottom:0;width:6%;height:30%}
+#intro .in-c.l{left:-17%}#intro .in-c.r{right:-17%}
+#intro .in-wax{position:absolute;left:0;right:0;bottom:0;height:72%;border-radius:2px 2px 1px 1px;background:linear-gradient(90deg,#4a4032,#c8bca0 40%,#8a7e66 70%,#2a241c);box-shadow:0 0 0 1px #0008}
+#intro .in-wax::before{content:"";position:absolute;left:50%;top:-6%;width:8%;height:8%;margin-left:-4%;background:#1a1410}
+#intro .in-fl{position:absolute;left:50%;bottom:72%;width:150%;aspect-ratio:1/2.4;margin-left:-75%;transform-origin:50% 100%;transform:scale(0);animation:inFlame 3.2s ease-out both}
+#intro .in-fl>i{position:absolute;inset:0;border-radius:50% 50% 45% 45%/62% 62% 38% 38%;background:radial-gradient(ellipse 40% 50% at 50% 70%,#fff4d0 0,#ffc060 30%,#e0601a 62%,#e0601a00 72%);transform-origin:50% 100%;animation:inFlick .9s steps(9) infinite}
+@keyframes inFlame{0%,8%{transform:scale(0)}14%{transform:scale(1.15,1.3)}19%{transform:scale(1)}80%{transform:scale(1)}84%{transform:scale(.7,.45)}88%,100%{transform:scale(0)}}
+@keyframes inFlick{0%{transform:none}11%{transform:scale(.94,1.06) translateX(3%)}22%{transform:scale(1.04,.95)}33%{transform:scale(.97,1.08) translateX(-4%)}44%{transform:scale(1.02,.98)}55%{transform:scale(.95,1.04) translateX(2%)}66%{transform:scale(1.03,.94)}77%{transform:scale(.98,1.07) translateX(-2%)}88%{transform:scale(1.01,.97)}}
+#intro .in-halo{position:absolute;left:50%;bottom:72%;width:900%;aspect-ratio:1;margin:0 0 -450% -450%;border-radius:50%;background:radial-gradient(circle,#ffb05a30 0,#ff7a2a14 30%,#0000 62%);opacity:0;animation:inHalo 3.2s linear both}
+@keyframes inHalo{0%,9%{opacity:0}22%{opacity:1}35%{opacity:.8}48%{opacity:1}64%{opacity:.85}78%{opacity:1}87%,100%{opacity:0}}
+/* the inscription */
+#intro .in-w{position:relative;display:flex;align-items:center;gap:.9em;margin:0;font:400 clamp(13px,3.3vw,18px) "IM Fell English SC",var(--serif);letter-spacing:.55em;color:#b0946a;text-shadow:0 0 10px #c8822a50;
+ opacity:0;transform:translateY(8px);animation:inWord 3.2s ease-out both}
+#intro .in-w b{font-weight:400;letter-spacing:0;color:#8a1420;text-shadow:0 0 8px #c0182e80}
+#intro .in-w span:last-child{margin-right:-.55em}
+@keyframes inWord{0%,52%{opacity:0;transform:translateY(8px)}70%{opacity:1;transform:none}86%{opacity:.9}100%{opacity:0}}
+/* reduced motion: a plain fade */
+#intro.rm{animation:inEnd .7s linear both}#intro.rm *{animation:none!important;opacity:0!important}
+
+/* ---- settings fits short screens (landscape phones): the panel scrolls instead of running off the top and bottom ---- */
+#settings{padding:8px 0}
+#settings .sbox{max-height:calc(100vh - 16px);max-height:calc(100dvh - 16px);overflow-y:auto;overscroll-behavior:contain;touch-action:pan-y}
+@media (max-height:480px){#settings .sbox{gap:9px;padding:12px 16px}#settings h2{font-size:20px}}
