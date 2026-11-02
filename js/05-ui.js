@@ -36,10 +36,18 @@ try{if(document.fonts){const rf=()=>{FIT.c.clear();fitRefresh()};document.fonts.
 function cardEl(id,big){const d=C[id],e=document.createElement('div');e.className=`card f-${d.f} r-${d.r}${d.r==='L'?' full':''}${d.t==='s'?' spell':''}${(n=>n>125?' long xlong xxl':n>88?' long xlong':n>46?' long':'')(cardText(d).replace(/<[^>]+>/g,'').length)}`;e.dataset.cid=id;
  e.innerHTML=`<div class="art" style="background-image:${artBG(id,big)}">${lgHTML(id,big)}</div>${costHTML(d.c,d.f)}<div class="nm"><span data-fit="nm">${d.n}</span></div><div class="ty">${sigHTML(d.f)}<span data-fit="ty">${d.t==='u'?FAC[d.f].s:'Rite'}</span>${setHTML(d.r)}${d.r==='L'?'<i class="lgem"><b></b></i>':''}</div><div class="tx"><div class="rt">${cardText(d)}</div>${d.fl?`<div class="fl"><span>${sigHTML(d.f)}${d.fl}</span></div>`:''}</div>${d.t==='u'?'<i class="plq l"></i><i class="plq r"></i>'+atkHTML(d.f,d.a)+hpHTML(d.h,100,d.f):''}${d.r==='R'||d.r==='L'?'<i class="foil"></i>':''}${d.r==='U'||d.r==='R'?'<i class="rim"></i>':''}${d.r!=='T'?'<i class="cpt"><i></i></i>':''}${lgTrim(id)}`;{const vr=varShow(id);if(vr){e.classList.add('vr','vr-'+vr);e.insertAdjacentHTML('beforeend','<i class="vfr"></i>')}}lgReg(e);fitScan(e);return e}
 /* ---- pick ---- */
-const SH={win:60,loss:25,pack:100,dup:{C:5,U:15,R:40,L:150},free:3};
+const SH={win:ECON.match.win,loss:ECON.match.loss,pack:ECON.pack.price,dup:ECON.dup,free:ECON.start.packs};
 const maxC=id=>C[id].r==='L'?1:2;
-let COLL=(()=>{try{const o=JSON.parse(localStorage.getItem('hsCol')||'null');if(o&&o.v===1&&o.own)return o}catch(e){}return{v:1,own:{},shards:0,packs:SH.free,opened:0}})();
-function saveColl(){try{localStorage.setItem('hsCol',JSON.stringify(COLL))}catch(e){}}
+let COLL=colUp(svGet('hsCol'))||colUp({own:{},shards:0,packs:SH.free,opened:0,src:{earn:0,paid:0,gift:SH.free},ptot:{earn:0,paid:0,gift:SH.free}});
+function saveColl(){svPut('hsCol',COLL)}
+/* v2.6 pack inventory: COLL.packs is the total; COLL.src splits it by where the packs came from (earn: shards & rewards,
+   paid: store purchases, gift: starter packs). Every change goes through packAdd/packTake and lands in COLL.log. */
+const PKLOG=400;
+function pkLog(op,n,src,why){COLL.log.push([Date.now(),op,n,src,why||'']);if(COLL.log.length>PKLOG)COLL.log.splice(0,COLL.log.length-PKLOG)}
+function pkFix(){const s=COLL.src,sum=s.earn+s.paid+s.gift,d=COLL.packs-sum;if(!d)return;if(d>0){s.earn+=d;pkLog('+',d,'earn','adjust')}else{let r=-d;for(const k of['earn','gift','paid']){const t=Math.min(r,s[k]);s[k]-=t;r-=t}pkLog('-',-d,'mix','adjust')}}
+function packAdd(n,src,why){n=Math.floor(+n||0);if(n<=0)return;src=['earn','paid','gift'].includes(src)?src:'earn';pkFix();COLL.packs+=n;COLL.src[src]+=n;COLL.ptot[src]+=n;pkLog('+',n,src,why);saveColl()}
+function packTake(why){pkFix();if(COLL.packs<=0)return null;const src=['earn','gift','paid'].find(k=>COLL.src[k]>0);COLL.packs--;COLL.src[src]--;pkLog('-',1,src,why||'open');return src}
+function buyPackShards(){if(COLL.shards<SH.pack)return false;COLL.shards-=SH.pack;packAdd(1,'earn','shards');return true}
 const owned=id=>C[id].pk||C[id].cmp?(COLL.own[id]||0):maxC(id);
 /* ================= CUSTOM DECKS (v7.4): up to 5 named decks in localStorage.hsDecks = {v:1,decks:[{id,name,fac,cards}]} =================
    The single v7.x deck (localStorage.hsDeck) is migrated into slot 1 on first load. A deck can be saved at any size; only valid ones
@@ -188,17 +196,17 @@ $('#quit').onclick=()=>{sfx('click');let back=G&&G.meta&&G.meta.mode==='camp'?'c
 function gameOver(){if(!G)return;cinSkip();const g=G,w=g.winner,me=w===0,ov=$('#over');g.ovq=1;UI.overShown=1;
  $('#ovt').textContent=w===-1?'STALEMATE':me?(UI.auto?'AUTOPILOT WINS':'VICTORY'):'DEFEAT';
  $('#ovp').textContent=w===-1?'Both minds were lost to the dark.':g.reason==='mad'?(me?'The enemy\'s mind shattered under ten Madness.':'Ten Madness. Your mind is no longer your own.'):g.reason==='time'?'The stars burned out before either side fell.':(me?'Their Sanity is gone. The void claims them.':'Your Sanity is gone. The void claims you.');
- let earned=0;try{if(!UI.auto&&!g.paid){g.paid=1;earned=Math.round((me?SH.win:SH.loss)*difMul(g.dif));COLL.shards=(+COLL.shards||0)+earned;saveColl();g.earned=earned}else if(g.paid)earned=g.earned||0}catch(e){console.warn('reward',e)}
+ let earned=0;try{if(!UI.auto&&!g.paid){g.paid=1;earned=Math.round((me?SH.win:SH.loss)*difMul(g.dif));if(me&&V8.fw!==dayKey()){V8.fw=dayKey();saveV8();g.fw=ECON.match.firstWin;earned+=g.fw}COLL.shards=(+COLL.shards||0)+earned;saveColl();g.earned=earned}else if(g.paid)earned=g.earned||0}catch(e){console.warn('reward',e)}
  let x8=null;try{if(!UI.auto)x8=v8MatchEnd(g)}catch(e){console.warn('v8 end',e)}
- try{ovRewards(earned)}catch(e){console.warn('rewards ui',e)}try{v8Over(g,x8)}catch(e){console.warn('v8 over',e)}
+ try{ovRewards(earned,g.fw)}catch(e){console.warn('rewards ui',e)}try{v8Over(g,x8)}catch(e){console.warn('v8 over',e)}
  const ok=me?'victory':'defeat',ovk=ok+(isLand()?'':'_p');ov.style.setProperty('--ovimg',SC.st[ovk]===2?'none':`url(${uiArt(ovk)})`);
  ov.dataset.winner=w;ov.classList.remove('win','lose','draw');ov.classList.add('on',w===-1?'draw':me?'win':'lose');sfx(me?'win':'lose')}
-function ovRewards(earned){const box=$('#ovrw'),k=$('#ovk'),sh=COLL.shards,pk=COLL.packs,need=Math.max(0,SH.pack-sh);
- box.innerHTML=UI.auto?'<small>Autopilot matches earn no Shards.</small>':`<div class="earn">${earned?'+'+earned+' Shards':'No Shards'}</div><div class="bal"><span class="shard"></span><b>${sh}</b> Shards${pk?` · <b>${pk}</b> sealed pack${pk>1?'s':''}`:''}</div><div class="pbarw"><i style="width:${Math.min(100,sh/SH.pack*100).toFixed(0)}%"></i></div><small>${pk?'A sealed pack awaits you.':need?need+' more Shards for a booster pack':'You can afford a booster pack.'}</small>`;
+function ovRewards(earned,fw){const box=$('#ovrw'),k=$('#ovk'),sh=COLL.shards,pk=COLL.packs,need=Math.max(0,SH.pack-sh);
+ box.innerHTML=UI.auto?'<small>Autopilot matches earn no Shards.</small>':`<div class="earn">${earned?'+'+earned+' Shards':'No Shards'}</div>${fw?`<div class="fwin">First win of the day · +${fw}◆</div>`:''}<div class="bal"><span class="shard"></span><b>${sh}</b> Shards${pk?` · <b>${pk}</b> sealed pack${pk>1?'s':''}`:''}</div><div class="pbarw"><i style="width:${Math.min(100,sh/SH.pack*100).toFixed(0)}%"></i></div><small>${pk?'A sealed pack awaits you.':need?need+' more Shards for a booster pack':'You can afford a booster pack.'}</small>`;
  const can=!UI.auto&&(pk>0||sh>=SH.pack);k.hidden=!can;k.querySelector('span').textContent=pk>0?'Open a Pack':'Buy & Open Pack · '+SH.pack+'◆'}
 $('#ovm').onclick=()=>{sfx('click');ovHide();const md=G&&G.meta&&G.meta.mode,back=md==='camp'?'camp':md==='gaunt'?'gaunt':md==='week'?'weekly':'title';G=null;show(back)};
 function ovHide(){const o=$('#over');o.classList.remove('on','win','lose','draw')}
-$('#ovk').onclick=()=>{sfx('click');const buy=COLL.packs<=0;if(buy){if(COLL.shards<SH.pack){sfx('err');return}COLL.shards-=SH.pack;COLL.packs++;saveColl()}ovHide();G=null;show('packs');PO.ret=1;startOpen()};
+$('#ovk').onclick=()=>{sfx('click');if(COLL.packs<=0&&!buyPackShards()){sfx('err');return}ovHide();G=null;show('packs');PO.ret=1;startOpen()};
 $('#ovr').onclick=()=>{sfx('click');ovHide();startMatch(LAST.mine,LAST.of,LAST.o||{})};
 /* ================= INPUT ================= */
 let P=null,lpJust=0;
@@ -279,13 +287,16 @@ $('#bSave').onclick=()=>{bdSave();const d=dkGet(BD.slot),ck=d&&dkCheck(d);if(ck&
 $('#bBack').onclick=()=>{bdSave();sfx('click');show('mydecks')};
 document.addEventListener('click',e=>{if(lpJust&&!e.target.closest('#bgrid'))lpJust=0},true);
 /* ================= COLLECTION & PACKS ================= */
-function rollPack(r=Math.random){const by=k=>PACK.filter(id=>C[id].r===k),pk=a=>a[Math.floor(r()*a.length)];
- const out=[pk(by('C')),pk(by('C')),pk(by('C')),pk(by('U')),pk(r()<.1?by('L'):by('R'))];return out}
-function grant(ids,vr){const res=[];for(const id of ids){const v=vr===false?null:varRoll(id);const n=COLL.own[id]||0;if(n>=maxC(id)){const s=v?0:SH.dup[C[id].r];COLL.shards+=s;res.push({id,dup:s,vr:v})}else{COLL.own[id]=n+1;res.push({id,dup:0,nw:n===0,vr:v})}if(v)varAdd(id,v)}COLL.opened++;saveColl();return res}
-function openPack(){if(COLL.packs<=0)return null;COLL.packs--;const ids=PO.force||rollPack();PO.force=null;return grant(ids)}
+function rollPack(r=Math.random,forceL){const by=k=>PACK.filter(id=>C[id].r===k),pk=a=>a[Math.floor(r()*a.length)];
+ return ECON.pack.slots.map(k=>pk(by(k==='R'&&(forceL||r()<ECON.pack.legChance)?'L':k)))}
+function grant(ids,vr,holoAt=-1){const res=[];for(const[i,id]of ids.entries()){const v=vr===false?null:i===holoAt&&C[id].pk?'holo':varRoll(id);const n=COLL.own[id]||0;if(n>=maxC(id)){const s=v?0:SH.dup[C[id].r];COLL.shards+=s;res.push({id,dup:s,vr:v})}else{COLL.own[id]=n+1;res.push({id,dup:0,nw:n===0,vr:v})}if(v)varAdd(id,v)}COLL.opened++;saveColl();return res}
+/* pity: the legPity-th pack without a Legendary has one in its Rare slot; the holoPity-th pack without a holo has a holographic Rare slot */
+function openPack(){const P=COLL.pity,E=ECON.pack;if(!packTake())return null;const forceL=P.L+1>=E.legPity;let ids=PO.force||rollPack(Math.random,forceL);PO.force=null;
+ const ri=ECON.pack.slots.lastIndexOf('R');if(forceL&&!ids.some(id=>C[id].r==='L')){ids=ids.slice();ids[ri]=rollPack(Math.random,1)[ri]}
+ const res=grant(ids,undefined,P.H+1>=E.holoPity?ri:-1);P.L=res.some(o=>C[o.id].r==='L')?0:P.L+1;P.H=res.some(o=>o.vr==='holo')?0:P.H+1;saveColl();return res}
 function renderPacks(){$('#pshards').textContent=COLL.shards;$('#pcount').textContent=COLL.packs;$('#pOpen').disabled=COLL.packs<=0;$('#pBuy').disabled=COLL.shards<SH.pack;
  const own=PACK.filter(id=>owned(id)).length;$('#pown').textContent=`${own}/${PACK.length} pack cards discovered`;$('#psealed').classList.toggle('none',COLL.packs<=0)}
-$('#pBuy').onclick=()=>{if(COLL.shards<SH.pack){sfx('err');return}COLL.shards-=SH.pack;COLL.packs++;saveColl();sfx('heal');renderPacks()};
+$('#pBuy').onclick=()=>{if(!buyPackShards()){sfx('err');return}sfx('heal');renderPacks()};
 const PO={res:null,stage:0};
 $('#pOpen').onclick=()=>startOpen();$('#psealed').onclick=()=>startOpen();
 function startOpen(){const res=openPack();if(!res){sfx('err');toast('No packs: earn Shards in matches');return}PO.res=res;PO.stage=1;const st=$('#pstage');st.className='on sealed';

@@ -220,7 +220,7 @@ function livingBoard(x,t,W,H){if(!G||!BG.painted)return;const f=G.p[0].fac,low=f
 function setFx(low){setQuality(low?'low':'auto')}
 function settingsOpen(){{const sp=$('#sSpd');if(sp){const v=String(UI.speed);sp.value=[...sp.options].some(o=>o.value===v)?v:'1'}}$('#sVol').value=Math.round(AU.vol*100);$('#sQ').value=QL.pref;$('#sMute').checked=AU.mute;qApply();$('#settings').classList.add('on')}
 fxInit();qApply();QL.rm.addEventListener&&QL.rm.addEventListener('change',()=>setQuality(QL.pref));
-$('#bSet').onclick=()=>{sfx('click');settingsOpen()};$('#mset').onclick=()=>{sfx('click');settingsOpen()};$('#sClose').onclick=()=>{sfx('click');$('#settings').classList.remove('on')};
+$('#tset').onclick=()=>{sfx('click');settingsOpen()};$('#mset').onclick=()=>{sfx('click');settingsOpen()};$('#sClose').onclick=()=>{sfx('click');$('#settings').classList.remove('on')};
 $('#settings').addEventListener('click',e=>{if(e.target.id==='settings')$('#settings').classList.remove('on')});
 $('#sVol').addEventListener('input',e=>{auInit();AU.vol=+e.target.value/100;localStorage.setItem('hsVol',AU.vol.toFixed(2));auVol()});
 $('#sQ').addEventListener('change',e=>{sfx('click');setQuality(e.target.value)});$('#sSpd').addEventListener('change',e=>{sfx('click');UI.speed=+e.target.value||1;try{localStorage.setItem('hsSpd',String(UI.speed))}catch(x){}});$('#sMute').addEventListener('change',e=>{auInit();AU.mute=e.target.checked;localStorage.setItem('hsMute',AU.mute?'1':'0');updMute()});
