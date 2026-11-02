@@ -3,3 +3,4 @@
 keystore.properties
 *.apk
 __pycache__/
+shots/
