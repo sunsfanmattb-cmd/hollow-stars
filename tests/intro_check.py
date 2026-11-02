@@ -1,5 +1,5 @@
-"""v2.7 intro + menu warp check: the intro shows on start, ends by itself, can be skipped with a tap, honours reduced motion,
-and the warp plays on menu changes but not when a match starts.
+"""v2.8 intro check: the cathedral intro shows on start, ends by itself, can be skipped with a tap and honours reduced motion;
+menus change with their plain fade (no warp overlay).
 
 Usage: python3 tests/intro_check.py [url-or-path-to-index.html]
 """
@@ -18,17 +18,14 @@ with sync_playwright() as p:
     pg.on('pageerror', lambda e: errs.append(str(e)))
     pg.goto(URL); pg.wait_for_timeout(300)
     check('intro covers the start', pg.evaluate("!!document.getElementById('intro')&&!INTRO.done"))
-    pg.wait_for_timeout(2700)
-    check('intro ends by itself within ~2.5 s', pg.evaluate("INTRO.done&&!document.getElementById('intro')"))
+    check('intro has the arch, sigil, candles and inscription', pg.evaluate("['.in-svg','.in-sig','.in-c.l','.in-c.r','.in-w'].every(s=>document.querySelector('#intro '+s))"))
+    pg.wait_for_timeout(3700)
+    check('intro ends by itself within ~3.2 s', pg.evaluate("INTRO.done&&!document.getElementById('intro')"))
     pg.goto(URL); pg.wait_for_timeout(600)
     pg.locator('#intro').dispatch_event('pointerdown'); pg.wait_for_timeout(450)
     check('a tap skips the intro', pg.evaluate("INTRO.done&&!document.getElementById('intro')"))
-    n0 = pg.evaluate("WARP.n"); pg.evaluate("show('packs')"); pg.wait_for_timeout(80)
-    check('menu change plays the warp', pg.evaluate(f"WARP.n==={n0}+1&&document.getElementById('warp').classList.contains('on')"))
-    pg.evaluate("show('packs')")
-    check('showing the same screen again does not warp', pg.evaluate(f"WARP.n==={n0}+1"))
-    pg.evaluate("UI.speed=.12;startMatch(prebuilt('v'),'c',{first:0})"); pg.wait_for_timeout(300)
-    check('starting a match does not warp', pg.evaluate(f"WARP.n==={n0}+1"))
+    pg.evaluate("show('packs')"); pg.wait_for_timeout(100)
+    check('menus change without a warp overlay', pg.evaluate("!document.getElementById('warp')&&typeof warp==='undefined'"))
     rm = b.new_context(viewport={'width': 412, 'height': 860}, reduced_motion='reduce').new_page()
     rm.on('pageerror', lambda e: errs.append(str(e)))
     rm.goto(URL); rm.wait_for_timeout(200)
