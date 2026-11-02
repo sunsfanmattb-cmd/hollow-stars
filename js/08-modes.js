@@ -122,6 +122,36 @@ c34:'The Gutter Hound eats from under the Banquet table. Lately, it has started 
 c35:'There is always room for another course. The Communion ensures there is always another course.',
 n12:'She found the last working shield on the station and has not taken it off in a year. Not to sleep. Not to eat.',
 n13:'No survey has found where the Pathless began. Crews who cross its road say the nightmares stop afterwards. Someone else\'s begin.',
+v36:'Hatchlings crawl out of the trench silt already watching. Divers who collect them report that the eggs were watching first.',
+v37:'The undertow beneath the drowned colonies runs in a perfect spiral. Survey drones sent to its centre return with their lenses scratched from the inside.',
+v38:'The bell hangs in a cathedral two kilometres down. Its ringer never stops, and every hour it tolls, someone on the surface wakes up wet.',
+v39:'The Cartographer maps the places where reality has worn thin. Each chart is perfect. Each one is of somewhere you have not been yet.',
+v40:'The Bloom grows wherever madness pools. Botanists counted four hundred eyes on a single stem before they realised it was counting them back.',
+v41:'Fathom Stalkers swim through the hull as easily as through water. Crews learn to listen for the sound of metal parting, very softly, behind them.',
+v42:'The Breaker walks through dreams like rooms in a house. When it leaves, the dreamer is awake. What is left of them, at least.',
+v43:'The Tide of Forgetting does not drown the body. It drowns the knowledge of how to fight, then of why, then of who.',
+v44:'The Lung is the size of a moon and lies at the bottom of every ocean at once. When it breathes in, the tides go out, and so do minds.',
+m36:'Mites are built by other drones from whatever is lying around. Usually the last mite. Occasionally the last engineer.',
+m37:'The emergency bulkheads close in four seconds. The drills last thirty. Survivors learn to run before the alarm finishes its first word.',
+m38:'The clamp sentries were told to hold their berths until relieved. Nobody was ever sent to relieve them, and they are still holding.',
+m39:'The Foreman was the last human supervisor on the yard. The drones have kept him running long after he stopped, out of respect.',
+m40:'Every black box on the Derelict records the same final minute, no matter which ship it came from. Investigators have stopped playing it aloud.',
+m41:'Coolant floods were meant to save the reactor in a meltdown. They save the reactor. Nothing in the compartment is ever found thawed.',
+m42:'The Titan lifts entire hulls from the debris field. Salvage teams swear the wrecks it raises are heavier than they should be, as if something inside is holding on.',
+m43:'An overloaded reactor turns every drone on its circuit into shrapnel. The Derelict considers this an efficient use of resources.',
+m44:'The captain ordered abandon ship and then sat back down. Four hundred years later the ship still answers to her, and the drones still salute.',
+c36:'Tithe-children are raised in the cathedral cellars. They are taught one hymn, one prayer, and the exact place on their throat to offer.',
+c37:'Initiates of the Communion open a vein to read the future in it. The future is always written in the same red hand.',
+c38:'The Congregant is sewn together from the faithful who were too weak to stand alone. Together, they are too stubborn to fall.',
+c39:'The Midwife catches whatever falls. Nothing in her care is allowed to stay dead, and nothing she delivers is quite what it was.',
+c40:'Ash from the altar is scattered over the enemy. Wherever it lands, it burns with the same fire as the sacrifice that made it.',
+c41:'The Choirboy sang the high notes until his voice broke. Then he kept singing with what was underneath.',
+c42:'The Abbess fasts for the Communion. She does not eat bread. She does not eat meat. She eats the ones who were born to be eaten.',
+c43:'Red Rapture is the Communion\'s holiest rite. The faithful are filled with power, the priest is emptied of blood, and both call it a fair trade.',
+c44:'The Feaster waits at the end of time for the last course. Prophets say it has already started on the appetisers.',
+n14:'The Medic patches up anyone who reaches the scav-camp. She does not ask what they ran from. She can usually tell from the wounds.',
+n15:'Flare guns were made to signal rescue ships. Out here, they are mostly used to see what is in the room before it sees you.',
+n16:'The lighthouse stands on a moon with no ocean. The keeper does not know who it guides. He knows that if the light goes out, something will come looking.',
 tD:'Drones of the dead fleet. They run maintenance cycles on whatever remains, including the crews.',
 tS:'Survivors. They got out. They stopped asking what they got out of.',
 tC:'Spawnlings are born hungry from open wounds. They already know their parent\'s name, and yours.'};
@@ -129,10 +159,10 @@ tC:'Spawnlings are born hungry from open wounds. They already know their parent\
 const V9D=()=>({v:1,gaunt:{run:null,best:0,runs:0,wins:0,done:0,last:null},ach:{got:{},seen:0,ctr:{}},cos:{back:'veil',theme:'none'},codex:{p:{},f:{}},week:{key:'',wins:0,games:0,claimed:0,total:0}});
 function v9Mig(o){const d=V9D();if(!o||typeof o!=='object'||o.v!==1)return d;for(const k of Object.keys(d)){if(!o[k]||typeof o[k]!=='object'||Array.isArray(o[k]))o[k]=d[k];else for(const j of Object.keys(d[k]))if(o[k][j]===undefined)o[k][j]=d[k][j]}
  for(const k of['got','ctr'])if(!o.ach[k]||typeof o.ach[k]!=='object')o.ach[k]={};for(const k of['p','f'])if(!o.codex[k]||typeof o.codex[k]!=='object')o.codex[k]={};return o}
-let V9=(()=>{let o=null;try{o=JSON.parse(localStorage.getItem('hsV9')||'null')}catch(e){}return v9Mig(o)})();
+let V9=v9Mig(svGet('hsV9'));
 /* first v9 run (v8 save): record cards the player already knows (pack cards owned + cards in saved decks) */
 if(!V9.codex.o){V9.codex.o={};try{for(const k in COLL.own)if(COLL.own[k]>0&&C[k])V9.codex.o[k]=1;for(const d of (DK.decks||[]))for(const k of d.cards||[])if(C[k])V9.codex.o[k]=1}catch(e){}}
-function saveV9(){try{localStorage.setItem('hsV9',JSON.stringify(V9))}catch(e){}}
+function saveV9(){svPut('hsV9',V9)}
 const ctr=(k,n=1)=>{V9.ach.ctr[k]=(V9.ach.ctr[k]||0)+n};
 
 /* ---------------- battery saver (state object BAT lives in d.js) ---------------- */
@@ -173,12 +203,12 @@ $('#codex').addEventListener('click',e=>{const t=e.target.closest('[data-cdf],[d
 const WK=[{id:'w_mad',n:'Madness Doubles',d:'All Madness gained is doubled, for both sides. Minds break fast.'},{id:'w_san',n:'Thick Skulls',d:'Both sides start with 25 Sanity.'},
  {id:'w_flux',n:'Overcharged Void',d:'Both sides start with 1 extra Flux.'},{id:'w_swift',n:'The Hunt',d:'Every unit has Swift.'},{id:'w_draw',n:'Torrent of Visions',d:'From your second turn on, each side draws 2 cards a turn.'},
  {id:'w_echo',n:'Resonance',d:'Every Rite has Echo.'},{id:'w_glass',n:'Glass Bodies',d:'Every unit gets +2 Attack and −1 Health.'},{id:'w_ward',n:'Warded Dark',d:'Every unit arrives with Ward.'}];
-const WKN=3,WKRW={sh:250,pk:1},WKWIN=30;
+const WKN=ECON.weekly.wins,WKRW=ECON.weekly.rw,WKWIN=ECON.weekly.winBonus;
 function weekKey(t){const d=t||v8now(),u=new Date(Date.UTC(d.getFullYear(),d.getMonth(),d.getDate())),dn=u.getUTCDay()||7;u.setUTCDate(u.getUTCDate()+4-dn);const y=u.getUTCFullYear(),w=Math.ceil(((u-Date.UTC(y,0,1))/864e5+1)/7);return y+'-W'+String(w).padStart(2,'0')}
 const weekMod=k=>WK[hash('hsw'+(k||weekKey()))%WK.length];
 function weekState(){const k=weekKey(),W=V9.week;if(W.key!==k){W.key=k;W.wins=0;W.games=0;W.claimed=0;saveV9()}return W}
 const weekClaimable=()=>{const W=weekState();return W.wins>=WKN&&!W.claimed};
-function weekClaim(){const W=weekState();if(W.wins<WKN||W.claimed)return{ok:0};W.claimed=1;W.total=(W.total||0)+1;give(WKRW);saveV9();achCheck();return{ok:1,rw:WKRW}}
+function weekClaim(){const W=weekState();if(W.wins<WKN||W.claimed)return{ok:0};W.claimed=1;W.total=(W.total||0)+1;give(WKRW,'weekly');saveV9();achCheck();return{ok:1,rw:WKRW}}
 function weekFoe(){const W=weekState(),R=rng(hash('hswf'+W.key+':'+W.games));return['v','m','c'][Math.floor(R()*3)]}
 function weekPlay(){auInit();sfx('click');const m=weekMod();startMatch(myDeck(),weekFoe(),{rule:[m.id],mode:'week',dif:'normal',dkey:UI.deck})}
 function renderWeekly(){const W=weekState(),m=weekMod(),k=W.key,opts=['v','m','c',...DK.decks.filter(d=>dkCheck(d).ok).map(d=>d.id)];if(!opts.includes(UI.deck))UI.deck='v';
@@ -206,7 +236,8 @@ function gtOffer(run){const R=rng(hash('gto'+run.seed+':'+run.w)),n=run.w,f=run.
  return out}
 function gtReplace(run){const sc=id=>(C[id].f==='n'?0:10)+{C:0,U:3,R:6,L:9}[C[id].r]+C[id].c*.1;let j=0;for(let i=1;i<run.deck.length;i++)if(sc(run.deck[i])<sc(run.deck[j]))j=i;return j}
 function gtPick(id){const run=gtRun();if(!run||!run.pick)return{ok:0};if(id&&!run.pick.includes(id))return{ok:0};let out=null;if(id){const j=gtReplace(run);out=run.deck[j];run.deck[j]=id;run.log.push(id)}run.pick=null;saveV9();return{ok:1,out}}
-function gtEnd(run){const G9=V9.gaunt,w=run.w,sh=25*w+(w>=GT.MAXW?300:0),pk=w>=GT.MAXW?3:w>=7?2:w>=4?1:0;G9.best=Math.max(G9.best,w);G9.wins+=w;G9.done++;G9.last={w,l:run.l,f:run.f,sh,pk,t:Date.now()};G9.run=null;give({sh,pk});saveV9();return G9.last}
+const gtPk=w=>ECON.gauntlet.packs.reduce((a,[n,p])=>w>=n?p:a,0);
+function gtEnd(run){const G9=V9.gaunt,w=run.w,E=ECON.gauntlet,sh=E.perWin*w+(w>=GT.MAXW?E.maxBonus:0),pk=gtPk(w);G9.best=Math.max(G9.best,w);G9.wins+=w;G9.done++;G9.last={w,l:run.l,f:run.f,sh,pk,t:Date.now()};G9.run=null;give({sh,pk},'gauntlet');saveV9();return G9.last}
 function gtFight(){const run=gtRun();if(!run)return;if(run.pick){toast('Choose your reward first');return}auInit();sfx('click');const foe=gtFoe(run);
  startMatch({fac:run.f,name:'Gauntlet · '+FAC[run.f].hero,cards:run.deck.slice()},foe.fac,{foe:{fac:foe.fac,name:foe.name,cards:foe.cards},dif:foe.dif,esan:foe.esan,mode:'gaunt',dkey:'gaunt'})}
 function gtResult(g,res){const run=gtRun();if(!run||g.gtDone)return null;g.gtDone=1;if(res==='d')return{draw:1,run};if(res==='w')run.w++;else run.l++;
@@ -216,7 +247,7 @@ function renderGaunt(){const G9=V9.gaunt,run=gtRun(),b=$('#gtx');
   ${L?`<div class="gtlast">Last run: <b>${L.w} wins</b> with ${FAC[L.f].n} · earned ${rwTxt(L)||'nothing'}</div>`:''}
   <div class="stiles"><div><b>${G9.best}</b><small>Best run</small></div><div><b>${G9.done}</b><small>Runs</small></div><div><b>${G9.wins}</b><small>Total wins</small></div><div><b>${GT.MAXW}</b><small>To conquer</small></div></div>
   <h3>CHOOSE YOUR HERO</h3><div class="seg gtf">${['v','m','c'].map(f=>`<button class="f-${f}${UX.gtf===f?' on':''}" data-gtf="${f}">${FAC[f].n}</button>`).join('')}</div>
-  <p class="qnote">You start with the starter deck of ${FAC[UX.gtf].n}. Rewards: 25◆ per win, a pack at 4 wins, two at 7, and three packs + 300◆ for all 12.</p>
+  <p class="qnote">You start with the starter deck of ${FAC[UX.gtf].n}. Rewards: ${ECON.gauntlet.perWin}◆ per win, ${ECON.gauntlet.packs.map(([n,p])=>`${p>1?p+' packs':'a pack'} at ${n} wins`).join(', ')}, and ${ECON.gauntlet.maxBonus}◆ more for all ${GT.MAXW}.</p>
   <div class="rowb"><button class="btn" id="gtGo">Begin the Gauntlet</button></div>`;return}
  const foe=gtFoe(run),pips=(n,m,c)=>Array.from({length:m},(_,i)=>`<i class="${i<n?c:''}"></i>`).join('');
  let h=`<div class="gthd f-${run.f}"><div><small>WINS</small><div class="pips w">${pips(run.w,GT.MAXW,'on')}</div></div><div><small>LIVES</small><div class="pips l">${pips(GT.MAXL-run.l,GT.MAXL,'on')}</div></div></div>`;
@@ -244,6 +275,8 @@ const CB={veil:{n:'The Veil',css:null},
  void:{n:'Starless Void',css:'radial-gradient(circle at 20% 30%,#fff8 0 .6px,#0000 1px),radial-gradient(circle at 70% 60%,#fff6 0 .6px,#0000 1px),radial-gradient(circle at 40% 80%,#fff5 0 .5px,#0000 1px),radial-gradient(circle at 50% 50%,#000 0 26%,#4affc022 27% 28%,#0000 29%),linear-gradient(#030306,#030306)'},
  chain:{n:'Gauntlet Chains',css:'repeating-linear-gradient(45deg,#8a7a6a30 0 3px,#0000 3px 7px,#8a7a6a18 7px 9px,#0000 9px 16px),radial-gradient(circle at 50% 50%,#2a2226,#08060a 75%)'},
  sigil:{n:'Pack Sigil',css:'repeating-conic-gradient(from 22.5deg at 50% 50%,#b070ff26 0 10deg,#0000 10deg 45deg),radial-gradient(circle at 50% 50%,#2a1040,#06030a 70%)'},
+ reliquary:{n:'Brass Reliquary',st:1,css:'radial-gradient(circle at 50% 50%,#0000 0 18%,#d8b06866 19% 20.5%,#0000 21.5% 29%,#d8b06833 30% 30.8%,#0000 31.5%),repeating-conic-gradient(from 0deg at 50% 50%,#c8984822 0 6deg,#0000 6deg 30deg),linear-gradient(135deg,#4a3418,#1a1008 60%,#2a1c0c)'},
+ pearl:{n:'Drowned Pearl',st:1,css:'radial-gradient(circle at 50% 46%,#f4f0ff 0 5%,#c8d8f0 7%,#5a7890 11%,#0000 13%),repeating-radial-gradient(circle at 50% 46%,#8ad8e01a 0 2px,#0000 2px 11px),radial-gradient(ellipse at 50% 46%,#1a3a4a,#040a10 74%)'},
  ritual:{n:'Weekly Rite',css:'radial-gradient(circle at 50% 50%,#0000 0 30%,#c8a07055 31% 32%,#0000 33% 40%,#c8a07033 41% 41.6%,#0000 42%),repeating-conic-gradient(from 0deg at 50% 50%,#c0182e22 0 30deg,#0000 30deg 60deg),radial-gradient(circle,#1a0a0c,#050203)'}};
 const TH={none:{n:'Faction Mat',css:null},
  ash:{n:'Ashfall',css:'linear-gradient(180deg,#8a807018,#0000 40%,#00000040),radial-gradient(ellipse at 50% 120%,#a09888 0,#0000 60%)'},
@@ -252,6 +285,7 @@ const TH={none:{n:'Faction Mat',css:null},
  tide:{n:'The Drowning Tide',css:'linear-gradient(180deg,#0a3a4a22,#0000 35%,#06202a55),radial-gradient(ellipse at 50% 100%,#2affc018,#0000 60%)'},
  hull:{n:'Dead Hull',css:'repeating-linear-gradient(90deg,#9ef8ff08 0 1px,#0000 1px 64px),linear-gradient(180deg,#06141a40,#0000 50%,#06141a50)'},
  cathedral:{n:'Red Cathedral',css:'radial-gradient(ellipse 60% 40% at 50% 0%,#c0182e30,#0000 70%),linear-gradient(180deg,#0000 50%,#2a040a50)'},
+ ember:{n:'Ember Vigil',st:1,css:'radial-gradient(ellipse 70% 30% at 50% 100%,#ff6a2a26,#0000 70%),radial-gradient(circle at 15% 85%,#ffb04a14 0 2%,#0000 6%),radial-gradient(circle at 85% 80%,#ffb04a14 0 2%,#0000 6%),linear-gradient(180deg,#0000 40%,#3a100640)'},
  aurora:{n:'Hollow Aurora',css:'linear-gradient(170deg,#4affc014,#0000 30%,#a050ff14 55%,#0000 75%,#ff3a6a10)'},
  vellum:{n:'Archive Vellum',css:'radial-gradient(ellipse at 50% 50%,#d8c09018,#0000 70%),linear-gradient(180deg,#2a201418,#2a201440)'},
  eclipse:{n:'Eclipse',css:'radial-gradient(circle at 50% 42%,#000 0 14%,#ffd07030 15%,#ff8a3a10 22%,#0000 36%),radial-gradient(ellipse at 50% 50%,#0000 40%,#0008)'}};
@@ -291,8 +325,9 @@ const ACH=[
  ['dk5','Five Doctrines','Build 5 custom decks.',()=>DK.decks.length>=5,{sh:40}]];
 const ACHI=Object.fromEntries(ACH.map(a=>[a[0],a]));
 const achNew=()=>Math.max(0,Object.keys(V9.ach.got).length-(V9.ach.seen||0));
-const cosHas=(kind,id)=>(kind==='back'?CB:TH)[id]&&(id==='veil'||id==='none'||ACH.some(a=>V9.ach.got[a[0]]&&a[4][kind]===id));
-function achCheck(quiet){const out=[];for(const a of ACH){if(V9.ach.got[a[0]])continue;let ok=false;try{ok=a[3]()}catch(e){}if(ok){V9.ach.got[a[0]]=Date.now();out.push(a);if(a[4].sh)give({sh:a[4].sh})}}
+/* v2.6: store cosmetics (CB/TH entries with st:1) are owned through a purchase entitlement, COLL.ent['back:<id>'] / ['theme:<id>'] */
+const cosHas=(kind,id)=>!!((kind==='back'?CB:TH)[id]&&(id==='veil'||id==='none'||(COLL.ent&&COLL.ent[kind+':'+id])||ACH.some(a=>V9.ach.got[a[0]]&&a[4][kind]===id)));
+function achCheck(quiet){const out=[];for(const a of ACH){if(V9.ach.got[a[0]])continue;let ok=false;try{ok=a[3]()}catch(e){}if(ok){V9.ach.got[a[0]]=Date.now();out.push(a);if(a[4].sh)give({sh:a[4].sh},'feat')}}
  if(out.length){saveV9();if(!quiet)toast('Achievement: '+out.map(a=>a[1]).join(' · '),2600);try{badges()}catch(e){}}return out}
 function cosApply(){const rs=document.documentElement.style,b=CB[V9.cos.back]&&cosHas('back',V9.cos.back)?V9.cos.back:'veil',t=TH[V9.cos.theme]&&cosHas('theme',V9.cos.theme)?V9.cos.theme:'none';
  rs.setProperty('--cardback',CB[b].css||`url(${cardBackURL._u||(cardBackURL._u=cardBackURL())})`);rs.setProperty('--th',TH[t].css||'none');document.body.dataset.th=t}
@@ -302,15 +337,15 @@ function renderAch(){const got=V9.ach.got,n=Object.keys(got).length,tab=UX.achTa
  $('#achtabs').innerHTML=`<button data-at="ach" class="${tab==='ach'?'on':''}">Achievements<em>${n}/${ACH.length}</em></button><button data-at="cos" class="${tab==='cos'?'on':''}">Card Backs &amp; Boards</button>`;
  const by=(kind,id)=>ACH.find(a=>a[4][kind]===id);
  if(tab==='ach')$('#achx').innerHTML=`<div class="pbarw"><i style="width:${(n/ACH.length*100).toFixed(0)}%"></i></div><div class="achl">${ACH.map(a=>`<div class="ach${got[a[0]]?' got':''}"><i class="am">${got[a[0]]?'✦':'◇'}</i><div><b>${a[1]}</b><small>${a[2]}</small></div><em>${rwName(a[4])}</em></div>`).join('')}</div>`;
- else $('#achx').innerHTML=`<h3>CARD BACK</h3><div class="cosg backs">${Object.keys(CB).map(id=>{const h=cosHas('back',id),a=by('back',id);return`<button class="cos cb${V9.cos.back===id?' on':''}${h?'':' unk'}" data-cos="back:${id}"><i style="background:${CB[id].css||`url(${cardBackURL._u||(cardBackURL._u=cardBackURL())}) center/cover`}"></i><b>${CB[id].n}</b><small>${h?(V9.cos.back===id?'Equipped':'Tap to equip'):'🔒 '+(a?a[1]:'')}</small></button>`}).join('')}</div>
-  <h3>BOARD THEME</h3><div class="cosg themes">${Object.keys(TH).map(id=>{const h=cosHas('theme',id),a=by('theme',id);return`<button class="cos tb${V9.cos.theme===id?' on':''}${h?'':' unk'}" data-cos="theme:${id}"><i style="background:${TH[id].css?TH[id].css+',':''}var(--pimgb,linear-gradient(#1a1018,#050304))"></i><b>${TH[id].n}</b><small>${h?(V9.cos.theme===id?'Equipped':'Tap to equip'):'🔒 '+(a?a[1]:'')}</small></button>`}).join('')}</div>`}
+ else $('#achx').innerHTML=`<h3>CARD BACK</h3><div class="cosg backs">${Object.keys(CB).map(id=>{const h=cosHas('back',id),a=by('back',id);return`<button class="cos cb${V9.cos.back===id?' on':''}${h?'':' unk'}" data-cos="back:${id}"><i style="background:${CB[id].css||`url(${cardBackURL._u||(cardBackURL._u=cardBackURL())}) center/cover`}"></i><b>${CB[id].n}</b><small>${h?(V9.cos.back===id?'Equipped':'Tap to equip'):'🔒 '+(a?a[1]:CB[id].st?'Store':'')}</small></button>`}).join('')}</div>
+  <h3>BOARD THEME</h3><div class="cosg themes">${Object.keys(TH).map(id=>{const h=cosHas('theme',id),a=by('theme',id);return`<button class="cos tb${V9.cos.theme===id?' on':''}${h?'':' unk'}" data-cos="theme:${id}"><i style="background:${TH[id].css?TH[id].css+',':''}var(--pimgb,linear-gradient(#1a1018,#050304))"></i><b>${TH[id].n}</b><small>${h?(V9.cos.theme===id?'Equipped':'Tap to equip'):'🔒 '+(a?a[1]:TH[id].st?'Store':'')}</small></button>`}).join('')}</div>`}
 $('#ach').addEventListener('click',e=>{const t=e.target.closest('[data-at],[data-cos]');if(!t)return;if(t.dataset.at){UX.achTab=t.dataset.at;sfx('click');renderAch();return}
  const[k,id]=t.dataset.cos.split(':');if(cosSet(k,id)){sfx('heal');renderAch()}else{sfx('err');const a=ACH.find(a=>a[4][k]===id);toast(a?'Unlock: '+a[1]+' · '+a[2]:'Locked')}});
 
 /* ---------------- match hooks ---------------- */
 function v9MatchEnd(g,res){const m=g.meta||{},out={};if(res==='w'){if(g.reason==='mad')ctr('madwin');if(g.p[0].san>=20)ctr('flaw')}
  if(m.mode==='gaunt')out.gt=gtResult(g,res);
- if(m.mode==='week'){const W=weekState();W.games++;if(res==='w'){W.wins=Math.min(WKN,W.wins+1);give({sh:WKWIN});out.wk={win:1,wins:W.wins,done:W.wins>=WKN}}else out.wk={win:0,wins:W.wins}}
+ if(m.mode==='week'){const W=weekState();W.games++;if(res==='w'){W.wins=Math.min(WKN,W.wins+1);give({sh:WKWIN},'weekly');out.wk={win:1,wins:W.wins,done:W.wins>=WKN}}else out.wk={win:0,wins:W.wins}}
  saveV9();out.ach=achCheck(1).map(a=>a[1]);return out}
 function v9OverHTML(g,x){if(!x)return'';let h='';const m=g.meta||{};
  if(x.gt){const t=x.gt;if(t.end)h+=`<p class="ovst">${t.end.w>=GT.MAXW?'Twelve foes lie broken behind you. The Gauntlet is conquered.':'The Gauntlet claims you.'} Run over: <b>${t.end.w} wins</b>.</p><div class="ovcr">${rwTxt(t.end)||'No reward'}</div>`;

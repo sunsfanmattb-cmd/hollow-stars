@@ -764,18 +764,21 @@ Object.assign(PAINT,{
 const SC5={n1:'space',n2:'wreck',n3:'corridor',n4:'corridor',n5:'space',n6:'space',n7:'wreck',n8:'space',tS:'corridor'};for(const k in SC5)SPEC[k]=k+'@'+SC5[k];
 const HSPEC={v:'hv@void',m:'hm@corridor',c:'hc@chapel',n:'hn@wreck'};
 /* ---------- pack / card-back art ---------- */
-function sigilURL(){const S=256,cv=mkc(S,S),x=cv.getContext('2d'),c=S/2,R=rng(777);x.save();x.globalCompositeOperation='lighter';
- for(let k=0;k<3;k++){x.strokeStyle=`rgba(200,160,255,${.7-k*.2})`;x.lineWidth=2.5-k*.6;x.beginPath();x.arc(c,c,S*(.44-k*.06),0,TAU);x.stroke()}
+/* v2.3: the emblem in tarnished bone and bronze with an ember slit eye (was lavender with a teal iris and a white glint) */
+function sigilURL(){const S=256,cv=mkc(S,S),x=cv.getContext('2d'),c=S/2,R=rng(777);x.save();
+ for(let k=0;k<3;k++){x.strokeStyle=`rgba(184,160,120,${.55-k*.15})`;x.lineWidth=2.4-k*.6;x.beginPath();x.arc(c,c,S*(.44-k*.06),0,TAU);x.stroke()}
  for(let i=0;i<24;i++){const a=i/24*TAU;x.beginPath();x.moveTo(c+Math.cos(a)*S*.38,c+Math.sin(a)*S*.38);x.lineTo(c+Math.cos(a)*S*(i%2?.41:.44),c+Math.sin(a)*S*(i%2?.41:.44));x.stroke()}
- x.restore();x.fillStyle=LGr(x,0,0,S,S,['#f0e0ff','#9a6ad0','#3a1a6a','#d0b0ff']);x.beginPath();for(let i=0;i<8;i++){const a=i/8*TAU-Math.PI/2,r=i%2?S*.13:S*.36;x.lineTo(c+Math.cos(a)*r,c+Math.sin(a)*r)}x.closePath();x.fill();x.strokeStyle='#000';x.lineWidth=3;x.stroke();
- x.fillStyle='#05020a';x.beginPath();x.ellipse(c,c,S*.13,S*.075,0,0,TAU);x.fill();const ig=x.createRadialGradient(c,c,1,c,c,S*.06);ig.addColorStop(0,'#4affc0');ig.addColorStop(.6,'#2a0a5a');ig.addColorStop(1,'#000');x.fillStyle=ig;x.beginPath();x.arc(c,c,S*.055,0,TAU);x.fill();x.fillStyle='#000';x.beginPath();x.ellipse(c,c,S*.012,S*.05,0,0,TAU);x.fill();
- x.fillStyle='rgba(255,255,255,.5)';x.beginPath();x.moveTo(c,c-S*.36);x.lineTo(c+S*.05,c-S*.12);x.lineTo(c-S*.02,c-S*.1);x.fill();return cv.toDataURL()}
+ x.restore();x.fillStyle=LGr(x,0,0,S,S,['#d8ccb0','#8a7458','#2a2018','#b8a07c']);x.beginPath();for(let i=0;i<8;i++){const a=i/8*TAU-Math.PI/2,r=i%2?S*.13:S*.36;x.lineTo(c+Math.cos(a)*r,c+Math.sin(a)*r)}x.closePath();x.fill();x.strokeStyle='#000';x.lineWidth=3;x.stroke();
+ x.strokeStyle='rgba(0,0,0,.35)';x.lineWidth=1;for(let i=0;i<14;i++){const a=R()*TAU,r=R()*S*.3;x.beginPath();x.moveTo(c+Math.cos(a)*r,c+Math.sin(a)*r);x.lineTo(c+Math.cos(a+.3)*(r+S*.05),c+Math.sin(a+.3)*(r+S*.05));x.stroke()}
+ x.fillStyle='#060302';x.beginPath();x.ellipse(c,c,S*.13,S*.075,0,0,TAU);x.fill();const ig=x.createRadialGradient(c,c,1,c,c,S*.06);ig.addColorStop(0,'#e0a040');ig.addColorStop(.55,'#7a2a0a');ig.addColorStop(1,'#000');x.fillStyle=ig;x.beginPath();x.arc(c,c,S*.055,0,TAU);x.fill();x.fillStyle='#000';x.beginPath();x.ellipse(c,c,S*.012,S*.05,0,0,TAU);x.fill();
+ return cv.toDataURL()}
 function packBgURL(){const W=240,H=356,cv=mkc(W,H),x=cv.getContext('2d'),R=rng(4040);x.fillStyle='#07040c';x.fillRect(0,0,W,H);nebula(x,W,H,R,PAL.v,6,.22);
  for(let i=0;i<60;i++){x.strokeStyle=`rgba(${R()<.5?'255,255,255':'0,0,0'},${.04+R()*.08})`;x.lineWidth=.6+R()*1.5;x.beginPath();const px=R()*W;x.moveTo(px,0);x.lineTo(px+(R()-.5)*60,H);x.stroke()}
  for(let i=0;i<5;i++)tentacle(x,R()<.5?-10:W+10,H*(.4+R()*.6),W*.6,R()<.5?-.6:-2.5,5,PAL.v,R,40,1);
  x.fillStyle='#000';x.fillRect(0,0,W,H*.1);x.fillRect(0,H*.92,W,H*.08);for(let i=0;i<W;i+=6){x.fillStyle='#1a1424';x.fillRect(i,H*.1-3,3,3);x.fillRect(i,H*.92,3,3)}
  x.strokeStyle='rgba(200,170,120,.55)';x.lineWidth=2;x.strokeRect(10,H*.1+6,W-20,H*.82-12);x.strokeStyle='rgba(0,0,0,.8)';x.strokeRect(14,H*.1+10,W-28,H*.82-20);
- const vg=x.createRadialGradient(W/2,H*.45,H*.1,W/2,H/2,H*.7);vg.addColorStop(0,'rgba(0,0,0,0)');vg.addColorStop(1,'rgba(0,0,0,.8)');x.fillStyle=vg;x.fillRect(0,0,W,H);return cv.toDataURL('image/jpeg',.85)}
+ const vg=x.createRadialGradient(W/2,H*.45,H*.1,W/2,H/2,H*.7);vg.addColorStop(0,'rgba(0,0,0,0)');vg.addColorStop(1,'rgba(0,0,0,.8)');x.fillStyle=vg;x.fillRect(0,0,W,H);
+ /* v2.3: tarnish it (one-time, at generation): most of the violet drained, a dried-blood tint, darker */x.globalCompositeOperation='saturation';x.globalAlpha=.75;x.fillStyle='hsl(0,0%,50%)';x.fillRect(0,0,W,H);x.globalCompositeOperation='multiply';x.globalAlpha=1;x.fillStyle='#8a6e60';x.fillRect(0,0,W,H);x.globalCompositeOperation='source-over';return cv.toDataURL('image/jpeg',.85)}
 function cardBackURL(){const W=200,H=280,cv=mkc(W,H),x=cv.getContext('2d'),R=rng(31337);x.fillStyle='#08050c';x.fillRect(0,0,W,H);nebula(x,W,H,R,PAL.v,4,.2);
  x.save();x.translate(W/2,H/2);for(let i=0;i<16;i++){x.rotate(TAU/16);x.strokeStyle='rgba(180,140,230,.12)';x.lineWidth=1;x.beginPath();x.moveTo(0,20);x.lineTo(0,H*.6);x.stroke()}x.restore();
  x.strokeStyle='#5a4a3a';x.lineWidth=5;x.strokeRect(6,6,W-12,H-12);x.strokeStyle='#000';x.lineWidth=2;x.strokeRect(12,12,W-24,H-24);x.strokeStyle='rgba(200,170,120,.45)';x.lineWidth=1;x.strokeRect(16,16,W-32,H-32);

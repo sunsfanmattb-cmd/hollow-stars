@@ -1,0 +1,49 @@
+/* ===== v2.5: zoom without flicker; faction stat badges =====
+   Zoom (see tests: probe/layers.py audit). A zoomed Legendary on a phone asked for ~300 MB of GPU textures: the screen behind the
+   (87% black) backdrop was split into huge "overlap" layers under the zoom's animated layers, the foil light was 2.6x the card, and
+   mask layers sat inside the tilting card. Phones cannot keep that resident; tiles get dropped and re-drawn = flicker and pop-in. */
+
+/* 1. while a card is zoomed full screen, nothing behind it is rendered at all (it was barely visible through the backdrop) */
+body.zmod :is(#pbg,#bg,#fog,#vig,#grain,#b3d,#b3th,#fxc,.screen.on){visibility:hidden}
+#zoom.modal{background:radial-gradient(ellipse at 50% 46%,#160d14 0,#080406 55%,#000 100%)}
+/* 2. the foil light layer: 1.9x the card instead of 2.6x (translation in js/06-fx.js keeps the same sweep) */
+#zoom .foil .fsh{inset:-45%}
+/* 3. no mask surfaces inside a tilting card: the print grain stops just short of the (chipped) edge instead of being masked to it,
+      and the particle window is a plain rectangle (a rounded overflow clip on an animated layer is a mask too) */
+.card::after{-webkit-mask:none;mask:none;inset:1.6%;border-radius:calc(var(--cw)*.048)}
+.card .cpt{inset:2.2%;border-radius:0}
+/* Legendaries already have their own drifting motes; no second particle layer on top */
+.card.r-L .cpt{display:none!important}
+/* 4. tilting (finger or gyroscope): the card turns as ONE flat picture. Before, ~15 child layers (art, motes, video, foil light,
+      glare, trim glints) were each drawn with the card's 3D rotation: coplanar layers can swap draw order from frame to frame
+      (z-fighting), layers without a fixed raster scale were re-rasterised as the angle changed, and the video could flip between
+      a hardware overlay and a texture. opacity:.999 makes the card a single render surface: its contents are composited flat once,
+      then that one texture is rotated. backface-visibility:hidden only split off extra layers (the card never turns past 13deg). */
+#zoom .card.zt{opacity:.999}
+#zoom .card,#zoom .card *,#zoom .card *::before,#zoom .card *::after,#zoom .card::before,#zoom .card::after{backface-visibility:visible!important}
+/* the tilt glare: 1.7x the card instead of 2x (translation in js/06-fx.js scaled to keep the same travel) */
+#zoom .glare{inset:-35%}
+
+/* ---- faction stat badges (js/04-badges.js): back image, live content, front image, number ---- */
+.atk,.hp{width:3.2em;height:3.4em}
+.cost{width:2.95em;height:3.4em}
+.atk{background:center/100% 100% no-repeat}
+.atk svg{display:none}
+.hp .hb,.hp .hfr,.cost .cb,.cost .cfr{position:absolute;inset:0;background:center/100% 100% no-repeat;pointer-events:none}
+.hp::before,.hp .shd{display:none}
+.hp .hb{z-index:0}.hp .hfr{z-index:2}
+.hp .drop{left:var(--hl,8%);top:var(--ht,2%);width:var(--hw,84%);height:var(--hh,96%);right:auto;bottom:auto;clip-path:var(--hc,var(--drop));z-index:1}
+.hp b,.atk b,.cost b{z-index:3;color:#f6efe4;letter-spacing:-.02em}
+.hp .spec{left:22%;top:22%;width:13%;height:26%;opacity:.55}
+.cost .cb{z-index:0}.cost .cfr{z-index:2}
+.cost .cr{inset:auto;left:15.38%;top:11.67%;width:69.23%;height:76.67%;z-index:1;clip-path:polygon(50% 0,100% 22.83%,100% 77.17%,50% 100%,0 77.17%,0 22.83%)}
+.cost .cr::before{mix-blend-mode:normal;opacity:.5;animation:none}
+.cost .cr::after{background:linear-gradient(0deg,#000c,transparent 46%),radial-gradient(circle at 50% 50%,transparent 38%,#000a 100%)}
+.cost::before{animation:none}
+.cost b{font-size:1.4em}
+.atk b{top:.42em}
+.atk.up b{color:#c8ff9a}.atk.dn b{color:#ffb0a0}.hp.hurt b{color:#ffc8c8}
+.flux .fx i{box-shadow:none}
+/* the zoomed card waits, invisible, for its full-size art (js/11-perf.js), then fades in: no small-to-big pop */
+#zoom .card{transition:opacity .16s ease-out}
+#zoom.zwait .card{opacity:0!important}

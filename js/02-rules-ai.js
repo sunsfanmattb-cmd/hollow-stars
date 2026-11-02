@@ -15,18 +15,33 @@ function draw(g,pi,n=1){const p=g.p[pi];for(let i=0;i<n;i++){if(!p.deck.length){
 function mkUnit(g,pi,id,uid){const d=C[id],R=g.rule||[],gl=R.includes('w_glass');const u={uid:uid??g.uid++,id,o:pi,a:d.a+(gl?2:0),h:Math.max(1,d.h-(gl?1:0)),k:d.k.slice(),ready:d.k.includes('swift')||R.includes('w_swift'),atk:0,dead:0};u.mh=u.h;if(R.includes('w_ward')&&!u.k.includes('ward')&&d.r!=='T')u.k.push('ward');return u}
 function summon(g,pi,id){const p=g.p[pi];if(p.board.length>=6)return null;const u=mkUnit(g,pi,id);p.board.push(u);fx(g,{k:'summon',id:'u'+u.uid});return u}
 function sacrifice(g,pi,ex){const b=g.p[pi].board.filter(u=>u!==ex&&u.h>0);if(!b.length)return null;b.sort((x,y)=>(x.a+x.h)-(y.a+y.h));destroy(g,b[0]);fx(g,{k:'sac',id:'u'+b[0].uid});return b[0]}
-function cleanup(g){for(let n=0;n<30;n++){let any=false;for(let pi=0;pi<2;pi++){const p=g.p[pi],dead=p.board.filter(u=>u.h<=0);if(!dead.length)continue;any=true;p.board=p.board.filter(u=>u.h>0);for(const u of dead){u.dead=1;fx(g,{k:'die',id:'u'+u.uid,cid:u.id,o:u.o});if(u.k.includes('salvage'))draw(g,pi,1);const d=C[u.id];if(d.death)d.death(g,pi,u)}}if(!any)break}checkWin(g)}
+function cleanup(g){for(let n=0;n<30;n++){let any=false;for(let pi=0;pi<2;pi++){const p=g.p[pi],dead=p.board.filter(u=>u.h<=0);if(!dead.length)continue;any=true;p.board=p.board.filter(u=>u.h>0);for(const u of dead){u.dead=1;fx(g,{k:'die',id:'u'+u.uid,cid:u.id,o:u.o});if(u.k.includes('salvage'))draw(g,pi,1);const d=C[u.id];if(d.death)d.death(g,pi,u);for(const q of p.board){const dq=C[q.id];if(dq.ally&&q.h>0)dq.ally(g,pi,q,u)}}}if(!any)break}auras(g);checkWin(g)}
 function checkWin(g){if(g.over)return;const l=g.p.map(p=>p.san<=0||p.mad>=10);if(l[0]||l[1]){g.over=true;g.winner=l[0]&&l[1]?-1:l[0]?1:0;const lp=g.p[l[0]?0:1];g.reason=lp.mad>=10?'mad':'san'}}
 function spellTargets(g,pi,tg){const r=[],add=pj=>{for(const u of g.p[pj].board)r.push('u'+u.uid)};
  if(tg==='unit'){add(0);add(1)}else if(tg==='enemyUnit')add(1-pi);else if(tg==='friendlyUnit')add(pi);else if(tg==='enemy'){add(1-pi);r.push('h'+(1-pi))}else if(tg==='any'){add(0);add(1);r.push('h0','h1')}return r}
+/* v2.4 targeting: d.tf filters the first target set; d.tg2 (+ d.tf2) asks for a second target after the first (encoded "u12>u34").
+   Units may target on arrival (d.tg on a unit): if nothing valid exists they are played without a target. */
+function cardTargets(g,pi,d,step,first){const tg=step?d.tg2:d.tg,f=step?d.tf2:d.tf;if(!tg)return[];let r=spellTargets(g,pi,tg);if(f)r=r.filter(t=>{const T=resolve(g,t);return T&&f(g,pi,T)});return first?r.filter(t=>t!==first):r}
+function needsTarget(g,pi,d){return !!d.tg&&(d.t==='s'||cardTargets(g,pi,d,0).length>0)}
+function validTarget(g,pi,d,tg){if(!tg)return false;const[a,b]=tg.split('>');if(!cardTargets(g,pi,d,0).includes(a))return false;return d.tg2?!!b&&cardTargets(g,pi,d,1,a).includes(b):!b}
+function allTargets(g,pi,d){const out=[];for(const a of cardTargets(g,pi,d,0)){if(d.tg2){for(const b of cardTargets(g,pi,d,1,a))out.push(a+'>'+b)}else out.push(a)}return out}
+/* v2.4 auras: "while this is on the board" bonuses (d.aura -> {a,h,k}) are recomputed from scratch after every action.
+   What a unit currently receives is kept on it (u.ab), so a bonus is lifted exactly when its source leaves. Losing a health
+   bonus never kills: health floors at 1. */
+function auras(g){for(const p of g.p){const src=p.board.filter(u=>u.h>0&&C[u.id].aura);for(const u of p.board){if(u.h<=0)continue;let a=0,h=0,k=null;
+  for(const s of src){const b=C[s.id].aura(g,s.o,s,u);if(b){a+=b.a||0;h+=b.h||0;if(b.k)k=b.k}}const o=u.ab||{a:0,h:0,k:null};
+  if(a!==o.a){u.a=Math.max(0,u.a+a-o.a)}if(h!==o.h){const dh=h-o.h;u.mh+=dh;u.h=dh>0?u.h+dh:Math.max(1,u.h+dh)}
+  if(o.k&&o.k!==k&&u.akw){u.k=u.k.filter(x=>x!==o.k);u.akw=0}if(k&&!u.k.includes(k)){u.k.push(k);u.akw=1}
+  u.ab=a||h||k?{a,h,k}:null}}}
 function canAtk(u){return u.ready&&!u.atk&&u.a>0&&u.h>0}
 function atkTargets(g,pi,u){const ph=u.k.includes('phase');const e=E(g,pi).board.filter(t=>ph||!t.k.includes('phase'));const gd=e.filter(t=>t.k.includes('guard'));if(!ph&&gd.length)return gd.map(t=>'u'+t.uid);return e.map(t=>'u'+t.uid).concat('h'+(1-pi))}
-function canPlay(g,pi,c){const p=g.p[pi],d=C[c.id];if(g.over||g.cur!==pi||d.c>p.flux)return false;if(d.t==='u')return p.board.length<6;if(d.tg)return spellTargets(g,pi,d.tg).length>0;return true}
+function canPlay(g,pi,c){const p=g.p[pi],d=C[c.id];if(g.over||g.cur!==pi||d.c>p.flux)return false;if(d.t==='u')return p.board.length<6;if(d.tg)return allTargets(g,pi,d).length>0;return true}
 function play(g,pi,huid,tg){const p=g.p[pi],i=p.hand.findIndex(c=>c.uid===huid);if(i<0)return false;const c=p.hand[i],d=C[c.id];if(!canPlay(g,pi,c))return false;
- if(d.tg&&(!tg||!spellTargets(g,pi,d.tg).includes(tg)))return false;
+ if(needsTarget(g,pi,d)){if(!validTarget(g,pi,d,tg))return false}else tg=null;
  p.hand.splice(i,1);p.flux-=d.c;g.sf=d.f;if(!c.echo&&(d.k.includes('echo')||(d.t==='s'&&g.rule&&g.rule.includes('w_echo')))&&p.hand.length<10){p.hand.push({uid:g.uid++,id:c.id,echo:1});fx(g,{k:'echo',pi,cid:c.id})}if(pi===0&&g.st&&!g.sim){const t=g.st;if(d.t==='s')t.rites++;else t.units++;if(d.r==='L')t.leg++;t.plays[c.id]=(t.plays[c.id]||0)+1}fx(g,{k:'play',pi,cid:c.id,tg,uid:c.uid,e:c.echo?1:0});
- if(d.t==='u'){const u=mkUnit(g,pi,c.id,c.uid);p.board.push(u);if(d.dread)addMad(g,1-pi,d.dread);if(d.play)d.play(g,pi,u)}
- else{if(tg)fx(g,{k:'spellhit',id:tg,f:d.f});d.cast(g,pi,resolve(g,tg))}
+ const[t1,t2]=tg?tg.split('>'):[];
+ if(d.t==='u'){const u=mkUnit(g,pi,c.id,c.uid);p.board.push(u);if(d.dread)addMad(g,1-pi,d.dread);if(d.play)d.play(g,pi,u,resolve(g,t1))}
+ else{if(t1)fx(g,{k:'spellhit',id:t1,f:d.f});if(t2)fx(g,{k:'spellhit',id:t2,f:d.f});d.cast(g,pi,resolve(g,t1),resolve(g,t2))}
  g.sf=null;cleanup(g);return true}
 function attack(g,pi,uid,tg){const u=g.p[pi].board.find(x=>x.uid===uid);if(!u||g.over||g.cur!==pi||!canAtk(u)||!atkTargets(g,pi,u).includes(tg))return false;const T=resolve(g,tg);u.atk=1;
  if(T.k==='h')hurtH(g,T.pi,u.a,u);else{const v=T.u,va=v.a;hurtU(g,v,u.a,u);hurtU(g,u,va,v);for(const[a,b]of[[u,v],[v,u]])if(a.k.includes('devour')&&a.h>0&&b.h<=0){buff(a,1,1);fx(g,{k:'buff',id:'u'+a.uid})}}
@@ -50,14 +65,14 @@ function ruleStart(g,pi){const R=g.rule,p=g.p[pi],bt=Math.floor(g.turn/2);
 
 /* ================= AI ================= */
 function legal(g,pi){const p=g.p[pi],A=[];if(g.over||g.cur!==pi)return A;
- for(const c of p.hand){const d=C[c.id];if(!canPlay(g,pi,c))continue;if(d.tg)for(const T of spellTargets(g,pi,d.tg))A.push({t:'play',uid:c.uid,tg:T});else A.push({t:'play',uid:c.uid})}
+ for(const c of p.hand){const d=C[c.id];if(!canPlay(g,pi,c))continue;const T=d.tg?allTargets(g,pi,d):[];if(T.length)for(const t of T)A.push({t:'play',uid:c.uid,tg:t});else A.push({t:'play',uid:c.uid})}
  for(const u of p.board)if(canAtk(u))for(const T of atkTargets(g,pi,u))A.push({t:'atk',uid:u.uid,tg:T});return A}
 function act(g,pi,a){return a.t==='play'?play(g,pi,a.uid,a.tg):attack(g,pi,a.uid,a.tg)}
 const cloneG=typeof structuredClone==='function'?g=>{const c=structuredClone(g);c.fx=[];c.sim=1;return c}:g=>{const c=JSON.parse(JSON.stringify(g));c.fx=[];c.sim=1;return c};
 const sanV=s=>s<=0?-80:s-(s<12?(12-s)*(12-s)*.07:0);
 const madV=m=>m*.7+m*m*.13;
 const KWV={guard:.8,phase:1.1,blight:1.7,salvage:.9,ward:1,devour:.7,corrupt:.6};
-function unitV(u){const d=C[u.id];let v=1+u.a*1.1+Math.max(u.h,0)*.9;for(const k of u.k){v+=KWV[k]||0;if(k==='drain')v+=u.a*.4}if(d.start||d.end)v+=1.8;return v}
+function unitV(u){const d=C[u.id];let v=1+u.a*1.1+Math.max(u.h,0)*.9;for(const k of u.k){v+=KWV[k]||0;if(k==='drain')v+=u.a*.4}if(d.start||d.end)v+=1.8;if(d.aura)v+=2.2;return v}
 function evalS(g,pi){if(g.over)return g.winner===pi?1e6:g.winner===-1?-1e5:-1e6;const m=g.p[pi],o=g.p[1-pi];let s=sanV(m.san)-sanV(o.san)+madV(o.mad)-madV(m.mad);
  for(const u of m.board)s+=unitV(u);for(const u of o.board)s-=unitV(u);const hn=p=>p.hand.reduce((n,c)=>n+(c.echo?.15:1),0);return s+Math.min(hn(m),8)*.9-Math.min(hn(o),8)*.9}
 function aiChoose(g,pi,raw){const A=legal(g,pi);if(!A.length)return null;const dif=raw||pi!==1?'normal':g.dif;
