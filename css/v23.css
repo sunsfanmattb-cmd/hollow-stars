@@ -1,0 +1,154 @@
+/* ===== v2.3: smooth combat, turn log, board zoom, pack opening rework =====
+   Combat animations below replace ones that animated filter/height (repaint + relayout on every frame of every hit). */
+
+/* hit flash: a blood-red overlay that fades (opacity only) instead of a filter on the whole unit */
+.unit::after{content:"";position:absolute;inset:0;border-radius:inherit;pointer-events:none;z-index:6;opacity:0;
+ background:radial-gradient(ellipse at 50% 45%,#ff6a5a88,#a0081860 55%,#3a000a40)}
+@keyframes hit{25%{transform:translateX(-4px)}50%{transform:translateX(4px)}75%{transform:translateX(-2px)}}
+@keyframes hitFl{0%{opacity:0}20%{opacity:1}100%{opacity:0}}
+.unit.hit::after{animation:hitFl .38s ease-out}
+@keyframes heavy{0%{transform:none}12%{transform:scale(1.06) translateY(3px)}40%{transform:scale(.98)}100%{transform:none}}
+/* death: fade, shrink and rise; the brightness flash is the same overlay going pale */
+@keyframes dissolve{30%{opacity:.9}to{opacity:0;transform:scale(.55) rotate(10deg) translateY(-20%)}}
+.unit.dying::after{background:radial-gradient(ellipse,#f0e8ff,#c8b0ff99 60%,#fff0);animation:hitFl .5s ease-out}
+.unit.dying.cracking{filter:none}
+.unit.dying.cracking::after{opacity:.75;animation:none}
+/* blood-drop health: the liquid level slides (transform) instead of resizing (layout + paint every frame for .8s) */
+.hp .fill{height:100%;transform:translateY(calc(100% - var(--p,100%)));transition:transform .8s cubic-bezier(.3,.8,.3,1)}
+@keyframes pulse{40%{transform:scale(1.12)}}
+@keyframes dfl{0%{opacity:.6}100%{opacity:1}}
+
+/* ===== turn log: "the Record" (js/14-turnlog.js) ===== */
+#tlog{position:absolute;z-index:32;display:flex;gap:var(--tg,6px);pointer-events:none;opacity:0;transition:opacity .4s}
+#tlog.on{opacity:1}
+body.land #tlog{flex-direction:column;align-items:center;transform:translateY(-50%)}
+body:not(.land) #tlog{flex-direction:row;justify-content:center;padding:0 12px}
+/* a frayed thread the relics hang on */
+#tlog .tsp{position:absolute;pointer-events:none;opacity:.55}
+body.land #tlog .tsp{left:50%;top:-14px;bottom:-14px;width:2px;margin-left:-1px;background:linear-gradient(180deg,transparent,#8a7050 12%,#5a4632 70%,transparent)}
+body:not(.land) #tlog .tsp{top:50%;left:8%;right:8%;height:2px;margin-top:-1px;background:linear-gradient(90deg,transparent,#5a4632 25%,#8a7050 50%,#5a4632 75%,transparent)}
+.tle{--own:#7a5cff;--rim:#6a5236;position:relative;flex:none;width:var(--ts,48px);height:var(--ts,48px);padding:0;border:0;border-radius:24%;cursor:pointer;pointer-events:auto;
+ background:#080507;box-shadow:0 0 0 1px #000,0 0 0 2px var(--rim),0 0 0 3px #000,0 5px 12px #000d;opacity:calc(1 - var(--k,0)*.075);transition:transform .18s,opacity .3s;-webkit-tap-highlight-color:transparent}
+.tle.o1{--own:#d0203a}
+.tle::before{content:"";position:absolute;inset:0;border-radius:inherit;z-index:2;pointer-events:none;box-shadow:inset 0 0 0 1.5px var(--own),inset 0 0 calc(var(--ts,48px)*.28) #000;opacity:.8}
+.tle .ta{position:absolute;inset:2px;border-radius:21%;background:#120c10 center 28%/cover no-repeat;filter:saturate(.78) contrast(1.08) brightness(.92)}
+.tle.k-void .ta{background:radial-gradient(circle,#1a0626,#000 70%)}
+.tle .tvd{position:absolute;inset:22%;z-index:2}.tle .tvd svg{width:100%;height:100%;fill:#8a5ab8}
+/* action glyph (top-left) */
+.tle .tk{position:absolute;left:-12%;top:-12%;width:44%;height:44%;z-index:3;border-radius:50%;display:grid;place-items:center;
+ background:radial-gradient(circle at 35% 30%,color-mix(in srgb,var(--own) 70%,#fff 10%),color-mix(in srgb,var(--own) 45%,#000) 70%);box-shadow:0 0 0 1px #000,0 0 0 2px #8a7458,0 2px 4px #000}
+.tle .tk svg{width:62%;height:62%;fill:#f2e8d4;filter:drop-shadow(0 1px 0 #000)}
+.tle.k-trig .tk,.tle.k-death .tk{background:radial-gradient(circle at 35% 30%,#7a6a52,#2a2016 70%)}
+.tle.k-void .tk{display:none}
+/* target (bottom-right): its portrait; a skull if it died */
+.tle .tt{position:absolute;right:-16%;bottom:-16%;width:52%;height:52%;z-index:3;border-radius:50%;background:#100a0c center 28%/cover no-repeat;box-shadow:0 0 0 1px #000,0 0 0 2px #b8a27a,0 0 0 3px #000,0 2px 6px #000}
+.tle .tt.hero{background-position:center}
+.tle .tt.dead{filter:grayscale(.85) brightness(.55)}
+.tle .tt svg{position:absolute;inset:16%;width:68%;height:68%;fill:#e8d8c0;filter:drop-shadow(0 0 2px #000) drop-shadow(0 0 1px #000)}
+/* the newest relic swings in on its thread, a candle flare behind it */
+.tle::after{content:"";position:absolute;inset:-35%;z-index:-1;border-radius:50%;pointer-events:none;background:radial-gradient(circle,color-mix(in srgb,var(--own) 55%,transparent),transparent 65%);opacity:0}
+.tle.new{animation:tlIn .55s cubic-bezier(.2,.9,.3,1.15) both}
+.tle.new::after{animation:tlFlare 1.6s ease-out both}
+body.land .tle.new{animation-name:tlInL}
+@keyframes tlInL{0%{transform:translateX(60%) rotate(14deg) scale(.6);opacity:0}100%{transform:none}}
+@keyframes tlIn{0%{transform:translateY(-60%) rotate(-10deg) scale(.6);opacity:0}100%{transform:none}}
+@keyframes tlFlare{0%{opacity:0}18%{opacity:.9}100%{opacity:0}}
+.tle:hover,.tle.sel{transform:scale(1.1);opacity:1;--rim:#c8b088;z-index:2}
+.tle:focus-visible{outline:2px solid #c8b088;outline-offset:3px}
+
+/* the details panel */
+#tlpop{position:fixed;left:0;top:0;z-index:86;pointer-events:none;opacity:0;width:min(372px,94vw);padding:12px 14px 14px;border-radius:9px;
+ background:linear-gradient(180deg,#0a0709e0,#050304f0),url(../art/ui/panel.webp) center/cover,#0a0709;
+ box-shadow:0 0 0 1px #000,0 0 0 2px #7a6446,0 0 0 3px #000,0 0 0 5px #2a2018,0 22px 50px #000e,inset 0 0 40px #000;transition:opacity .14s}
+#tlpop.on{opacity:1}
+#tlpop.o0{box-shadow:0 0 0 1px #000,0 0 0 2px #7a6446,0 0 0 3px #000,0 0 0 5px #2a2018,0 22px 50px #000e,inset 0 0 40px #000,inset 0 1px 0 #7a5cff55}
+#tlpop.o1{box-shadow:0 0 0 1px #000,0 0 0 2px #7a6446,0 0 0 3px #000,0 0 0 5px #2a2018,0 22px 50px #000e,inset 0 0 40px #000,inset 0 1px 0 #d0203a66}
+#tlpop .tph{display:flex;align-items:baseline;justify-content:space-between;gap:10px;margin-bottom:10px;padding-bottom:7px;border-bottom:1px solid #3a2e22}
+#tlpop .tph b{font-family:var(--disp);font-weight:400;font-size:15px;letter-spacing:.14em;text-transform:uppercase;color:#c8b8ff;text-shadow:0 0 10px #4a2aa0,0 1px 0 #000}
+#tlpop.o1 .tph b{color:#ff9aa6;text-shadow:0 0 10px #8a0a1e,0 1px 0 #000}
+#tlpop .tph small{font:italic 12px var(--serif);color:#8a7c6a;white-space:nowrap}
+#tlpop .tpb{display:flex;gap:13px;align-items:flex-start}
+#tlpop .tpc{flex:none}
+#tlpop .tpc .card{--cw:128px}
+body:not(.land) #tlpop .tpc .card{--cw:104px}
+#tlpop .tvb{display:block;width:96px;height:96px}#tlpop .tvb svg{width:100%;height:100%;fill:#6a3a98}
+#tlpop .tpx{flex:1;min-width:0;display:flex;flex-direction:column;gap:7px;padding-top:2px}
+#tlpop .tpr{display:grid;grid-template-columns:30px 1fr;grid-template-areas:"i n" "i c";column-gap:8px;align-items:center}
+#tlpop .tpr .ra{grid-area:i;width:30px;height:30px;border-radius:50%;background:#100a0c center 28%/cover;box-shadow:0 0 0 1px #000,0 0 0 2px #6a5236,0 0 0 3px #000}
+#tlpop .tpr.o1 .ra{box-shadow:0 0 0 1px #000,0 0 0 2px #8a2232,0 0 0 3px #000}
+#tlpop .tpr.o0 .ra{box-shadow:0 0 0 1px #000,0 0 0 2px #5a46a8,0 0 0 3px #000}
+#tlpop .tpr span:not(.cs){grid-area:n;font:13px/1.2 var(--serif);color:#e2d6c0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#tlpop .tpr .cs{grid-area:c;display:flex;flex-wrap:wrap;gap:3px 4px}
+#tlpop .tpr.none span{grid-column:1/-1;font:italic 13px var(--serif);color:#8a7c6a}
+#tlpop em{font:700 11px/1 system-ui,sans-serif;font-style:normal;letter-spacing:.03em;padding:3px 6px 3px;border-radius:3px;display:inline-flex;align-items:center;gap:3px;white-space:nowrap;box-shadow:inset 0 0 0 1px #0008}
+#tlpop em svg{width:12px;height:12px;fill:currentColor}
+#tlpop em.dm{background:#5a0814;color:#ffc2c2}
+#tlpop em.kd{background:#1a1416;color:#d8c8b4;box-shadow:inset 0 0 0 1px #5a4a3a}
+#tlpop em.hl{background:#0e3a22;color:#a8f0c0}
+#tlpop em.md{background:#3a1458;color:#e6c8ff}
+#tlpop em.mdn{background:#0e2a3a;color:#b0e4ff}
+#tlpop em.bf{background:#4a3608;color:#ffe08a}
+#tlpop em.wd{background:#0c3036;color:#a8f4ff}
+#tlpop em.cr{background:#24360c;color:#c8f08a}
+#tlpop em.dr,#tlpop em.sm{background:#2a2218;color:#d8c8a8}
+body:not(.land) #tlpop{padding:10px 11px 12px}
+@media (prefers-reduced-motion:reduce){.tle.new,.tle.new::after{animation:none}}
+body.fxlow .tle.new::after,body.q-low .tle.new::after{animation:none}
+
+/* ===== pack opening: the Hollow Below (js/12-packs.js, art/ui/void.webp) =====
+   The lavender void with neon star streaks is gone: a painted dark (bruise violet, dirty olive, old blood) with limbs reaching
+   for a starless rift; the canvas on top adds ash, the rift's living edge and the watchers. Accents are bone, ash and ember. */
+#pstage{background:#000}
+#pstage>i#pvbg:not(#pvoid):not(#pvsig):not(#pveye):not(#pvflash){position:absolute;inset:-4%;z-index:0}
+#pvbg{position:absolute;inset:-4%;display:block;pointer-events:none;z-index:0;background:#000 url(../art/ui/void.webp) 50% 46%/cover no-repeat;animation:pvBreath 14s ease-in-out infinite;will-change:transform}
+@keyframes pvBreath{0%,100%{transform:scale(1)}50%{transform:scale(1.035) rotate(.4deg)}}
+#pstage.vtear #pvbg{animation:pvSuck 1.2s cubic-bezier(.6,0,.3,1) forwards}
+@keyframes pvSuck{0%{transform:scale(1)}45%{transform:scale(1.12) rotate(-1.5deg)}100%{transform:scale(1.02)}}
+#pstage.vlegend #pvbg{animation:pvLegBg 3s ease-out}
+@keyframes pvLegBg{0%{transform:scale(1)}15%{transform:scale(1.06)}100%{transform:scale(1)}}
+#pstage>*:not(#pvoid):not(#pvsig):not(#pveye):not(#pvflash):not(#pvbg){position:relative;z-index:2}
+#pvoid{z-index:1}
+/* sigil rings: faint scratched bone, slow; the neon impossible triangle becomes a ghost */
+#pvsig .rl{stroke:#8a7a64;stroke-width:.25;opacity:.45}
+#pvsig .gl path,#pvsig .r2 .gl path,#pvsig .r3 .gl path{stroke:#9a8a72;stroke-width:1.1}
+#pvsig .r1{opacity:.16;animation-duration:150s}
+#pvsig .r2{opacity:.1;animation-duration:110s}
+#pvsig .r3{opacity:.2;animation-duration:70s}
+#pvsig .tri{opacity:.07}
+#pvsig .tri path,#pvsig .tri .t2,#pvsig .tri .t3{stroke:#b8a888}
+#pstage.vborn #pvsig{opacity:.6}
+#pstage.vrare #pvsig .gl path{stroke:#c0a060}
+#pstage.vlegend #pvsig .gl path{stroke:#e8d8a8}
+/* the eye in the rift opens dimmer and settles fainter */
+@keyframes pvOpen{0%{opacity:0;transform:translate(-50%,-50%) scaleY(.02)}35%{opacity:.85;transform:translate(-50%,-50%) scaleY(1.04)}70%{opacity:.6;transform:translate(-50%,-50%) scaleY(.97)}100%{opacity:.1;transform:translate(-50%,-50%) scaleY(1)}}
+#pstage.vborn #pveye{opacity:.1}
+@keyframes pvStare{0%{opacity:.1;transform:translate(-50%,-50%) scale(1)}15%{opacity:.75;transform:translate(-50%,-50%) scale(1.35)}100%{opacity:.1;transform:translate(-50%,-50%) scale(1)}}
+/* tearing: not a white-violet flash but a dull ember bloom out of the dark */
+#pvflash{background:radial-gradient(circle at 50% 46%,#e8d8b8cc 0,#a0482080 10%,#4a100a55 28%,transparent 58%)}
+@keyframes pvFlash{0%{opacity:0;transform:scale(.3)}14%{opacity:.75;transform:scale(1)}100%{opacity:0;transform:scale(1.5)}}
+/* the pack: no purple glow; the dark around it, a faint ember underneath */
+#pstage .pack,#psealed.pack{box-shadow:0 0 0 1px #000,0 0 0 3px #3a2e24,0 0 0 4px #000,0 24px 50px #000,0 0 70px #000,0 10px 60px #4a100a40}
+.pack .psig{filter:drop-shadow(0 0 10px #8a5a2a66)}
+@keyframes pvSig{0%,100%{opacity:.8;transform:translate(-50%,-50%) scale(1)}50%{opacity:.95;transform:translate(-50%,-50%) scale(1.03)}}
+.pack b{color:#d8ccb0;text-shadow:0 2px 0 #000,0 0 14px #6a1a0a}
+.pack small{color:#8a7c6a}
+.pack::before{background:linear-gradient(115deg,transparent 30%,#ffffff12 45%,#d8c8a010 50%,transparent 62%) 0 0/100% 100% no-repeat}
+#pstage .pseam{background:repeating-linear-gradient(90deg,#8a7a60 0 4px,transparent 4px 8px);opacity:.55}
+#pvcry{color:#8a7c68;text-shadow:0 0 10px #3a0a06,0 1px 0 #000;letter-spacing:.36em}
+/* card backs in the reveal: the default back's violet is pushed toward tarnished bronze here (static filter, set once) */
+#pstage .pback{filter:saturate(.45) sepia(.35) brightness(.78) contrast(1.08)}
+/* rarity: tarnished, cold and sickly instead of neon */
+.pslot.r-U:not(.up) .pback{box-shadow:0 0 0 1px #000,0 0 0 2px #4a7a80,0 0 18px #2a5a6066}
+.pslot.r-R:not(.up) .pback{box-shadow:0 0 0 1px #000,0 0 0 2px #a07a30,0 0 22px #8a5a1888}
+.pslot.r-L:not(.up) .pback{box-shadow:0 0 0 1px #000,0 0 0 2px #c8a860,0 0 26px #8a6a2499,0 0 60px #5a0a0a77}
+.pslot.up.r-U .pfront{box-shadow:0 0 20px #2a5a6088}
+.pslot.up.r-R .pfront{box-shadow:0 0 26px #8a5a18aa}
+.pslot.up.r-L .pfront{box-shadow:0 0 34px #a07a30bb,0 0 80px #5a0a0a99}
+body.q-low #pvbg,body.fxlow #pvbg{animation:none}
+@media (prefers-reduced-motion:reduce){#pvbg{animation:none!important}}
+/* the rings fall into the rift and vanish as they go (at full opacity in the centre they read as a shell) */
+@keyframes pvCollapse{0%{transform:translate(-50%,-50%) scale(1) rotate(0);opacity:.5}50%{transform:translate(-50%,-50%) scale(.2) rotate(-200deg);opacity:0}70%{transform:translate(-50%,-50%) scale(.6) rotate(-260deg);opacity:0}100%{transform:translate(-50%,-50%) scale(1.25) rotate(-320deg);opacity:.35}}
+/* while it rips, the pack loses its heavy drop shadow (shrinking and spinning, that shadow became a dark blob) */
+#pstage.vtear .pack{box-shadow:0 0 0 1px #000,0 0 0 3px #3a2e24}
+/* v2.4: the friendly unit chosen as the first of two targets (Communion of Ash) */
+.unit.pick1{box-shadow:0 0 0 1px #000,0 0 0 3px #e8c060,0 0 18px #c8902a99,0 5px 12px #000e}

@@ -2,28 +2,30 @@
 /* ================= v8: difficulty, campaign, daily quests + login calendar, crafting, cosmetics, stats, menu hub =================
    Saves: localStorage.hsV8 = {v:1,dif,camp,quests,login,stats}; cosmetics live in hsCol (COLL.var/COLL.show). Every loader fills
    missing fields with defaults, so v7.x saves load unchanged (migration = additive only). Dates are the device's LOCAL calendar day. */
-const DIFS={easy:{n:'Easy',m:.5,d:'The void hesitates and blunders. Half Shards.'},normal:{n:'Normal',m:1,d:'The void as you know it.'},nightmare:{n:'Nightmare',m:1.6,d:'It plans whole turns ahead and you start with 1 Madness. ×1.6 Shards.'}};
+const DIFS={easy:{n:'Easy',m:ECON.dif.easy,d:'The void hesitates and blunders. ×'+ECON.dif.easy+' Shards.'},normal:{n:'Normal',m:ECON.dif.normal,d:'The void as you know it.'},nightmare:{n:'Nightmare',m:ECON.dif.nightmare,d:'It plans whole turns ahead and you start with 1 Madness. ×'+ECON.dif.nightmare+' Shards.'}};
 const difMul=d=>(DIFS[d]||DIFS.normal).m;
 let V8NOW=null;const v8now=()=>V8NOW?new Date(V8NOW):new Date();
 const dayKey=t=>{const d=t||v8now();return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0')};
 const dayAdd=(k,n)=>{const[y,m,d]=k.split('-').map(Number);return dayKey(new Date(y,m-1,d+n,12))};
-const V8D=()=>({v:1,dif:'normal',camp:{},quests:null,login:{last:'',day:0,claimed:''},stats:{games:0,wins:0,losses:0,draws:0,streak:0,best:0,deck:{},fac:{},dif:{},cards:{},hist:[]}});
+const V8D=()=>({v:1,dif:'normal',fw:'',camp:{},quests:null,login:{last:'',day:0,claimed:''},stats:{games:0,wins:0,losses:0,draws:0,streak:0,best:0,deck:{},fac:{},dif:{},cards:{},hist:[]}});
 function v8Mig(o){const d=V8D();if(!o||typeof o!=='object'||o.v!==1)return d;for(const k of Object.keys(d))if(o[k]===undefined||(o[k]===null&&k!=='quests')||typeof o[k]!==typeof d[k]&&k!=='quests')o[k]=d[k];
  for(const k of Object.keys(d.stats))if(o.stats[k]===undefined||typeof o.stats[k]!==typeof d.stats[k])o.stats[k]=d.stats[k];if(!Array.isArray(o.stats.hist))o.stats.hist=[];
  for(const k of Object.keys(d.login))if(o.login[k]===undefined)o.login[k]=d.login[k];if(!DIFS[o.dif])o.dif='normal';return o}
-let V8=(()=>{let o=null;try{o=JSON.parse(localStorage.getItem('hsV8')||'null')}catch(e){}return v8Mig(o)})();
-function saveV8(){try{localStorage.setItem('hsV8',JSON.stringify(V8))}catch(e){}}
-function collMig(){let ch=0;if(!COLL.var||typeof COLL.var!=='object'){COLL.var={};ch=1}if(!COLL.show||typeof COLL.show!=='object'){COLL.show={};ch=1}if(typeof COLL.shards!=='number'){COLL.shards=+COLL.shards||0;ch=1}if(typeof COLL.packs!=='number'){COLL.packs=+COLL.packs||0;ch=1}if(ch)saveColl()}
+let V8=v8Mig(svGet('hsV8'));
+function saveV8(){svPut('hsV8',V8)}
+function collMig(){let ch=0;if(!COLL.src)colUp(COLL);if(!COLL.var||typeof COLL.var!=='object'){COLL.var={};ch=1}if(!COLL.show||typeof COLL.show!=='object'){COLL.show={};ch=1}if(typeof COLL.shards!=='number'){COLL.shards=+COLL.shards||0;ch=1}if(typeof COLL.packs!=='number'){COLL.packs=+COLL.packs||0;ch=1}if(ch)saveColl()}
 collMig();
-const give=rw=>{collMig();COLL.shards+=rw.sh||0;COLL.packs+=rw.pk||0;saveColl()};
+/* every free reward goes through give(); `why` names the source in the pack log */
+const give=(rw,why)=>{collMig();COLL.shards+=rw.sh||0;saveColl();if(rw.pk)packAdd(rw.pk,'earn',why||'reward')};
 const rwTxt=rw=>[rw.sh?`${rw.sh}◆`:'',rw.pk?(rw.pk>1?rw.pk+' packs':'a pack'):''].filter(Boolean).join(' + ');
 const myDeck=()=>{const d=dkGet(UI.deck);return d&&dkCheck(d).ok?dkDeck(d):prebuilt(['v','m','c'].includes(UI.deck)?UI.deck:'v')};
 const deckLabel=k=>{if(k==='gaunt')return'Gauntlet';const d=dkGet(k);return d?d.name:FAC[['v','m','c'].includes(k)?k:'v'].hero};
 
 /* ---------------- cosmetics: ~3% of pack cards come as a variant. CSS-only static frames (no images, no animation, no blend) ---------------- */
-const VARS=['gild','crimson','void','prism'],VARN={gild:'GILDED',crimson:'CRIMSON FRAME',void:'VOID FRAME',prism:'PRISMATIC'},VARP=.03;
+/* v2.4: 'holo' is the chase variant: a full holographic print, rarer than the frames (rolled first, HOLOP per pack card, ~1 in 25 packs) */
+const VARS=['gild','crimson','void','prism','holo'],VARN={gild:'GILDED',crimson:'CRIMSON FRAME',void:'VOID FRAME',prism:'PRISMATIC',holo:'HOLOGRAPHIC'},VARP=ECON.pack.frame,HOLOP=ECON.pack.holo;
 let VARR=Math.random;
-function varRoll(id){if(!C[id]||!C[id].pk)return null;return VARR()<VARP?VARS[Math.min(3,Math.floor(VARR()*4))]:null}
+function varRoll(id){if(!C[id]||!C[id].pk)return null;if(VARR()<HOLOP)return'holo';return VARR()<VARP?VARS[Math.min(3,Math.floor(VARR()*4))]:null}
 function varAdd(id,v){collMig();const a=COLL.var[id]||(COLL.var[id]=[]);if(!a.includes(v))a.push(v)}
 const varHas=id=>(COLL.var&&COLL.var[id])||[];
 function varShow(id){const s=COLL.show&&COLL.show[id];return s&&varHas(id).includes(s)&&owned(id)?s:null}
@@ -31,7 +33,7 @@ function varEl(e,v){if(v&&!e.classList.contains('vr')){e.classList.add('vr','vr-
 function varSet(id,v){collMig();if(v&&!varHas(id).includes(v))return false;if(v)COLL.show[id]=v;else delete COLL.show[id];saveColl();return true}
 
 /* ---------------- crafting: pack cards only (campaign rewards and starters can't be crafted) ---------------- */
-const CRAFT={C:40,U:100,R:400,L:1600};
+const CRAFT=ECON.craft;
 const canCraft=id=>!!(C[id]&&C[id].pk);
 function craft(id){if(!canCraft(id))return{ok:0,why:C[id]&&C[id].cmp?'Campaign cards are earned, not crafted':'Starter cards are always yours'};const n=COLL.own[id]||0;
  if(n>=maxC(id))return{ok:0,why:'You already own the maximum'};const c=CRAFT[C[id].r];if(COLL.shards<c)return{ok:0,why:`Needs ${c} Shards`};COLL.shards-=c;COLL.own[id]=n+1;saveColl();return{ok:1,cost:c}}
@@ -102,8 +104,8 @@ const campOpen=(cid,i)=>i===0||campProg(cid).done.includes(i-1);
 const DIFR={easy:0,normal:1,nightmare:2};
 function campClear(key,dif){const h=CAMPI[key];if(!h)return null;const P=campProg(h.cid),first=!P.done.includes(h.i),m=difMul(dif);const out={first,key,post:h.post,cards:[],sh:0,pk:0};
  if(first){P.done.push(h.i);if(h.rw.card){const id=h.rw.card;COLL.own[id]=maxC(id);out.cards.push(id)}out.sh=Math.round((h.rw.sh||0)*m);out.pk=h.rw.pk||0}
- else out.sh=Math.round((h.rw.sh||0)*.4*m);
- if(!(DIFR[P.best[h.i]]>=DIFR[dif]))P.best[h.i]=dif;give({sh:out.sh,pk:out.pk});saveV8();return out}
+ else out.sh=Math.round((h.rw.sh||0)*ECON.camp.replay*m);
+ if(!(DIFR[P.best[h.i]]>=DIFR[dif]))P.best[h.i]=dif;give({sh:out.sh,pk:out.pk},'campaign');saveV8();return out}
 const UC={c:'v',sel:0};
 function startChapter(cid,i){const h=CAMP.find(c=>c.id===cid).ch[i];if(!campOpen(cid,i)){sfx('err');toast('Clear the previous chapter first');return}auInit();sfx('click');
  startMatch(myDeck(),cid,{foe:campDeck(h),rule:h.rule,esan:h.esan||0,boss:h.boss||null,ch:cid+':'+i,dif:V8.dif,dkey:UI.deck})}
@@ -127,29 +129,36 @@ $('#camp').addEventListener('click',e=>{const t=e.target.closest('[data-camp],[d
  else{const i=+t.dataset.ch;if(!campOpen(UC.c,i)){sfx('err');toast('Clear the previous chapter first');return}UC.sel=i}sfx('click');renderCamp()});
 
 /* ---------------- daily quests + 7-day login calendar (local date) ---------------- */
-const QT={winf:{n:1,t:q=>`Win a match with ${FAC[q.f].n}`,rw:{sh:70}},win:{n:2,t:()=>'Win 2 matches',rw:{sh:80}},rites:{n:6,t:()=>'Play 6 Rites',rw:{sh:50}},
- units:{n:14,t:()=>'Play 14 units',rw:{sh:50}},dmg:{n:40,t:()=>'Deal 40 damage to enemy minds',rw:{sh:60}},leg:{n:1,t:()=>'Play a Legendary',rw:{sh:60}},
- camp:{n:1,t:()=>'Clear a campaign chapter',rw:{pk:1}},games:{n:3,t:()=>'Finish 3 matches',rw:{sh:50}},hard:{n:1,t:()=>'Win a match on Nightmare',rw:{pk:1}}};
-const LOGIN=[{sh:30},{sh:40},{pk:1},{sh:60},{sh:80},{sh:100},{pk:1,sh:150}];
+const QT={winf:{n:1,t:q=>`Win a match with ${FAC[q.f].n}`},win:{n:2,t:()=>'Win 2 matches'},rites:{n:6,t:()=>'Play 6 Rites'},
+ units:{n:14,t:()=>'Play 14 units'},dmg:{n:40,t:()=>'Deal 40 damage to enemy minds'},leg:{n:1,t:()=>'Play a Legendary'},
+ camp:{n:1,t:()=>'Clear a campaign chapter'},games:{n:3,t:()=>'Finish 3 matches'},hard:{n:1,t:()=>'Win a match on Nightmare'}};
+for(const k in QT)QT[k].rw=ECON.quests.rw[k]||{sh:50};
+const LOGIN=ECON.login;
 function qMake(k,R){return{k,f:['v','m','c'][Math.floor(R()*3)],n:QT[k].n,p:0,cl:0}}
-function genQuests(day){const R=rng(hash('hsq'+day)),ks=Object.keys(QT),out=[];while(out.length<3){const k=ks[Math.floor(R()*ks.length)];if(!out.some(q=>q.k===k))out.push(qMake(k,R))}return out}
-function questsToday(){const t=dayKey();if(!V8.quests||V8.quests.day!==t||!Array.isArray(V8.quests.list)){V8.quests={day:t,list:genQuests(t),rr:0};saveV8()}return V8.quests}
-function questReroll(i){const Q=questsToday(),q=Q.list[i];if(!q)return{ok:0,why:'No quest'};if(Q.rr)return{ok:0,why:'You already rerolled today'};if(q.p>=q.n)return{ok:0,why:'That quest is complete'};
- const ks=Object.keys(QT).filter(k=>!Q.list.some(x=>x.k===k)),R=rng(hash('hsr'+Q.day+i));Q.list[i]=qMake(ks[Math.floor(R()*ks.length)],R);Q.rr=1;saveV8();return{ok:1}}
-function questClaim(i){const q=questsToday().list[i];if(!q||q.p<q.n||q.cl)return{ok:0};q.cl=1;give(QT[q.k].rw);saveV8();return{ok:1,rw:QT[q.k].rw}}
+function genQuests(day){const R=rng(hash('hsq'+day)),ks=Object.keys(QT),out=[];while(out.length<ECON.quests.max){const k=ks[Math.floor(R()*ks.length)];if(!out.some(q=>q.k===k))out.push(qMake(k,R))}return out}
+/* v2.6: quests are banked. A new player starts with a full set; after that ECON.quests.perDay new quests arrive each day
+   (one per missed day too) while fewer than ECON.quests.max are waiting. Claimed quests leave at the next day. */
+const dayGap=(a,b)=>{const p=k=>{const[y,m,d]=k.split('-').map(Number);return Date.UTC(y,m-1,d)};return Math.round((p(b)-p(a))/864e5)};
+function qAdd(Q){const ks=Object.keys(QT).filter(k=>!Q.list.some(q=>q.k===k));if(!ks.length)return;const R=rng(hash('hsq'+Q.day+':'+(Q.n=(Q.n||0)+1)));Q.list.push(qMake(ks[Math.floor(R()*ks.length)],R))}
+function questsToday(){const t=dayKey(),E=ECON.quests;let Q=V8.quests;
+ if(!Q||!Array.isArray(Q.list)){V8.quests={day:t,list:genQuests(t),rr:0,n:0};saveV8();return V8.quests}
+ if(Q.day!==t){const gap=Math.max(1,dayGap(Q.day,t)||1);Q.list=Q.list.filter(q=>!q.cl);Q.day=t;Q.rr=0;for(let i=0;i<gap*E.perDay&&Q.list.length<E.max;i++)qAdd(Q);saveV8()}return Q}
+function questReroll(i){const Q=questsToday(),q=Q.list[i];if(!q)return{ok:0,why:'No quest'};if(Q.rr>=ECON.quests.rerolls)return{ok:0,why:'You already rerolled today'};if(q.p>=q.n)return{ok:0,why:'That quest is complete'};
+ const ks=Object.keys(QT).filter(k=>!Q.list.some(x=>x.k===k)),R=rng(hash('hsr'+Q.day+i));Q.list[i]=qMake(ks[Math.floor(R()*ks.length)],R);Q.rr=(Q.rr|0)+1;saveV8();return{ok:1}}
+function questClaim(i){const q=questsToday().list[i];if(!q||q.p<q.n||q.cl)return{ok:0};q.cl=1;give(QT[q.k].rw,'quest');saveV8();return{ok:1,rw:QT[q.k].rw}}
 function questProgress(g,win,camp){const Q=questsToday(),st=g.st||{},done=[];for(const q of Q.list){if(q.p>=q.n)continue;const b=q.p;
   switch(q.k){case'winf':if(win&&g.p[0].fac===q.f)q.p++;break;case'win':if(win)q.p++;break;case'rites':q.p+=st.rites||0;break;case'units':q.p+=st.units||0;break;
    case'dmg':q.p+=st.dmg||0;break;case'leg':q.p+=st.leg?1:0;break;case'camp':if(camp)q.p++;break;case'games':q.p++;break;case'hard':if(win&&g.dif==='nightmare')q.p++;break}
   q.p=Math.min(q.n,q.p);if(q.p>=q.n&&b<q.n)done.push(QT[q.k].t(q))}return done}
 function loginCheck(){const t=dayKey(),L=V8.login;if(L.last===t)return L;L.day=L.last&&dayAdd(L.last,1)===t?L.day%7+1:1;L.last=t;saveV8();return L}
 const loginCan=()=>{const L=loginCheck();return L.claimed!==L.last};
-function loginClaim(){const L=loginCheck();if(L.claimed===L.last)return{ok:0};L.claimed=L.last;const rw=LOGIN[L.day-1];give(rw);saveV8();return{ok:1,rw,day:L.day}}
+function loginClaim(){const L=loginCheck();if(L.claimed===L.last)return{ok:0};L.claimed=L.last;const rw=LOGIN[L.day-1];give(rw,'login');saveV8();return{ok:1,rw,day:L.day}}
 const qClaimable=()=>questsToday().list.filter(q=>q.p>=q.n&&!q.cl).length+(loginCan()?1:0);
 function renderQuests(){const L=loginCheck(),Q=questsToday(),can=L.claimed!==L.last;
  $('#qcal').innerHTML=LOGIN.map((r,i)=>{const d=i+1,st=d<L.day||(d===L.day&&!can)?'got':d===L.day?'now':'';return`<div class="qd ${st}"><small>Day ${d}</small><b>${r.pk?'<i class="qpk"></i>':''}${r.sh?r.sh+'◆':''}</b>${st==='got'?'<em>✓</em>':''}</div>`}).join('');
  $('#qlog').innerHTML=can?`<button class="btn" id="qLogin">Claim day ${L.day}: ${rwTxt(LOGIN[L.day-1])}</button>`:`<p class="qnote">Day ${L.day} claimed. Come back tomorrow to keep the streak. Miss a day and it starts over.</p>`;
- $('#qlist').innerHTML=Q.list.map((q,i)=>{const T=QT[q.k],full=q.p>=q.n;return`<div class="qq${full?' full':''}${q.cl?' cl':''}"><div class="qt"><b>${T.t(q)}</b><span>${rwTxt(T.rw)}</span></div><div class="pbarw"><i style="width:${(q.p/q.n*100).toFixed(0)}%"></i></div><div class="qa"><small>${q.p}/${q.n}</small>${q.cl?'<em>Claimed</em>':full?`<button class="btn sm" data-qc="${i}">Claim</button>`:Q.rr?'':`<button class="btn sm ghost" data-qr="${i}">Reroll</button>`}</div></div>`}).join('');
- $('#qfoot').textContent=Q.rr?'Reroll used today. New quests at local midnight.':'You can reroll one quest per day. New quests at local midnight.';
+ $('#qlist').innerHTML=Q.list.map((q,i)=>{const T=QT[q.k],full=q.p>=q.n;return`<div class="qq${full?' full':''}${q.cl?' cl':''}"><div class="qt"><b>${T.t(q)}</b><span>${rwTxt(T.rw)}</span></div><div class="pbarw"><i style="width:${(q.p/q.n*100).toFixed(0)}%"></i></div><div class="qa"><small>${q.p}/${q.n}</small>${q.cl?'<em>Claimed</em>':full?`<button class="btn sm" data-qc="${i}">Claim</button>`:Q.rr>=ECON.quests.rerolls?'':`<button class="btn sm ghost" data-qr="${i}">Reroll</button>`}</div></div>`}).join('');
+ $('#qfoot').textContent=`A new quest arrives each day, up to ${ECON.quests.max} waiting. ${Q.rr>=ECON.quests.rerolls?'Reroll used today.':'You can reroll one quest per day.'}`;
  const lb=$('#qLogin');if(lb)lb.onclick=()=>{const r=loginClaim();if(r.ok){sfx('heal');toast('Day '+r.day+': '+rwTxt(r.rw))}renderQuests();badges()}}
 $('#qlist').addEventListener('click',e=>{const c=e.target.closest('[data-qc]'),r=e.target.closest('[data-qr]');
  if(c){const o=questClaim(+c.dataset.qc);if(o.ok){sfx('heal');toast('Quest reward: '+rwTxt(o.rw))}}else if(r){const o=questReroll(+r.dataset.qr);sfx(o.ok?'click':'err');if(!o.ok)toast(o.why)}else return;renderQuests();badges()});
@@ -195,10 +204,11 @@ $('#craft').addEventListener('click',async e=>{const id=CF.id;if(!id)return;cons
  else if(t.dataset.vr!==undefined){varSet(id,t.dataset.vr||null);sfx('click');renderColl()}});
 
 /* ---------------- hub, badges, quick-play difficulty ---------------- */
-function badges(){const q=qClaimable(),p=COLL.packs,set=(id,n)=>{const b=$(id);if(!b)return;const t=n>0?String(n):'';if(b.textContent!==t)b.textContent=t;b.classList.toggle('on',n>0)};set('#bgQ',q);set('#bgPk',p);try{set('#bgW',weekClaimable()?1:0);set('#bgA',achNew())}catch(e){}}
+function badges(){const q=qClaimable(),p=COLL.packs,set=(id,n)=>{const b=$(id);if(!b)return;const t=n>0?String(n):'';if(b.textContent!==t)b.textContent=t;b.classList.toggle('on',n>0)};set('#bgQ',q);set('#bgPk',p);{const b=$('#bgSt');if(b){const n=COLL.ent&&COLL.ent.pickL>0;b.textContent=n?'!':'';b.classList.toggle('on',!!n)}}try{set('#bgW',weekClaimable()?1:0);set('#bgA',achNew())}catch(e){}}
 function renderPdif(){const b=$('#pdif');if(b)b.innerHTML=Object.keys(DIFS).map(k=>`<button data-pd="${k}" class="${V8.dif===k?'on':''}">${DIFS[k].n}</button>`).join('')+`<small>${DIFS[V8.dif].d}</small>`}
 $('#pdif').addEventListener('click',e=>{const b=e.target.closest('[data-pd]');if(!b)return;V8.dif=b.dataset.pd;saveV8();sfx('click');renderPdif()});
 function v8Show(id){try{if(id==='title')badges();if(id==='camp')renderCamp();if(id==='quests')renderQuests();if(id==='stats')renderStats();if(id==='pick')renderPdif();if(id==='coll')craftSync()}catch(e){console.warn('v8 screen',e)}}
+onShow(v8Show);
 $('#bCamp').onclick=()=>{sfx('click');show('camp')};$('#bQuest').onclick=()=>{sfx('click');show('quests')};$('#bStats').onclick=()=>{sfx('click');show('stats')};
 loginCheck();questsToday();badges();
 Object.defineProperty(window.__hs,'V8',{get(){return V8},set(v){V8=v8Mig(v)},configurable:true});

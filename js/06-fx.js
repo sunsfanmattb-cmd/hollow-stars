@@ -8,7 +8,6 @@ var QL;QL={rm:matchMedia('(prefers-reduced-motion: reduce)'),mobile:/Android|iPh
 function qDefault(){return QL.mobile?'medium':'high'}
 const QLV={high:{n:.55,shake:.7,fxd:1.5,bgd:1.25,bgfps:30,vid:2},medium:{n:.3,shake:.45,fxd:1,bgd:1,bgfps:15,vid:1},low:{n:.15,shake:0,fxd:1,bgd:.75,bgfps:8,vid:0}};
 const qv=()=>QLV[QL.q]||QLV.medium;
-const FXQ={rm:QL.rm,get low(){return QL.q==='low'},set low(v){setQuality(v?'low':'auto')}};
 const fxLow=()=>QL.q==='low'||QL.rm.matches;
 function qApply(){const b=document.body;for(const k of['high','medium','low'])b.classList.toggle('q-'+k,QL.q===k);b.classList.toggle('fxlow',fxLow());
  if(FX.cv)fxSize();if(typeof bgInit==='function'&&BG.cv)bgInit();VID.max=qv().vid;if(typeof madSet==='function'&&G){MZ.me=-1;madSet()}const s=$('#sQ');if(s)s.value=QL.pref;const n=$('#sQn');if(n)n.textContent=QL.pref==='auto'?'Auto · now '+QL.q[0].toUpperCase()+QL.q.slice(1):''}
@@ -59,7 +58,6 @@ function drawP(x,p,u){switch(p.t){
 /* ---------- screen shake (WAAPI transform, decays) ---------- */
 function shake(el,mag,ms=260){ms=Math.min(ms,320);if(!el||fxLow()||mag<=0)return;mag*=qv().shake;const k=[];for(let i=0;i<=8;i++){const f=(1-i/8)*mag;k.push({transform:i===8?'none':`translate(${rr(-f,f).toFixed(1)}px,${rr(-f,f).toFixed(1)}px) rotate(${rr(-f,f)*.08}deg)`})}el.animate(k,{duration:ms,easing:'ease-out'})}
 /* ---------- combat impacts ---------- */
-const FAC_HIT={v:'#2a0838',m:'#9ef8ff',c:'#8a0414',n:'#d8c8a0'};
 function impact(f,x,y,ax,ay,n,hero){const dx=x-ax,dy=y-ay,L=Math.hypot(dx,dy)||1,ux=dx/L,uy=dy/L,big=hero?1.6:1,cnt=k=>nq((k+n*3)*big);
  f=f||'n';
  if(f==='v'){if(ax||ay){const t=sp('te',ax,ay,0,0,.55,9*big,'');if(t){t.x2=x;t.y2=y;t.k=Math.random()*6}}
@@ -80,7 +78,7 @@ function dmgFx(f){const el=f.id[0]==='h'?heroBox(+f.id[1]):tEl(f.id);if(!el)retu
  const mag=Math.min(hero?16:9,(hero?5:1.5)+f.n*(hero?1.6:1));shake($('#match'),mag,hero?520:340);
  if(hero){bump(el,'heavy');if(!fxLow()){const h=$('#hflash');restartCls(h,'on')}sfx(+f.id[1]===0?'heroHitMe':'heroHit')}else sfx('hit'+(f.f||'n'))}
 /* ---------- unit enters the board: ripple across the mat ---------- */
-function enterFx(uid){const el=tEl('u'+uid);if(!el)return;const u=findU(G,uid),f=u?C[u.id].f:'n',[x,y]=center(el),r=el.getBoundingClientRect();
+function enterFx(uid){const el=tEl('u'+uid);if(!el)return;const u=findU(G,uid),f=u?C[u.id].f:'n',[x,y]=center(el),r=rectOf(el);
  const col={v:'#6affd0',m:'#ffb050',c:'#ff2a3a',n:'#e0d0a0'}[f];for(let i=0;i<nq(3);i++){const g=sp('rg',x,r.bottom-4,0,0,1.1+i*.2,innerWidth*.55,col);if(g){g.k=2.2-i*.5;g.vr=.32;g.a=.55-i*.12;g.dl=i*.12;g.add=1}}
  if(f==='m')for(let i=0;i<nq(14);i++){const a=rr(Math.PI,Math.PI*2),s=rr(120,380),p=sp('sp',x+rr(-r.width/2,r.width/2),r.bottom,Math.cos(a)*s,Math.sin(a)*s,rr(.2,.5),1.4,'#ffd080');if(p){p.add=1;p.g=600}}
  if(f==='c')for(let i=0;i<nq(12);i++){const a=rr(Math.PI*1.1,Math.PI*1.9),s=rr(100,300),p=sp('dr',x+rr(-r.width/2,r.width/2),r.bottom-6,Math.cos(a)*s,Math.sin(a)*s,rr(.4,.8),rr(1.4,3),'#7a0410');if(p){p.g=1000}}
@@ -90,7 +88,7 @@ function enterFx(uid){const el=tEl('u'+uid);if(!el)return;const u=findU(G,uid),f
 function artImg(id){let im=FX.img[id];if(!im){im=new Image();im.src=realArtS(id);FX.img[id]=im}return im}
 function crackLines(r){const cx=r.left+r.width*rr(.35,.65),cy=r.top+r.height*rr(.3,.6),L=[];for(let i=0;i<7;i++){let a=i/7*6.28+rr(-.3,.3),x=cx,y=cy;const l=[x,y];for(let k=0;k<5;k++){a+=rr(-.5,.5);const s=Math.max(r.width,r.height)*rr(.08,.16);x+=Math.cos(a)*s;y+=Math.sin(a)*s;l.push(x,y)}L.push(l)}return{L,cx,cy}}
 function deathFx(f){const el=document.querySelector(`.unit.dying[data-u="${f.id.slice(1)}"]`)||tEl(f.id);const id=f.cid||(el&&el.dataset.cid);if(!el||!id)return;
- const d=C[id],fac=d.f,tok=d.r==='T',r=el.getBoundingClientRect();sfx('die'+fac);
+ const d=C[id],fac=d.f,tok=d.r==='T',r=rectOf(el);sfx('die'+fac);
  if(fxLow()){el.classList.add('shatter');for(let i=0;i<nq(10);i++)sp('sm',r.left+rr(0,r.width),r.top+rr(0,r.height),0,-20,.8,14,fac==='c'?'#5a0208':'#3a3040');return}
  const{L,cx,cy}=crackLines(r);const ck=sp('ck',0,0,0,0,.34,2.2,fac==='m'?'#9ef8ff':fac==='v'?'#c890ff':'#ff4050');if(ck){ck.pts=L;ck.add=1}
  el.classList.add('cracking');setTimeout(()=>{el.classList.add('shatter');shatter(el,r,id,fac,tok,cx,cy)},150);shake($('#match'),tok?3:6,300)}
@@ -113,7 +111,7 @@ function shatter(el,r,id,fac,tok,cx,cy){const im=artImg(id),cols=tok?2:3,rows=to
  else for(let i=0;i<nq(16*k);i++)sp('sm',X+rr(-r.width/2,r.width/2),Y+rr(-r.height/2,r.height/2),rr(-15,15),rr(-50,-10),rr(.8,1.4),rr(14,24),'#6a6050')}
 /* ---------- blood drop: drip + splatter on damage, pulse on heal ---------- */
 function dropFx(h,heal){if(heal){restartCls(h,'refill');clearTimeout(h._r);h._r=setTimeout(()=>h.classList.remove('refill'),900);return}
- const r=h.getBoundingClientRect(),x=r.left+r.width/2,y=r.bottom-r.height*.12;for(let i=0;i<nq(7);i++){const p=sp('dr',x+rr(-3,3),y,rr(-70,70),rr(-120,20),rr(.4,.8),rr(1,2.4),'#a00818');if(p){p.g=1100;p.dl=i*.03}}
+ const r=rectOf(h),x=r.left+r.width/2,y=r.bottom-r.height*.12;for(let i=0;i<nq(7);i++){const p=sp('dr',x+rr(-3,3),y,rr(-70,70),rr(-120,20),rr(.4,.8),rr(1,2.4),'#a00818');if(p){p.g=1100;p.dl=i*.03}}
  const q=sp('pl',x,y+r.height*.45,0,0,1.1,r.width*.38,'#6a0410');if(q){q.a=.7;q.dl=.25}}
 /* ---------- madness escalation ---------- */
 const MZ={me:0,op:0,t:null,wn:0};
@@ -154,7 +152,7 @@ function tiltOff(){const el=TL.el;if(!el)return;el.style.transform='';el.style.r
    Transform-only (card rotate, art parallax, glare + foil light layers translate), one rAF loop that runs only while the view is open.
    Axes are remapped by screen orientation so it feels the same in portrait and landscape. (v7 drove a page-wide CSS var from the
    sensor at ~60 Hz, which restyled and repainted every card on screen: removed.) */
-const ZTMAX=13;const ZT={c:null,raf:0,tx:0,ty:0,x:0,y:0,base:null,sens:0,fing:0,ev:0};
+const ZTMAX=13,ZTSK=2.4;const ZT={c:null,raf:0,tx:0,ty:0,x:0,y:0,base:null,sens:0,fing:0,ev:0};
 function scrAngle(){const a=screen.orientation&&typeof screen.orientation.angle==='number'?screen.orientation.angle:(typeof window.orientation==='number'?window.orientation:0);return((a%360)+360)%360}
 function orient(e){if(e.gamma==null||e.beta==null)return;ZT.ev++;const a=scrAngle();let x,y;
  if(a===90){x=e.beta;y=-e.gamma}else if(a===270){x=-e.beta;y=e.gamma}else if(a===180){x=-e.gamma;y=-e.beta}else{x=e.gamma;y=e.beta}
@@ -168,10 +166,14 @@ function ztOpen(card){gyroOn();ZT.c=card;ZT.base=null;ZT.x=ZT.y=ZT.tx=ZT.ty=0;ZT
     transform animations (unbounded cull rect), so tilting never re-records paint; inline style.transform from JS re-painted the art,
     the lp layer and the card frame on every frame (tests/tiltprobe.py) */
  const A=ZT.an={},mk=(el,a,b)=>{if(!el)return null;const n=el.animate([{transform:a},{transform:b}],{duration:1000,fill:'both',composite:'add'});n.pause();n.currentTime=500;return n};
- card.style.transform='perspective(900px)';A.ry=mk(card,`rotateY(${-ZTMAX}deg)`,`rotateY(${ZTMAX}deg)`);A.rx=mk(card,`rotateX(${ZTMAX}deg)`,`rotateX(${-ZTMAX}deg)`);
+ /* v2.5: no perspective(). Any perspective makes the card's on-screen scale change with the angle, and Chrome then re-rasterises every
+    layer in the card (and its rounded-clip mask layers) again and again while it turns: the flicker players saw when tilting by finger
+    or gyroscope (probe/tilt.py: 24 whole-card repaints per pass with perspective, 0 without). The turn now reads from 2D cues - the
+    rotation's foreshortening plus a slight skew that leans the near edge in - with the art parallax and the moving light doing the depth. */
+ card.style.transform='none';A.ry=mk(card,`rotateY(${-ZTMAX}deg) skewY(${ZTSK}deg)`,`rotateY(${ZTMAX}deg) skewY(${-ZTSK}deg)`);A.rx=mk(card,`rotateX(${ZTMAX}deg) skewX(${-ZTSK*.7}deg)`,`rotateX(${-ZTMAX}deg) skewX(${ZTSK*.7}deg)`);
  const pa=card.querySelector('.lg')||card.querySelector('.ap');if(pa){pa.style.transform='scale(1.07)';A.ax=mk(pa,'translate3d(3.2%,0,0)','translate3d(-3.2%,0,0)');A.ay=mk(pa,'translate3d(0,2.4%,0)','translate3d(0,-2.4%,0)')}
- const gl=card.querySelector('.glare');A.gx=mk(gl,'translate3d(-37.6%,0,0)','translate3d(37.6%,0,0)');A.gy=mk(gl,'translate3d(0,-28%,0)','translate3d(0,28%,0)');
- const fs=card.querySelector('.fsh');A.fx=mk(fs,'translate3d(54%,0,0)','translate3d(-54%,0,0)');A.fy=mk(fs,'translate3d(0,30%,0)','translate3d(0,-30%,0)');ztKick()}
+ const gl=card.querySelector('.glare');A.gx=mk(gl,'translate3d(-44%,0,0)','translate3d(44%,0,0)');A.gy=mk(gl,'translate3d(0,-33%,0)','translate3d(0,33%,0)');
+ /* v2.5: the foil light is 1.9x the card (was 2.6x = 17 MB of GPU texture on a phone); same travel, larger percentages */const fs=card.querySelector('.fsh');A.fx=mk(fs,'translate3d(74%,0,0)','translate3d(-74%,0,0)');A.fy=mk(fs,'translate3d(0,41%,0)','translate3d(0,-41%,0)');ztKick()}
 function ztClose(){gyroOff();if(ZT.an)for(const k in ZT.an)ZT.an[k]&&ZT.an[k].cancel();ZT.an=null;ZT.c=null;ZT.base=null;if(ZT.raf){cancelAnimationFrame(ZT.raf);ZT.raf=0}}
 function ztFinger(nx,ny){if(!ZT.c)return;ZT.fing=performance.now();ZT.tx=nx;ZT.ty=ny;ztKick()}
 function ztKick(){if(!ZT.raf&&ZT.c&&!LG.rm.matches)ZT.raf=requestAnimationFrame(ztFrame)}
@@ -189,14 +191,14 @@ function ztFrame(t){ZT.raf=0;const c=ZT.c;if(!c||!c.isConnected){ZT.c=null;retur
 /* v9 battery: the deviceorientation listener is attached only while the zoom view is open (gyroOn/gyroOff) */
 /* ---------- pack opening ---------- */
 function packTearFx(){const el=$('#pwrap'),r=el.getBoundingClientRect(),x=r.left+r.width/2,y=r.top+r.height*.14;shake($('#pstage'),10,500);
- for(let i=0;i<nq(40);i++){const a=rr(0,7),s=rr(150,700),p=sp('sp',x+rr(-r.width/2,r.width/2),y,Math.cos(a)*s,Math.sin(a)*s,rr(.3,.8),rr(1,2.5),i%2?'#e0b0ff':'#ffffff');if(p){p.add=1;p.dr=2;p.g=300}}
- for(let i=0;i<nq(16);i++){const p=sp('as',x+rr(-r.width/2,r.width/2),y+rr(-6,6),rr(-200,200),rr(-420,-120),rr(.8,1.4),rr(3,7),'#3a2a48');if(p){p.g=900;p.k=rr(0,6)}}
- const fl=sp('fl',x,r.top+r.height/2,0,0,.6,r.width*1.4,'#c080ff');if(fl){fl.add=1;fl.a=.8}}
-function flipFx(s,rar){const r=s.getBoundingClientRect(),x=r.left+r.width/2,y=r.top+r.height/2,col={C:'#c8c8c8',U:'#4aa8e0',R:'#ffc850',L:'#ff6af0'}[rar]||'#ccc',n={C:6,U:14,R:26,L:60}[rar]||6;
- for(let i=0;i<nq(n);i++){const a=rr(0,7),sp_=rr(80,rar==='L'?900:420),p=sp('sp',x,y,Math.cos(a)*sp_,Math.sin(a)*sp_,rr(.3,.8),rr(1,2.4),i%3?col:'#ffffff');if(p){p.add=1;p.dr=2.2}}
- if(rar!=='C'){const fl=sp('fl',x,y,0,0,.6,r.width*(rar==='L'?3:1.4),col);if(fl){fl.add=1;fl.a=.7}}
+ for(let i=0;i<nq(40);i++){const a=rr(0,7),s=rr(150,700),p=sp('sp',x+rr(-r.width/2,r.width/2),y,Math.cos(a)*s,Math.sin(a)*s,rr(.3,.8),rr(1,2.5),i%2?'#a89880':'#d8ccb4');if(p){p.add=1;p.dr=2;p.g=300;p.a=.7}}
+ for(let i=0;i<nq(16);i++){const p=sp('as',x+rr(-r.width/2,r.width/2),y+rr(-6,6),rr(-200,200),rr(-420,-120),rr(.8,1.4),rr(3,7),'#1a1214');if(p){p.g=900;p.k=rr(0,6)}}
+ const fl=sp('fl',x,r.top+r.height/2,0,0,.6,r.width*1.2,'#8a3a1a');if(fl){fl.add=1;fl.a=.55}}
+function flipFx(s,rar){const r=s.getBoundingClientRect(),x=r.left+r.width/2,y=r.top+r.height/2,col={C:'#8a8478',U:'#6a9aa0',R:'#c09848',L:'#d8c070'}[rar]||'#8a8478',n={C:6,U:14,R:26,L:60}[rar]||6;
+ for(let i=0;i<nq(n);i++){const a=rr(0,7),sp_=rr(80,rar==='L'?900:420),p=sp('sp',x,y,Math.cos(a)*sp_,Math.sin(a)*sp_,rr(.3,.8),rr(1,2.4),i%3?col:'#e8dcc4');if(p){p.add=1;p.dr=2.2;p.a=.8}}
+ if(rar!=='C'){const fl=sp('fl',x,y,0,0,.6,r.width*(rar==='L'?2.4:1.2),col);if(fl){fl.add=1;fl.a=.45}}
  if(rar==='L'){shake($('#pstage'),11,320);const W=innerWidth,H=innerHeight;const nt=QL.q==='high'?6:4;for(let i=0;i<nt;i++){const a=i/nt*6.28,t=sp('te',x,y,0,0,1.1,18,'');if(t){t.x2=x+Math.cos(a)*W*.7;t.y2=y+Math.sin(a)*H*.6;t.k=i;t.dl=i*.03}}
-  const f2=sp('fl',x,y,0,0,1.1,Math.max(W,H)*.55,'#6affc0');if(f2){f2.add=1;f2.a=.35;f2.dl=.1}for(let i=0;i<(QL.q==='high'?2:1);i++){const g=sp('rg',x,y,0,0,1+i*.25,Math.max(W,H),'#ff9af0');if(g){g.k=4;g.add=1;g.dl=i*.15}}sfx('sting')}}
+  const f2=sp('fl',x,y,0,0,1.1,Math.max(W,H)*.5,'#6a1a10');if(f2){f2.add=1;f2.a=.4;f2.dl=.1}for(let i=0;i<(QL.q==='high'?2:1);i++){const g=sp('rg',x,y,0,0,1+i*.25,Math.max(W,H),'#c8a868');if(g){g.k=3;g.add=1;g.a=.5;g.dl=i*.15}}sfx('sting')}}
 /* ---------- living board (drawn on the background canvas, ~22 fps) ---------- */
 const LB={drips:[],pools:[],sparks:[],lamps:[[.064,.243],[.31,.083],[.041,.668],[.322,.911],[.674,.911],[.938,.217],[.945,.703],[.718,.052]],t:0};
 function livingBoard(x,t,W,H){if(!G||!BG.painted)return;const f=G.p[0].fac,low=fxLow(),land=isLand();BG.rip=BG.rip||[];
@@ -213,15 +215,14 @@ function livingBoard(x,t,W,H){if(!G||!BG.painted)return;const f=G.p[0].fac,low=f
  x.globalCompositeOperation='lighter';for(const p of BG.rip){const a=(t-p.t)/(p.amb?2600:1500);if(a>1){p.dead=1;continue}const col={v:'#6affd0',m:'#ffb050',c:'#ff2a3a',n:'#e0d0a0'}[p.f]||'#fff';x.globalAlpha=(1-a)*(p.amb?.12:.35);x.strokeStyle=col;x.lineWidth=p.amb?1:2;
   for(let k=0;k<(p.amb?2:3);k++){const rr_=(a*(p.amb?.25:.7)*W)*(1-k*.18);if(rr_<=0)continue;x.beginPath();ell(x,p.x,p.y,rr_,rr_*.4,0,0,7);x.stroke()}}BG.rip=BG.rip.filter(p=>!p.dead);x.globalCompositeOperation='source-over';x.globalAlpha=1}
 /* ---------- settings ---------- */
-function setFx(low){setQuality(low?'low':'auto')}
 function settingsOpen(){{const sp=$('#sSpd');if(sp){const v=String(UI.speed);sp.value=[...sp.options].some(o=>o.value===v)?v:'1'}}$('#sVol').value=Math.round(AU.vol*100);$('#sQ').value=QL.pref;$('#sMute').checked=AU.mute;qApply();$('#settings').classList.add('on')}
 fxInit();qApply();QL.rm.addEventListener&&QL.rm.addEventListener('change',()=>setQuality(QL.pref));
-$('#bSet').onclick=()=>{sfx('click');settingsOpen()};$('#mset').onclick=()=>{sfx('click');settingsOpen()};$('#sClose').onclick=()=>{sfx('click');$('#settings').classList.remove('on')};
+$('#tset').onclick=()=>{sfx('click');settingsOpen()};$('#mset').onclick=()=>{sfx('click');settingsOpen()};$('#sClose').onclick=()=>{sfx('click');$('#settings').classList.remove('on')};
 $('#settings').addEventListener('click',e=>{if(e.target.id==='settings')$('#settings').classList.remove('on')});
 $('#sVol').addEventListener('input',e=>{auInit();AU.vol=+e.target.value/100;localStorage.setItem('hsVol',AU.vol.toFixed(2));auVol()});
 $('#sQ').addEventListener('change',e=>{sfx('click');setQuality(e.target.value)});$('#sSpd').addEventListener('change',e=>{sfx('click');UI.speed=+e.target.value||1;try{localStorage.setItem('hsSpd',String(UI.speed))}catch(x){}});$('#sMute').addEventListener('change',e=>{auInit();AU.mute=e.target.checked;localStorage.setItem('hsMute',AU.mute?'1':'0');updMute()});
 $('#cin').addEventListener('pointerdown',e=>{e.stopPropagation();cinSkip()},true);
-Object.assign(window.__hs,{gyroOn,gyroOff,qKick,ZTMAX,sfx,SFX,auVol,vidReady,ZT,ztOpen,ztClose,ztFinger,scrAngle,FX,FXQ,QL,qv,setQuality,qApply,fxLow,setFx,MZ,madSet,whisper,lgCinema,CIN,cinSkip,impact,deathFx,dropFx,tiltHeld,tiltOff,TL,orient,LB,AU,shake});
+Object.assign(window.__hs,{gyroOn,gyroOff,qKick,ZTMAX,sfx,SFX,auVol,vidReady,ZT,ztOpen,ztClose,ztFinger,scrAngle,FX,QL,qv,setQuality,qApply,fxLow,MZ,madSet,whisper,lgCinema,CIN,cinSkip,impact,deathFx,dropFx,tiltHeld,tiltOff,TL,orient,LB,AU,shake});
 /* v7.3 keyword tooltip: tap/hover a keyword icon on a unit (long-press still opens the full card) */
 (function(){const tip=$('#kwtip');let tt=0;function show(sv){const k=sv.dataset.k||sv.dataset.kw;if(!k||!KW[k])return;tip.innerHTML=`<b>${KW[k][0]}</b> · ${KW[k][1]}`;const r=sv.getBoundingClientRect();
   tip.style.left=Math.max(118,Math.min(innerWidth-118,r.left+r.width/2))+'px';tip.style.top=Math.max(40,r.top)+'px';tip.classList.add('on');clearTimeout(tt);tt=setTimeout(()=>tip.classList.remove('on'),1800)}

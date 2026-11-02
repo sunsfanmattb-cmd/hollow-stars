@@ -33,4 +33,20 @@ function raysCanvas(col){const cv=document.createElement('canvas');cv.width=cv.h
   if(p&&p.then){document.body.classList.add('cinhold');p.then(()=>document.body.classList.remove('cinhold'),()=>document.body.classList.remove('cinhold'))}
   return p}}
 
-Object.assign(window.__hs,{CVIS,RAYS});
+/* ---- v2.5 zoom without pop-in ----
+   The zoom shows a card's full-size painting (600x840 for Legendaries). It used to appear with the small art and swap the big one in
+   when it finished decoding: a visible pop, plus a repaint of the largest layers right as the zoom animated in. Now the big art
+   starts decoding the moment a finger (or the mouse) touches a card - the long-press alone takes 480 ms, a 600x840 WebP decodes in
+   well under that. If it is still decoding when the zoom opens, the zoom is built as usual but the card stays invisible (.zwait)
+   until the art is ready (at most 260 ms), then fades in. Decoded images are kept warm in BIG (most recent 24). */
+const BIG={im:new Map(),max:24,tok:0};
+function bigWarm(id){if(!id||!C[id])return Promise.resolve();let e=BIG.im.get(id);if(!e){const im=new Image();im.decoding='async';im.src=realArt(id);
+  e={im,p:(im.decode?im.decode():new Promise(r=>{im.onload=r})).catch(()=>{}).then(()=>{e.ok=1})};BIG.im.set(id,e);
+  if(BIG.im.size>BIG.max)BIG.im.delete(BIG.im.keys().next().value)}else{BIG.im.delete(id);BIG.im.set(id,e)}return e.p}
+document.addEventListener('pointerdown',e=>{const c=e.target.closest&&e.target.closest('[data-cid]');if(c)bigWarm(c.dataset.cid)},true);
+document.addEventListener('pointerover',e=>{if(e.pointerType!=='mouse')return;const c=e.target.closest&&e.target.closest('#cgrid [data-cid],#bgrid [data-cid]');if(c)bigWarm(c.dataset.cid)},{passive:true});
+{const s1=showZoom;showZoom=function(el){const r=s1.apply(this,arguments),id=el&&el.dataset&&el.dataset.cid,e=id&&BIG.im.get(id),z=$('#zoom'),tok=++BIG.tok;
+  if(id&&!(e&&e.ok)&&z.classList.contains('on')){z.classList.add('zwait');Promise.race([bigWarm(id),sleep(260)]).then(()=>{if(BIG.tok===tok)z.classList.remove('zwait')})}return r}}
+{const h1=hideZoom;hideZoom=function(){BIG.tok++;return h1.apply(this,arguments)}}
+
+Object.assign(window.__hs,{CVIS,RAYS,BIG,bigWarm});
