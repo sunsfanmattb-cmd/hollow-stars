@@ -53,6 +53,8 @@ with sync_playwright() as p:
     ev("COLL.pity={L:0,H:0};saveColl()")
     n = ev("(()=>{let L=0;const N=4000;for(let i=0;i<N;i++){if(rollPack().some(id=>C[id].r==='L'))L++}return L/N})()")
     check('base Legendary rate is about 10%', 0.08 < n < 0.12, n)
+    e = ev("(()=>{let E=0;const N=4000;for(let i=0;i<N;i++){if(rollPack().some(id=>C[id].r==='E'))E++}return E/N})()")
+    check('Epic rate is about 12%', 0.095 < e < 0.145, e)
 
     # ---- quests: banked, one per day, max 3 ----
     ev("V8NOW=Date.parse('2026-11-02T12:00:00');V8.quests=null;questsToday()")

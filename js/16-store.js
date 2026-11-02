@@ -35,14 +35,14 @@ const modalClose=()=>{$('#odds').className=''};
 $('#oddsClose').onclick=()=>{sfx('click');modalClose()};$('#odds').addEventListener('click',e=>{if(e.target.id==='odds')modalClose()});
 
 const oPct=x=>{const v=x*100;const t=v>=10?v.toFixed(0):v.toFixed(2);return(t.includes('.')?t.replace(/\.?0+$/,''):t)+'%'};
-function oddsHTML(){const E=ECON.pack,P=COLL.pity,n=k=>PACK.filter(id=>C[id].r===k).length,RN={C:'Common',U:'Uncommon',R:'Rare',L:'Legendary'};
+function oddsHTML(){const E=ECON.pack,P=COLL.pity,n=k=>PACK.filter(id=>C[id].r===k).length,RN={C:'Common',U:'Uncommon',R:'Rare',E:'Epic',L:'Legendary'};
  const slots=[];E.slots.forEach((k,i)=>{const l=slots[slots.length-1];if(l&&l.k===k)l.to=i+1;else slots.push({k,from:i+1,to:i+1})});
  const holoPack=1-Math.pow(1-E.holo,E.slots.length),frame=(1-E.holo)*E.frame/4;
- return`<table class="otab"><tr><th>Slot</th><th>Card</th></tr>${slots.map(s=>`<tr><td>${s.from===s.to?'Card '+s.from:`Cards ${s.from}–${s.to}`}</td><td>${s.k==='R'?`Rare ${oPct(1-E.legChance)} · <b class="r-L">Legendary ${oPct(E.legChance)}</b>`:RN[s.k]+' 100%'}</td></tr>`).join('')}</table>
- <p class="onote">Within a rarity every card is equally likely (${n('C')} Commons, ${n('U')} Uncommons, ${n('R')} Rares, ${n('L')} Legendaries). Earned and purchased packs use the same odds.</p>
+ return`<table class="otab"><tr><th>Slot</th><th>Card</th></tr>${slots.map(s=>`<tr><td>${s.from===s.to?'Card '+s.from:`Cards ${s.from}–${s.to}`}</td><td>${s.k==='R'?`Rare ${oPct(1-E.legChance-(E.epicChance||0))} · <b class="r-E">Epic ${oPct(E.epicChance||0)}</b> · <b class="r-L">Legendary ${oPct(E.legChance)}</b>`:RN[s.k]+' 100%'}</td></tr>`).join('')}</table>
+ <p class="onote">Within a rarity every card is equally likely (${n('C')} Commons, ${n('U')} Uncommons, ${n('R')} Rares, ${n('E')} Epics, ${n('L')} Legendaries). Earned and purchased packs use the same odds.</p>
  <h3>GUARANTEES</h3><div class="ogu"><div><b>Legendary</b><span>At least one every ${E.legPity} packs</span><small>${P.L} opened since your last</small></div><div><b>Holographic</b><span>At least one every ${E.holoPity} packs</span><small>${P.H} opened since your last</small></div></div>
  <h3>SPECIAL PRINTS</h3><table class="otab"><tr><th>Each card</th><th>Chance</th></tr><tr><td>Holographic</td><td>${oPct(E.holo)}</td></tr><tr><td>Gilded, Crimson Frame, Void Frame, Prismatic</td><td>${oPct(frame)} each</td></tr><tr><td>A pack with a holographic card</td><td>${oPct(holoPack)}</td></tr></table>
- <h3>DUPLICATES</h3><p class="onote">Copies beyond the most you can use (2, or 1 for a Legendary) become Shards: ${['C','U','R','L'].map(k=>`${RN[k]} ${ECON.dup[k]}◆`).join(' · ')}. A duplicate in a special print is kept as that print.</p>`}
+ <h3>DUPLICATES</h3><p class="onote">Copies beyond the most you can use (2, or 1 for a Legendary) become Shards: ${['C','U','R','E','L'].map(k=>`${RN[k]} ${ECON.dup[k]}◆`).join(' · ')}. A duplicate in a special print is kept as that print.</p>`}
 const showOdds=()=>{sfx('click');modal('PACK ODDS',oddsHTML(),'odds')};
 $('#pOdds').onclick=showOdds;$('#stOdds').onclick=showOdds;
 
@@ -75,7 +75,7 @@ for(const id of['#bStore','#pStore'])$(id).hidden=!storeOpen();
 $('#bStore').onclick=()=>{sfx('click');show('store')};$('#pStore').onclick=()=>{sfx('click');show('store')};
 
 /* packs screen: rules line and shard price from ECON (called by renderPacks) */
-function packRules(){const E=ECON.pack,M=ECON.match;$('#prules').textContent=`Each pack: 3 Common · 1 Uncommon · 1 Rare (${oPct(E.legChance)} chance of a Legendary, guaranteed every ${E.legPity} packs). Wins pay ${M.win} Shards, losses ${M.loss}, and your first win each day ${M.firstWin} more. Extra copies become Shards.`;
+function packRules(){const E=ECON.pack,M=ECON.match;$('#prules').textContent=`Each pack: 3 Common · 1 Uncommon · 1 Rare or better (${oPct(E.epicChance)} Epic, ${oPct(E.legChance)} Legendary, a Legendary guaranteed every ${E.legPity} packs). Wins pay ${M.win} Shards, losses ${M.loss}, and your first win each day ${M.firstWin} more. Extra copies become Shards.`;
  $('#pBuy').textContent=`Buy · ${E.price}◆`}
 onShow(id=>{if(id!=='store'&&$('#odds').classList.contains('on'))modalClose()},true);onShow(id=>{if(id==='store')renderStore()});
 

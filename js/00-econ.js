@@ -8,12 +8,12 @@ const ECON={
  dif:{easy:.5,normal:1,nightmare:1.6},
  /* new players */
  start:{packs:3},
- /* booster packs: 3 Common, 1 Uncommon, 1 Rare slot that is a Legendary legChance of the time.
+ /* booster packs: 3 Common, 1 Uncommon, 1 Rare slot that is a Legendary legChance of the time and an Epic epicChance of the time.
     Pity: a Legendary is guaranteed by the legPity-th pack without one; a holographic card by the holoPity-th pack without one. */
- pack:{price:100,slots:['C','C','C','U','R'],legChance:.1,legPity:20,holo:.008,frame:.03,holoPity:50},
+ pack:{price:100,slots:['C','C','C','U','R'],legChance:.1,epicChance:.12,legPity:20,holo:.008,frame:.03,holoPity:50},
  /* extra copies (and disenchanting) pay these Shards; crafting costs these */
- dup:{C:5,U:15,R:40,L:150},
- craft:{C:40,U:100,R:400,L:1600},
+ dup:{C:5,U:15,R:40,E:80,L:150},
+ craft:{C:40,U:100,R:400,E:800,L:1600},
  /* daily quests: one new quest arrives each day, up to max waiting; one reroll per day */
  quests:{perDay:1,max:3,rerolls:1,rw:{winf:{sh:70},win:{sh:80},rites:{sh:50},units:{sh:50},dmg:{sh:60},leg:{sh:60},camp:{pk:1},games:{sh:50},hard:{pk:1}}},
  /* 7-day login calendar (miss a day and it restarts) */

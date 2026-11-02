@@ -18,6 +18,7 @@ const TL_ICO={
  atk:'M3.5 20.5l3-3-1.5-1.5 1.4-1.4 1.5 1.5L18 6V3h3v3l-10.1 9.9 1.5 1.5-1.4 1.4-1.5-1.5-3 3z',
  play:'M7 3h10a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2zm5 4.5L9 12l3 4.5 3-4.5z',
  rite:'M12 2l2.4 6.6L21 9l-5.2 4.3L17.6 21 12 17.1 6.4 21l1.8-7.7L3 9l6.6-.4z',
+ hp:'M12 2a10 10 0 1 1 0 20 10 10 0 0 1 0-20zm0 3.5L9.6 11H5l3.8 2.8L7.4 18 12 15.3l4.6 2.7-1.4-4.2L19 11h-4.6z',
  trig:'M6 2h12v3c0 3-3 5-4.4 7 1.4 2 4.4 4 4.4 7v3H6v-3c0-3 3-5 4.4-7C9 10 6 8 6 5zm2.5 3c0 1.6 1.8 3 3.5 4.6 1.7-1.6 3.5-3 3.5-4.6z',
  death:'M12 2a8 8 0 0 0-8 8c0 2.6 1.2 4.6 3 5.8V19a1 1 0 0 0 1 1h1v2h2v-2h2v2h2v-2h1a1 1 0 0 0 1-1v-3.2c1.8-1.2 3-3.2 3-5.8a8 8 0 0 0-8-8zm-3 7a2 2 0 1 1 0 4 2 2 0 0 1 0-4zm6 0a2 2 0 1 1 0 4 2 2 0 0 1 0-4z',
  void:'M12 3a9 9 0 1 1 0 18 9 9 0 0 1 0-18zm0 4a5 5 0 1 0 0 10 5 5 0 0 0 0-10zm0 3a2 2 0 1 1 0 4 2 2 0 0 1 0-4z'};
@@ -31,6 +32,7 @@ function tlRecord(pre,fxl,hint){if(!G||!fxl||!fxl.length)return;const out=[],all
  const bucket=(k,pi,cid,tg,w)=>({k,pi,cid,tg,w,res:new Map(),pl:[{mad:0,draw:0,heal:0,sum:[]},{mad:0,draw:0,heal:0,sum:[]}],turn:G.turn,hits:0});
  const play=fxl.find(f=>f.k==='play');
  if(play){const d=C[play.cid];main=bucket(d.t==='s'?'rite':'play',play.pi,play.cid,play.tg?play.tg.split('>').pop():null);if(play.e)main.echo=1}
+ else if(fxl.some(f=>f.k==='hp')){const h=fxl.find(f=>f.k==='hp');main=bucket('hp',h.pi,null,h.tg);main.hp=h.fac}/* v2.9 hero power */
  else if(hint&&hint.k==='atk'){const a=pre.get(hint.uid);if(a)main=bucket('atk',a.o,a.cid,hint.tg)}
  cur=main;if(main)allB.push(main);
  const row=(b,id)=>{let r=b.res.get(id);if(!r){const w=tlWho(pre,id);if(!w)return null;r={...w,dmg:0,heal:0,died:0,buff:[0,0],ward:0,cor:0,blight:0,sac:0,sum:0};b.res.set(id,r)}return r};
@@ -65,11 +67,11 @@ function tlBuild(){if(TLOG.el)return;const m=$('#match');m.insertAdjacentHTML('b
  TLOG.el.addEventListener('pointerleave',e=>{if(e.pointerType!=='mouse')return;if(e.target===TLOG.el){clearTimeout(TLOG.ht);TLOG.ht=setTimeout(()=>{if(TLOG.pin<0)tlClose()},140)}},true);
  TLOG.el.addEventListener('click',e=>{const t=e.target.closest('.tle');if(!t)return;e.stopPropagation();const i=+t.dataset.i;if(TLOG.pin===i){TLOG.pin=-1;tlClose()}else{TLOG.pin=i;tlOpen(i)}sfx('click')});
  document.addEventListener('pointerdown',e=>{if(TLOG.pin>=0&&!e.target.closest('#tlog,#tlpop')){TLOG.pin=-1;tlClose()}},true)}
-function tlTile(b,i){const d=b.cid&&C[b.cid],f=d?d.f:'n',t=b.tg?tlTarget(b):null;
- const art=b.cid?`url(${realArtS(b.cid)})`:'none',lbl=tlTitle(b)+(d?': '+d.n:'');
+function tlTile(b,i){const d=b.cid&&C[b.cid],f=d?d.f:b.hp||'n',t=b.tg?tlTarget(b):null;
+ const art=b.cid?`url(${realArtS(b.cid)})`:b.hp?`url(${realArt('h'+b.hp)})`:'none',lbl=tlTitle(b)+(d?': '+d.n:b.hp&&HP[b.hp]?': '+HP[b.hp].n:'');
  return `<button class="tle o${b.pi} k-${b.k} f-${f}" data-i="${i}" role="listitem" aria-label="${esc(lbl)}"><i class="ta" style="background-image:${art}"></i>${b.k==='void'?`<i class="tvd">${tlSvg('void')}</i>`:''}<i class="tk">${tlSvg(b.k==='play'?'play':b.k)}</i>${t?`<i class="tt${t.died?' dead':''}${t.h?' hero':''}" style="background-image:url(${t.h?realArt(t.cid):realArtS(t.cid)})">${t.died?tlSvg('death'):''}</i>`:''}</button>`}
 function tlTarget(b){const r=b.res.find(x=>(b.tg[0]==='h'&&x.h&&x.pi===+b.tg[1])||(x.uid===+b.tg.slice(1)));if(r)return r;const w=tlWho(new Map(),b.tg);return w?{...w,died:0}:null}
-function tlTitle(b){const me=b.pi===0;return b.k==='atk'?(me?'You attacked':'The enemy attacked'):b.k==='play'?(me?'You summoned':'The enemy summoned'):b.k==='rite'?(me?'You cast':'The enemy cast'):b.k==='death'?'Death rattle':b.k==='void'?(me?'You drew from the void':'The enemy drew from the void'):b.w==='start'?'Start of turn':'End of turn'}
+function tlTitle(b){const me=b.pi===0;return b.k==='hp'?(me?'You used your hero power':'The enemy used its hero power'):b.k==='atk'?(me?'You attacked':'The enemy attacked'):b.k==='play'?(me?'You summoned':'The enemy summoned'):b.k==='rite'?(me?'You cast':'The enemy cast'):b.k==='death'?'Death rattle':b.k==='void'?(me?'You drew from the void':'The enemy drew from the void'):b.w==='start'?'Start of turn':'End of turn'}
 function tlRender(added){if(!TLOG.el)tlBuild();const el=TLOG.el,n=Math.min(TLOG.show,TLOG.list.length);
  /* shift existing tiles' indices; add new ones on top; drop the overflow (no rebuild of the tiles that stay) */
  const old=[...el.querySelectorAll('.tle')];for(const t of old){const i=+t.dataset.i+added;if(i>=n){t.remove();continue}t.dataset.i=i;t.classList.remove('new');t.style.setProperty('--k',i)}
@@ -90,7 +92,7 @@ function tlRows(b){let h='',shown=0,more=0;const nm=r=>r.h?(r.pi===0?'You':esc(r
  return h||'<div class="tpr none"><span>Nothing came of it.</span></div>'}
 function tlOpen(i){const b=TLOG.list[i];if(!b||!TLOG.pop)return;clearTimeout(TLOG.ht);TLOG.hov=i;const p=TLOG.pop;
  p.className='on o'+b.pi;p.innerHTML=`<div class="tph"><b>${tlTitle(b)}</b><small>${b.echo?'Echo · ':''}Turn ${Math.max(1,Math.ceil(b.turn/2))}</small></div><div class="tpb"><div class="tpc"></div><div class="tpx">${tlRows(b)}</div></div>`;
- const box=p.querySelector('.tpc');if(b.cid){const c=cardEl(b.cid);box.appendChild(c);try{fitScan(p)}catch(e){}}else box.innerHTML=`<i class="tvb">${tlSvg('void')}</i>`;
+ const box=p.querySelector('.tpc');if(b.cid){const c=cardEl(b.cid);box.appendChild(c);try{fitScan(p)}catch(e){}}else if(b.hp&&HP[b.hp])box.innerHTML=`<div class="tphp f-${b.hp}"><i style="background-image:url(${realArt('h'+b.hp)})"></i><b>${HP[b.hp].n}</b><small>${HP_COST} Flux</small><p>${HP[b.hp].x}</p></div>`;else box.innerHTML=`<i class="tvb">${tlSvg('void')}</i>`;
  /* place it beside the tile (desktop: to the left of the column; phone: under the strip), clamped to the screen */
  const t=TLOG.el.querySelector(`.tle[data-i="${i}"]`),r=t?t.getBoundingClientRect():TLOG.el.getBoundingClientRect(),pr={width:p.offsetWidth,height:p.offsetHeight},land=document.body.classList.contains('land');
  let x,y;const cr=TLOG.el.getBoundingClientRect();/* column rect for x: a tile may still be swinging in */if(land){x=cr.left-pr.width-Math.max(16,r.width*.35);y=r.top+r.height/2-pr.height/2}else{x=Math.min(innerWidth-pr.width-8,Math.max(8,r.left+r.width/2-pr.width/2));y=cr.bottom+12}

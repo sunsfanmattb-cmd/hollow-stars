@@ -194,7 +194,7 @@ function packTearFx(){const el=$('#pwrap'),r=el.getBoundingClientRect(),x=r.left
  for(let i=0;i<nq(40);i++){const a=rr(0,7),s=rr(150,700),p=sp('sp',x+rr(-r.width/2,r.width/2),y,Math.cos(a)*s,Math.sin(a)*s,rr(.3,.8),rr(1,2.5),i%2?'#a89880':'#d8ccb4');if(p){p.add=1;p.dr=2;p.g=300;p.a=.7}}
  for(let i=0;i<nq(16);i++){const p=sp('as',x+rr(-r.width/2,r.width/2),y+rr(-6,6),rr(-200,200),rr(-420,-120),rr(.8,1.4),rr(3,7),'#1a1214');if(p){p.g=900;p.k=rr(0,6)}}
  const fl=sp('fl',x,r.top+r.height/2,0,0,.6,r.width*1.2,'#8a3a1a');if(fl){fl.add=1;fl.a=.55}}
-function flipFx(s,rar){const r=s.getBoundingClientRect(),x=r.left+r.width/2,y=r.top+r.height/2,col={C:'#8a8478',U:'#6a9aa0',R:'#c09848',L:'#d8c070'}[rar]||'#8a8478',n={C:6,U:14,R:26,L:60}[rar]||6;
+function flipFx(s,rar){const r=s.getBoundingClientRect(),x=r.left+r.width/2,y=r.top+r.height/2,col={C:'#8a8478',U:'#6a9aa0',R:'#c09848',E:'#a070e0',L:'#d8c070'}[rar]||'#8a8478',n={C:6,U:14,R:26,E:40,L:60}[rar]||6;
  for(let i=0;i<nq(n);i++){const a=rr(0,7),sp_=rr(80,rar==='L'?900:420),p=sp('sp',x,y,Math.cos(a)*sp_,Math.sin(a)*sp_,rr(.3,.8),rr(1,2.4),i%3?col:'#e8dcc4');if(p){p.add=1;p.dr=2.2;p.a=.8}}
  if(rar!=='C'){const fl=sp('fl',x,y,0,0,.6,r.width*(rar==='L'?2.4:1.2),col);if(fl){fl.add=1;fl.a=.45}}
  if(rar==='L'){shake($('#pstage'),11,320);const W=innerWidth,H=innerHeight;const nt=QL.q==='high'?6:4;for(let i=0;i<nt;i++){const a=i/nt*6.28,t=sp('te',x,y,0,0,1.1,18,'');if(t){t.x2=x+Math.cos(a)*W*.7;t.y2=y+Math.sin(a)*H*.6;t.k=i;t.dl=i*.03}}

@@ -37,7 +37,7 @@ function fitRefresh(root=document){for(const e of root.querySelectorAll('[data-f
 /* v9.7: names were measured in the fallback serif before the faction faces arrived; re-measure once they load */
 try{if(document.fonts){const rf=()=>{FIT.c.clear();fitRefresh()};document.fonts.ready.then(rf);document.fonts.addEventListener('loadingdone',rf)}}catch(e){}
 function cardEl(id,big){const d=C[id],e=document.createElement('div');e.className=`card f-${d.f} r-${d.r}${d.r==='L'?' full':''}${d.t==='s'?' spell':''}${(n=>n>125?' long xlong xxl':n>88?' long xlong':n>46?' long':'')(cardText(d).replace(/<[^>]+>/g,'').length)}`;e.dataset.cid=id;
- e.innerHTML=`<div class="art" style="background-image:${artBG(id,big)}">${lgHTML(id,big)}</div>${costHTML(d.c,d.f)}<div class="nm"><span data-fit="nm">${d.n}</span></div><div class="ty">${sigHTML(d.f)}<span data-fit="ty">${d.t==='u'?FAC[d.f].s:'Rite'}</span>${setHTML(d.r)}${d.r==='L'?'<i class="lgem"><b></b></i>':''}</div><div class="tx"><div class="rt">${cardText(d)}</div>${d.fl?`<div class="fl"><span>${sigHTML(d.f)}${d.fl}</span></div>`:''}</div>${d.t==='u'?'<i class="plq l"></i><i class="plq r"></i>'+atkHTML(d.f,d.a)+hpHTML(d.h,100,d.f):''}${d.r==='R'||d.r==='L'?'<i class="foil"></i>':''}${d.r==='U'||d.r==='R'?'<i class="rim"></i>':''}${d.r!=='T'?'<i class="cpt"><i></i></i>':''}${lgTrim(id)}`;{const vr=varShow(id);if(vr){e.classList.add('vr','vr-'+vr);e.insertAdjacentHTML('beforeend','<i class="vfr"></i>')}}lgReg(e);fitScan(e);return e}
+ e.innerHTML=`<div class="art" style="background-image:${artBG(id,big)}">${lgHTML(id,big)}</div>${costHTML(d.c,d.f)}<div class="nm"><span data-fit="nm">${d.n}</span></div><div class="ty">${sigHTML(d.f)}<span data-fit="ty">${d.t==='u'?FAC[d.f].s:'Rite'}</span>${setHTML(d.r)}${d.r==='L'?'<i class="lgem"><b></b></i>':''}</div><div class="tx"><div class="rt">${cardText(d)}</div>${d.fl?`<div class="fl"><span>${sigHTML(d.f)}${d.fl}</span></div>`:''}</div>${d.t==='u'?'<i class="plq l"></i><i class="plq r"></i>'+atkHTML(d.f,d.a)+hpHTML(d.h,100,d.f):''}${'REL'.includes(d.r)?'<i class="foil"></i>':''}${'URE'.includes(d.r)?'<i class="rim"></i>':''}${d.r!=='T'?'<i class="cpt"><i></i></i>':''}${lgTrim(id)}`;{const vr=varShow(id);if(vr){e.classList.add('vr','vr-'+vr);e.insertAdjacentHTML('beforeend','<i class="vfr"></i>')}}lgReg(e);fitScan(e);return e}
 /* ---- pick ---- */
 const SH={win:ECON.match.win,loss:ECON.match.loss,pack:ECON.pack.price,dup:ECON.dup,free:ECON.start.packs};
 const maxC=id=>C[id].r==='L'?1:2;
@@ -100,12 +100,14 @@ $('#dNew').onclick=async()=>{if(DK.decks.length>=DKMAX){sfx('err');toast('5 deck
  const d={id:dkId(),name:v,fac:'v',cards:[]};DK.decks.push(d);saveDecks();bdOpen(d.id)};
 /* ================= MATCH ================= */
 let G=null,LAST=null;
-function startMatch(mine,of,o={}){LAST={mine,of,o};const dif=o.dif||V8.dif;G=newGame(mine,o.foe||prebuilt(of),{ai:[UI.auto?1:0,1],first:o.first,rule:o.rule,esan:o.esan,dif});G.meta={mode:o.mode||(o.ch?'camp':'quick'),ch:o.ch||null,dif,deck:mine.name||mine.fac,dkey:o.dkey||UI.deck,boss:o.boss||null};UI.sel=null;UI.busy=false;UI.aiRun=false;UI.overShown=0;UI.cin=null;$('#cin').className='';MZ.me=MZ.op=-1;LB.drips=[];LB.pools=[];BG.rip=[];$$('.whisp').forEach(w=>w.remove());{const l=isLand()?'':'_p';scPre(['victory'+l,'defeat'+l])}
+function startMatch(mine,of,o={}){LAST={mine,of,o};const dif=o.dif||V8.dif;G=newGame(mine,o.foe||prebuilt(of),{ai:[UI.auto?1:0,1],first:o.first,rule:o.rule,esan:o.esan,dif,mull:!UI.auto&&o.mull!==false});G.meta={mode:o.mode||(o.ch?'camp':'quick'),ch:o.ch||null,dif,deck:mine.name||mine.fac,dkey:o.dkey||UI.deck,boss:o.boss||null};UI.sel=null;UI.busy=false;UI.aiRun=false;UI.overShown=0;UI.cin=null;$('#cin').className='';MZ.me=MZ.op=-1;LB.drips=[];LB.pools=[];BG.rip=[];$$('.whisp').forEach(w=>w.remove());{const l=isLand()?'':'_p';scPre(['victory'+l,'defeat'+l])}
  for(const id of['#opb','#myb','#hand'])$(id).innerHTML='';$('#over').classList.remove('on');show('match');
- for(const pi of[0,1]){const el=$(pi?'#oph':'#myh'),p=G.p[pi];el.className=`hero f-${p.fac}`;el.querySelector('.av').style.backgroundImage=pi&&o.boss?`url(${realArt(o.boss)}),${heroBG(p.fac)}`:heroBG(p.fac);el.classList.toggle('boss',!!(pi&&o.boss));el.querySelector('.hn').textContent=pi?p.name:(UI.auto?'Autopilot — ':'You — ')+FAC[p.fac].n;el.querySelector('.md').innerHTML='<i></i>'.repeat(10)+'<span>MADNESS</span>';el.querySelector('.fx').innerHTML='<i></i>'.repeat(10);el.querySelector('.san').textContent=''}
- renderMatch();flushFx();if(G.second===0&&!UI.auto){const g=G;setTimeout(()=>{if(G===g)toast('You go second: +1 card, and +1 Flux on your first turn',2200)},D(250))}v8MatchStart(G);if(G.p[G.cur].ai)runAI()}
+ for(const pi of[0,1]){const el=$(pi?'#oph':'#myh'),p=G.p[pi];el.className=`hero f-${p.fac}`;el.querySelector('.av').style.backgroundImage=pi&&o.boss?`url(${realArt(o.boss)}),${heroBG(p.fac)}`:heroBG(p.fac);el.classList.toggle('boss',!!(pi&&o.boss));el.querySelector('.hn').textContent=pi?p.name:(UI.auto?'Autopilot — ':'You — ')+FAC[p.fac].n;el.querySelector('.md').innerHTML='<i></i>'.repeat(10)+'<span>MADNESS</span>';el.querySelector('.fx').innerHTML='<i></i>'.repeat(10);el.querySelector('.san').textContent='';hpMount(el,pi,p.fac)}
+ renderMatch();flushFx();if(G.mullPending)mullOpen();else matchGo()}
+/* after the mulligan (or straight away when there is none): the first turn begins */
+function matchGo(){if(!G)return;renderMatch();flushFx();if(G.second===0&&!UI.auto){const g=G;setTimeout(()=>{if(G===g)toast('You go second: +1 card, and +1 Flux on your first turn',2200)},D(250))}v8MatchStart(G);if(G.p[G.cur].ai)runAI()}
 function heroBox(pi){return $(pi?'#oph':'#myh')}
-function renderHero(pi){const p=G.p[pi],el=heroBox(pi);const s=el.querySelector('.san');s.textContent=Math.max(0,p.san);s.classList.toggle('low',p.san<=7);
+function renderHero(pi){const p=G.p[pi],el=heroBox(pi);hpRender(el,pi);el.classList.toggle('unh',p.mad>=5);const s=el.querySelector('.san');s.textContent=Math.max(0,p.san);s.classList.toggle('low',p.san<=7);
  el.querySelectorAll('.md i').forEach((e,i)=>{e.classList.toggle('on',i<p.mad);e.classList.toggle('hi',i<p.mad&&p.mad>=7)});el.querySelector('.fv').textContent=`${p.flux}/${p.max} FLUX`;el.querySelectorAll('.fx i').forEach((e,i)=>{const c=i<p.flux?'on':i<p.max?'sp':'lk';if(e.className!==c)e.className=c});
  {const s=`✋ ${p.hand.length}<br>▤ ${p.deck.length}`;if(el._cts!==s){el._cts=s;el.querySelector('.cts').innerHTML=s}}el.classList.toggle('act',G.cur===pi&&!G.over)}
 function unitEl(u){const d=C[u.id],e=document.createElement('div');e.className=`unit f-${d.f}`;e.dataset.u=u.uid;e.dataset.cid=u.id;e.innerHTML=`<div class="art${d.r==='L'?' lgart':''}" style="background-image:${artBG(u.id)}">${lgHTML(u.id)}${d.r==='L'?'<i class="lsl"></i>':''}</div>${lgTrim(u.id)}<div class="kws"></div>${atkHTML(d.f,u.a)}${hpHTML(u.h,100,d.f)}`;e._h=u.h;lgReg(e);return e}
@@ -132,16 +134,17 @@ function syncHand(){const box=$('#hand'),hand=G.p[0].hand,my=G.cur===0&&!G.p[0].
   if(el._L!==L){el._L=L;el.style.left=L}if(el._T!==T){el._T=T;el.style.top=T}if(el._R!==R){el._R=R;el.style.rotate=R}if(el._z!==z){el._z=z;el.style.zIndex=z;el.style.setProperty('--i',i)}
   const can=my&&canPlay(G,0,c),sl=sel===c.uid;if(el._can!==can){el._can=can;el.classList.toggle('can',can)}if(el._sel!==sl){el._sel=sl;el.classList.toggle('sel',sl)}});
  for(const[k,el]of ex)if(!keep.has(el))el.remove()}
-function selTargets(){const s=UI.sel;if(!s||!G)return[];if(s.k==='h'){const c=G.p[0].hand.find(x=>x.uid===s.uid);if(!c)return[];const d=C[c.id];if(!d.tg)return[];return s.t1?cardTargets(G,0,d,1,s.t1):d.tg2?cardTargets(G,0,d,0).filter(a=>cardTargets(G,0,d,1,a).length):cardTargets(G,0,d,0)}const u=findU(G,s.uid);return u&&canAtk(u)?atkTargets(G,0,u):[]}
+function selTargets(){const s=UI.sel;if(!s||!G)return[];if(s.k==='p')return hpTargets(G,0);if(s.k==='h'){const c=G.p[0].hand.find(x=>x.uid===s.uid);if(!c)return[];const d=C[c.id];if(!d.tg)return[];return s.t1?cardTargets(G,0,d,1,s.t1):d.tg2?cardTargets(G,0,d,0).filter(a=>cardTargets(G,0,d,1,a).length):cardTargets(G,0,d,0)}const u=findU(G,s.uid);return u&&canAtk(u)?atkTargets(G,0,u):[]}
 function hint(){if(!G)return'';if(G.over)return'';if(G.p[G.cur].ai)return G.cur===1?'The enemy stirs…':'Autopilot is thinking…';const s=UI.sel;
  if(s?.k==='h'){const c=G.p[0].hand.find(x=>x.uid===s.uid),d=c&&C[c.id];if(d)return s.t1?'Now choose an enemy unit for '+d.n:needsTarget(G,0,d)?(d.tg2?'Choose a friendly unit to sacrifice':'Choose a target for '+d.n):'Tap again or drag up to play '+d.n}
+ if(s?.k==='p'){const h=HP[G.p[0].fac];return h.n+': '+h.x+(h.tg?' Choose a friendly unit.':' Tap it again to use.')}
  if(s?.k==='u')return'Choose what to attack · ☠ = it dies';if(legal(G,0).length)return'Your turn: drag or tap cards, tap units to attack';return'No moves left. End your turn.'}
-function renderMatch(){if(!G)return;overCheck();artPre([...G.p[0].hand.map(c=>c.id),...G.p[0].board.map(u=>u.id),...G.p[1].board.map(u=>u.id),'h'+G.p[0].fac,'h'+G.p[1].fac],1);renderHero(0);renderHero(1);syncBoard($('#opb'),G.p[1].board);syncBoard($('#myb'),G.p[0].board);syncHand();
+function renderMatch(){if(!G)return;overCheck();artPre([...G.p[0].hand.map(c=>c.id),...G.p[0].board.map(u=>u.id),...G.p[1].board.map(u=>u.id),'h'+G.p[0].fac,'h'+G.p[1].fac],1);renderHero(0);renderHero(1);syncBoard($('#opb'),G.p[1].board);syncBoard($('#myb'),G.p[0].board);syncHand();handCosts();
  {const nt=new Map();for(const t of selTargets()){const el=tEl(t,1);if(el)nt.set(el,t[0]==='u'&&findU(G,+t.slice(1))?.o===0)}$$('.tgt').forEach(e=>{if(!nt.has(e))e.classList.remove('tgt','ftgt')});for(const[el,f]of nt){if(!el.classList.contains('tgt'))el.classList.add('tgt');el.classList.toggle('ftgt',f)}}
  {const p1=UI.sel&&UI.sel.k==='h'&&UI.sel.t1;for(const e of $$('.pick1'))if(!p1||e!==tEl(p1,1))e.classList.remove('pick1');if(p1){const e=tEl(p1,1);if(e)e.classList.add('pick1')}}
  madSet();$('#hint').textContent=hint();const my=G.cur===0&&!G.p[0].ai&&!G.over;try{pvSync(my&&!!UI.sel)}catch(e){}const eb=$('#endt');eb.disabled=!my||UI.busy;eb.querySelector('span').textContent=my?'End Turn':'Enemy Turn';eb.classList.toggle('glow',my&&!legal(G,0).length);eb.classList.toggle('wait',my&&!!UI.busy)}
 /* v1.6 combat preview: play the selected attack/Rite on a cloned game and badge each target with the outcome */
-function pvCalc(t){const s=UI.sel;try{const c=cloneG(G),hc=s.k==='h'&&G.p[0].hand.find(x=>x.uid===s.uid);if(hc&&C[hc.id].tg2&&!s.t1)return'';const tt=s.t1?s.t1+'>'+t:t,ok=s.k==='u'?attack(c,0,s.uid,t):play(c,0,s.uid,tt);if(!ok)return'';if(c.over)return c.winner===0?'LETHAL':'✖';if(t[0]==='h')return'';const tu=findU(G,+t.slice(1)),dies=!findU(c,+t.slice(1)),me=s.k==='u'&&!findU(c,s.uid);if(tu&&tu.o===0)return dies?'☠':'';return dies&&me?'☠ TRADE':dies?'☠':me?'✖':''}catch(e){return''}}
+function pvCalc(t){const s=UI.sel;try{const c=cloneG(G),hc=s.k==='h'&&G.p[0].hand.find(x=>x.uid===s.uid);if(hc&&C[hc.id].tg2&&!s.t1)return'';const tt=s.t1?s.t1+'>'+t:t,ok=s.k==='u'?attack(c,0,s.uid,t):s.k==='p'?heroPower(c,0,t):play(c,0,s.uid,tt);if(!ok)return'';if(c.over)return c.winner===0?'LETHAL':'✖';if(t[0]==='h')return'';const tu=findU(G,+t.slice(1)),dies=!findU(c,+t.slice(1)),me=s.k==='u'&&!findU(c,s.uid);if(s.k==='p')return dies?'✝':'';if(tu&&tu.o===0)return dies?'☠':'';return dies&&me?'☠ TRADE':dies?'☠':me?'✖':''}catch(e){return''}}
 function pvSync(on){const pv=new Map();if(on)for(const t of selTargets()){const el=tEl(t,1);if(el){const v=pvCalc(t);if(v)pv.set(el,v)}}for(const b of $$('.pvb'))if(pv.get(b.parentElement)!==b.textContent)b.remove();for(const[el,v]of pv)if(!el.querySelector(':scope>.pvb')){const b=document.createElement('i');b.className='pvb'+(v==='LETHAL'?' lethal':v==='✖'?' bad':'');b.textContent=v;el.appendChild(b)}}
 function tEl(t,box){if(t[0]==='h')return box?heroBox(+t[1]):heroBox(+t[1]).querySelector('.av');return document.querySelector(`.unit[data-u="${t.slice(1)}"]`)}
 /* v2.3 smooth combat: positions are measured once per action, before any DOM is written (the layout is still clean, so this is
@@ -159,6 +162,7 @@ function bump(el,c){if(!el)return;restartCls(el,c);clearTimeout(el['_b'+c]);el['
 function restartCls(el,c){if(el.classList.contains(c)){const an=el.getAnimations({subtree:true});if(an.length){for(const a of an)a.currentTime=0;return}el.classList.remove(c);void getComputedStyle(el).animationName}el.classList.add(c)}
 const FCOL={v:'#b060ff',m:'#40e0f0',c:'#ff4060',n:'#e0c070'};
 function flushFx(){if(!G)return;BG.act=performance.now();batPoke();const L=G.fx;G.fx=[];for(const f of L){switch(f.k){
+  case'hp':hpFx(f);break;
  case'dmg':{const el=tEl(f.id),h=f.id[0]==='h';floatAt(el,'-'+f.n,h?'#ff3040':'#ff5a78',h?'big':f.n>=4?'mid':'');bump(h?heroBox(+f.id[1]):el,'hit');dmgFx(f);break}
  case'heal':floatAt(tEl(f.id),'+'+f.n,'#8affb0');sfx('heal');break;
  case'mad':floatAt(heroBox(f.pi).querySelector('.md'),(f.n>0?'+':'')+f.n+' MADNESS',f.n>0?'#e080ff':'#a0e8ff','s');if(f.n>0)sfx('mad');break;
@@ -187,12 +191,14 @@ async function preview(cid,ms){const p=$('#preview');p.innerHTML='';p.appendChil
 async function runAI(){if(UI.aiRun)return;UI.aiRun=true;UI.busy=true;renderMatch();const g0=G;
  while(G===g0&&!G.over&&G.p[G.cur].ai){const pi=G.cur;await sleep(D(650));
   for(let n=0;n<40&&G===g0&&!G.over;n++){const a=aiChoose(G,pi);if(!a)break;
-   if(a.t==='play'){const c=G.p[pi].hand.find(x=>x.uid===a.uid);await preview(c.id,D(1100));if(G!==g0)break;if(a.tg){for(const x of a.tg.split('>')){const te=tEl(x,1);te&&te.classList.add('tgt')}await sleep(D(250));if(G!==g0)break}apply(()=>play(G,pi,a.uid,a.tg));/* v2.0: the match may have been quit during the waits */if(UI.cin)await UI.cin}
+   if(a.t==='play'){const c=G.p[pi].hand.find(x=>x.uid===a.uid);await preview(c.id,D(1100));if(G!==g0)break;if(a.tg){for(const x of a.tg.split('>')){const te=tEl(x,1);te&&te.classList.add('tgt')}await sleep(D(250));if(G!==g0)break}apply(()=>play(G,pi,a.uid,a.tg,a.pos));/* v2.0: the match may have been quit during the waits */if(UI.cin)await UI.cin}
+   else if(a.t==='hp'){await hpCue(pi,a.tg);if(G!==g0)break;apply(()=>heroPower(G,pi,a.tg))}
    else await lunge(a.uid,a.tg,()=>attack(G,pi,a.uid,a.tg));await sleep(D(420))}
   if(G!==g0||G.over)break;await sleep(D(350));if(G!==g0)break;apply(()=>endTurn(G))}
  if(G===g0){UI.aiRun=false;UI.busy=false;renderMatch()}}/* startMatch resets aiRun for a new match; releasing it here could let two AI loops run */
 function setSel(s){UI.sel=s;renderMatch()}
-async function humanPlay(uid,tg){if(UI.busy||G.cur!==0)return;UI.sel=null;const ok=apply(()=>play(G,0,uid,tg));if(!ok){sfx('err');return}if(UI.cin){UI.busy=true;renderMatch();const g=G;await UI.cin;if(G===g){UI.busy=false;renderMatch()}}}
+function humanHP(tg){if(UI.busy||G.cur!==0)return;UI.sel=null;if(!apply(()=>heroPower(G,0,tg)))sfx('err')}
+async function humanPlay(uid,tg,pos){if(UI.busy||G.cur!==0)return;UI.sel=null;const ok=apply(()=>play(G,0,uid,tg,pos));if(!ok){sfx('err');return}if(UI.cin){UI.busy=true;renderMatch();const g=G;await UI.cin;if(G===g){UI.busy=false;renderMatch()}}}
 async function humanAtk(uid,tg){if(UI.busy||G.cur!==0)return;rcSnap();UI.sel=null;UI.busy=true;renderMatch();await lunge(uid,tg,()=>attack(G,0,uid,tg));UI.busy=false;renderMatch()}
 $('#endt').onclick=()=>{if(!G||G.cur!==0||UI.busy||G.over||G.p[0].ai)return;sfx('endt');UI.sel=null;apply(()=>endTurn(G));runAI()};
 $('#quit').onclick=()=>{sfx('click');let back=G&&G.meta&&G.meta.mode==='camp'?'camp':'title';try{const b=v9Quit(G);if(b)back=b}catch(e){console.warn(e)}G=null;UI.aiRun=false;show(back)};
@@ -213,7 +219,7 @@ $('#ovk').onclick=()=>{sfx('click');if(COLL.packs<=0&&!buyPackShards()){sfx('err
 $('#ovr').onclick=()=>{sfx('click');ovHide();startMatch(LAST.mine,LAST.of,LAST.o||{})};
 /* ================= INPUT ================= */
 let P=null,lpJust=0;
-function myTurn(){return G&&cur==='match'&&G.cur===0&&!G.over&&!UI.busy&&!UI.cin&&!G.p[0].ai}
+function myTurn(){return G&&cur==='match'&&G.cur===0&&!G.over&&!UI.busy&&!UI.cin&&!G.p[0].ai&&!G.mullPending}
 document.addEventListener('contextmenu',e=>e.preventDefault());
 document.addEventListener('pointerdown',e=>{batPoke();auInit();BG.act=performance.now();if($('#zoom').classList.contains('modal')){if(e.target.closest('#zoom .card')){tilt(e);P=null;return}hideZoom();lpJust=1;P=null;return}
  const el=e.target.closest('[data-cid]');P={x:e.clientX,y:e.clientY,el,id:e.pointerId,drag:0,lp:0,lx:e.clientX};if(el&&el.closest('#hand,#bgrid,#cgrid,.pfront'))tiltHeld(el.closest('.card')||el,e);
@@ -227,33 +233,35 @@ function startDrag(e){tiltOff();const el=P.el;if(!myTurn()||!el)return;
   const g=el.cloneNode(true);g.id='ghost';g.classList.remove('sel','can','drawn');g.style.cssText='';document.body.appendChild(g);el.classList.add('out');P.g=g;if(!needsTarget(G,0,C[c.id]))$('#myb').classList.add('drop')}
  else if(el.dataset.u){const u=findU(G,+el.dataset.u);if(!u||u.o!==0||!canAtk(u))return;P.drag='u';P.uid=u.uid;UI.sel={k:'u',uid:u.uid};renderMatch();const[a,b]=center(el);P.ax=a;P.ay=b;arrowTo(a,b,a,b);$('#arrow').style.display='block'}
  moveDrag(e)}
-function moveDrag(e){if(P.drag==='h'){P.g.style.left=e.clientX+'px';P.g.style.top=e.clientY+'px';if(!fxLow()){const v=Math.max(-1,Math.min(1,(e.clientX-P.lx)/14));P.vx=(P.vx||0)*.7+v*.3;P.lx=e.clientX;P.g.style.transform=`translate(-50%,-60%) scale(.95) perspective(700px) rotateY(${(P.vx*22).toFixed(1)}deg) rotate(${(-4+P.vx*8).toFixed(1)}deg)`;P.g.style.setProperty('--ox',P.vx.toFixed(2))}}else if(P.drag==='u')arrowTo(P.ax,P.ay,e.clientX,e.clientY,e)}
+function moveDrag(e){if(P.drag==='h'){P.g.style.left=e.clientX+'px';P.g.style.top=e.clientY+'px';insMark(e.clientX,e.clientY);if(!fxLow()){const v=Math.max(-1,Math.min(1,(e.clientX-P.lx)/14));P.vx=(P.vx||0)*.7+v*.3;P.lx=e.clientX;P.g.style.transform=`translate(-50%,-60%) scale(.95) perspective(700px) rotateY(${(P.vx*22).toFixed(1)}deg) rotate(${(-4+P.vx*8).toFixed(1)}deg)`;P.g.style.setProperty('--ox',P.vx.toFixed(2))}}else if(P.drag==='u')arrowTo(P.ax,P.ay,e.clientX,e.clientY,e)}
 function arrowTo(ax,ay,x,y,e){const dx=x-ax,dy=y-ay,L=Math.hypot(dx,dy)||1,bend=Math.min(90,L*.28),cx=(ax+x)/2+dy/L*bend*(dx>0?-1:1)*.35,cy=(ay+y)/2-bend;
  const d=`M${ax.toFixed(1)} ${ay.toFixed(1)}Q${cx.toFixed(1)} ${cy.toFixed(1)} ${x.toFixed(1)} ${y.toFixed(1)}`;$('#arl').setAttribute('d',d);$('#arg').setAttribute('d',d);
  const h=e&&document.elementFromPoint(e.clientX,e.clientY),t=h&&h.closest('.tgt');$('#arrow').classList.toggle('hot',!!t)}
-function cancelDrag(p){if(p.g)p.g.remove();$('#arrow').style.display='none';$('#myb').classList.remove('drop');$$('#hand .out').forEach(x=>x.classList.remove('out'));UI.sel=null;if(G)renderMatch()}
+function cancelDrag(p){if(p.g)p.g.remove();insMark();$('#arrow').style.display='none';$('#myb').classList.remove('drop');$$('#hand .out').forEach(x=>x.classList.remove('out'));UI.sel=null;if(G)renderMatch()}
 function dropTarget(x,y){const el=document.elementFromPoint(x,y);if(!el)return null;const u=el.closest('.unit[data-u]:not(.dying)'),h=el.closest('[data-hero]');return u?'u'+u.dataset.u:h?'h'+h.dataset.hero:null}
 function endDrag(p,e){const x=e.clientX,y=e.clientY;cancelDrag(p);const tg=dropTarget(x,y);
  if(p.drag==='h'){const c=G.p[0].hand.find(q=>q.uid===p.uid);if(!c)return;const d=C[c.id];
   if(needsTarget(G,0,d)){const ok=tg&&cardTargets(G,0,d,0).includes(tg);if(ok&&!d.tg2)humanPlay(c.uid,tg);else if(ok&&cardTargets(G,0,d,1,tg).length){UI.sel={k:'h',uid:c.uid,t1:tg};sfx('click');renderMatch()}else{if(tg)sfx('err');UI.sel={k:'h',uid:c.uid};if(d.t==='u')toast('Choose a target');renderMatch()}}
-  else if(y<$('#hand').getBoundingClientRect().top-4||($('body').classList.contains('land')&&x>$('#hand').getBoundingClientRect().left&&y<$('#hand').getBoundingClientRect().top+10))humanPlay(c.uid)}
+  else if(y<$('#hand').getBoundingClientRect().top-4||($('body').classList.contains('land')&&x>$('#hand').getBoundingClientRect().left&&y<$('#hand').getBoundingClientRect().top+10))humanPlay(c.uid,null,d.t==='u'?insPos(x,y):null)}
  else if(p.drag==='u'){if(tg&&atkTargets(G,0,findU(G,p.uid)).includes(tg))humanAtk(p.uid,tg);else if(tg)sfx('err')}}
 function tap(t){if(!G)return;if(!myTurn()){if(G.p[G.cur].ai&&!G.over&&t.closest('#match'))toast('Wait: the enemy is acting');return}
+ if(t.closest('.hpb')){hpTap(+t.closest('.hpb').dataset.hp);return}
+ if(UI.sel&&UI.sel.k==='p'){const u0=t.closest('.unit[data-u]:not(.dying)'),ts0=u0?'u'+u0.dataset.u:null;if(ts0&&selTargets().includes(ts0)){humanHP(ts0);return}if(t.closest('#match')){setSel(null);return}}
  const h=t.closest('#hand [data-h]'),u=t.closest('.unit[data-u]:not(.dying)'),hero=t.closest('[data-hero]');const ts=u?'u'+u.dataset.u:hero?'h'+hero.dataset.hero:null;const s=UI.sel;
  if(s&&s.k==='h'){const c=G.p[0].hand.find(x=>x.uid===s.uid),d=c&&C[c.id];if(d){
    const need=needsTarget(G,0,d);if(h&&+h.dataset.h===s.uid){if(!need)humanPlay(c.uid);else{sfx('err');toast(s.t1?'Choose an enemy unit':'Choose a target')}return}
    if(need&&ts&&selTargets().includes(ts)){if(d.tg2&&!s.t1){UI.sel={k:'h',uid:c.uid,t1:ts};sfx('click');renderMatch()}else humanPlay(c.uid,s.t1?s.t1+'>'+ts:ts);return}
    if(!need&&!h&&t.closest('#match')&&!t.closest('#mid')){humanPlay(c.uid);return}}}
  if(s&&s.k==='u'&&ts&&selTargets().includes(ts)){humanAtk(s.uid,ts);return}
- if(h){const c=G.p[0].hand.find(x=>x.uid===+h.dataset.h);if(c&&canPlay(G,0,c)){sfx('click');setSel({k:'h',uid:c.uid})}else{sfx('err');toast(C[c.id].c>G.p[0].flux?'Not enough Flux':'Cannot play that now');setSel(null)}return}
+ if(h){const c=G.p[0].hand.find(x=>x.uid===+h.dataset.h);if(c&&canPlay(G,0,c)){sfx('click');setSel({k:'h',uid:c.uid})}else{sfx('err');toast(costOf(G,0,c)>G.p[0].flux?'Not enough Flux':'Cannot play that now');setSel(null)}return}
  if(u){const v=findU(G,+u.dataset.u);if(v&&v.o===0){if(canAtk(v)){sfx('click');setSel(s&&s.k==='u'&&s.uid===v.uid?null:{k:'u',uid:v.uid})}else{toast(v.atk?'Already attacked this turn':v.a<=0?'It has no attack':'It needs a turn to wake (no Swift)');setSel(null)}return}
   if(s&&s.k==='u'){sfx('err');const g=E(G,0).board.filter(q=>q.k.includes('guard'));toast(v.k.includes('phase')&&!findU(G,s.uid).k.includes('phase')?'Only Phase units can attack Phase units':g.length?'You must attack a Guard first':'Invalid target');return}}
  if(hero&&s&&s.k==='u'){sfx('err');toast('You must attack a Guard first');return}
  if(s)setSel(null)}
 /* ---- zoom ---- */
 function showZoom(el,modal){const id=el.dataset.cid;if(!id||!C[id])return;const z=$('#zoom'),d=C[id];z.innerHTML='';const zc=cardEl(id,1);zc.insertAdjacentHTML('beforeend','<i class="gw"><i class="glare"></i></i>');z.appendChild(zc);
- const u=el.dataset.u&&G?findU(G,+el.dataset.u):null;let h='';if(u&&(u.a!==d.a||u.h!==d.h))h+=`<p><b>Currently ${u.a}/${u.h}</b></p>`;for(const k of new Set(u?u.k:d.k))if(KW[k])h+=`<p><b>${KW[k][0]}${k==='dread'?' '+d.dread:''}:</b> ${KW[k][1]}</p>`;
- if(d.fl)h+=`<p class="fl">“${d.fl}”</p>`;h+=`<p><i>${FAC[d.f].n} · ${{C:'Common',U:'Uncommon',R:'Rare',L:'Legendary',T:'Token'}[d.r]}</i></p>`;const k=document.createElement('div');k.className='kd';k.innerHTML=h;z.appendChild(k);
+ const u=el.dataset.u&&G?findU(G,+el.dataset.u):null;let h='';if(u&&(u.a!==d.a||u.h!==d.h))h+=`<p><b>Currently ${u.a}/${u.h}</b></p>`;for(const k of new Set(u?u.k:d.k))if(KW[k])h+=`<p><b>${KW[k][0]}${k==='dread'?' '+d.dread:k==='pact'?' '+d.pact:''}:</b> ${KW[k][1]}</p>`;
+ if(d.fl)h+=`<p class="fl">“${d.fl}”</p>`;h+=`<p><i>${FAC[d.f].n} · ${{C:'Common',U:'Uncommon',R:'Rare',E:'Epic',L:'Legendary',T:'Token'}[d.r]}</i></p>`;const k=document.createElement('div');k.className='kd';k.innerHTML=h;z.appendChild(k);
  z.className='on'+(modal?' modal':'');if(modal)ztOpen(zc);if(!modal){const r=el.getBoundingClientRect(),zw=document.body.classList.contains('dz')?Math.min(z.offsetWidth,innerWidth*.62):Math.min(250,innerWidth*.62),cf=$('#coll.on #craft'),lim=cf?cf.getBoundingClientRect().top:innerHeight,left=r.left+r.width/2>innerWidth/2?Math.max(8,r.left-zw-16):Math.min(innerWidth-zw-8,r.right+16);z.style.left=left+'px';z.style.top=Math.max(8,Math.min(lim-z.offsetHeight-8,r.top+r.height/2-z.offsetHeight/2))+'px'}else{z.style.left=z.style.top=''}}
 function tilt(e){const c=$('#zoom.on .card');if(!c||LG.rm.matches)return;const r=c.getBoundingClientRect(),nx=Math.max(-1,Math.min(1,(e.clientX-r.left-r.width/2)/(r.width/2))),ny=Math.max(-1,Math.min(1,(e.clientY-r.top-r.height/2)/(r.height/2)));
  if(ZT.c!==c)ztOpen(c);ztFinger(nx,ny)}
@@ -291,7 +299,7 @@ $('#bBack').onclick=()=>{bdSave();sfx('click');show('mydecks')};
 document.addEventListener('click',e=>{if(lpJust&&!e.target.closest('#bgrid'))lpJust=0},true);
 /* ================= COLLECTION & PACKS ================= */
 function rollPack(r=Math.random,forceL){const by=k=>PACK.filter(id=>C[id].r===k),pk=a=>a[Math.floor(r()*a.length)];
- return ECON.pack.slots.map(k=>pk(by(k==='R'&&(forceL||r()<ECON.pack.legChance)?'L':k)))}
+ const E=ECON.pack;return E.slots.map(k=>{if(k!=='R')return pk(by(k));const x=r();return pk(by(forceL||x<E.legChance?'L':x<E.legChance+(E.epicChance||0)?'E':'R'))})}
 function grant(ids,vr,holoAt=-1){const res=[];for(const[i,id]of ids.entries()){const v=vr===false?null:i===holoAt&&C[id].pk?'holo':varRoll(id);const n=COLL.own[id]||0;if(n>=maxC(id)){const s=v?0:SH.dup[C[id].r];COLL.shards+=s;res.push({id,dup:s,vr:v})}else{COLL.own[id]=n+1;res.push({id,dup:0,nw:n===0,vr:v})}if(v)varAdd(id,v)}COLL.opened++;saveColl();return res}
 /* pity: the legPity-th pack without a Legendary has one in its Rare slot; the holoPity-th pack without a holo has a holographic Rare slot */
 function openPack(){const P=COLL.pity,E=ECON.pack;if(!packTake())return null;const forceL=P.L+1>=E.legPity;let ids=PO.force||rollPack(Math.random,forceL);PO.force=null;
@@ -308,7 +316,7 @@ function startOpen(){const res=openPack();if(!res){sfx('err');toast('No packs: e
  $('#pdone').classList.remove('on');sfx('click');renderPacks()}
 $('#pwrap').onclick=e=>{e.stopPropagation();if(PO.stage!==1)return;PO.stage=2;const st=$('#pstage');st.classList.add('tear');sfx('tear');packTearFx();setTimeout(()=>{st.classList.remove('sealed','tear');st.classList.add('dealt')},900)};
 function flip(s){if(!s||s.classList.contains('up'))return;s.classList.add('up');s._ut=performance.now();setTimeout(vidSync,2100);const r=C[PO.res[+s.dataset.i].id].r;setTimeout(()=>flipFx(s,r),260);
- if(r==='L'){sfx('legend');const st=$('#pstage');st.classList.add('legend');s.classList.add('lgx');setTimeout(()=>st.classList.remove('legend'),2600)}else if(r==='R')sfx('rare');else sfx('flip');
+ if(r==='L'){sfx('legend');const st=$('#pstage');st.classList.add('legend');s.classList.add('lgx');setTimeout(()=>st.classList.remove('legend'),2600)}else if(r==='R'||r==='E')sfx('rare');else sfx('flip');
  if($$('#prow .pslot:not(.up)').length===0)setTimeout(()=>$('#pdone').classList.add('on'),400)}
 $('#prow').addEventListener('click',e=>{const s=e.target.closest('.pslot');if(PO.stage===2&&s&&!s.classList.contains('up')){e.stopPropagation();flip(s)}});
 $('#pall').onclick=()=>{if(PO.stage!==2)return;$$('#prow .pslot:not(.up)').forEach((s,i)=>setTimeout(()=>flip(s),i*220))};
@@ -326,6 +334,10 @@ $('#howtx').innerHTML=`<p>You are a mind adrift in the dark between stars. Break
 <p><b>Turns.</b> Decks are 30 cards; you start with 5 and draw 1 each turn (the first player skips their first draw). Whoever goes second starts with a 6th card and gets +1 Flux on their first turn. Play units and Rites, attack, then press <b>End Turn</b>. Drawing from an empty deck costs Sanity and adds Madness.</p>
 <p><b>Units</b> have Attack (amber) and Health (red). A new unit must wait a turn before attacking, unless it has Swift. Each unit attacks once per turn. When units fight, both deal damage at the same time. Damage stays until the unit dies.</p>
 <p><b>Rites</b> are one-shot spells. Some need a target.</p>
+<p><b>Opening hand.</b> Before the first turn you may send back any of your starting cards; they are shuffled into your deck and replaced.</p>
+<p><b>Hero power.</b> The badge on your portrait is your hero's power: <b>2 Flux, once per turn</b>. Tap it to read it, tap again to use it. The Abyss: if you control an Entity, the enemy gains 1 Madness. The Derelict: summon a Drone and remove 1 Madness. The Red Communion: sacrifice a unit to give another +2/+2.</p>
+<p><b>The Madness gamble.</b> <b>Pact</b> cards are strong for their cost, but you gain that much Madness. <b>Unhinged</b> cards get stronger while you have 5 or more Madness. Remember: at 10, your mind breaks and you lose.</p>
+<p><b>Placement.</b> Drag a unit between two of yours to place it there (tapped units go to the right end). Some units help the units <b>adjacent</b> to them.</p>
 <p><b>Controls.</b> <b>Drag</b> a card up onto the board to play it, or onto a target. You can also <b>tap</b> a card to select it, then tap again (or tap a target). To attack, <b>tap</b> or <b>drag</b> one of your glowing units onto an enemy unit or the enemy portrait. <b>Long-press</b> any card, or hover with a mouse, to read it up close.</p>
 <p><b>Keywords</b></p><div class="kwl">${Object.keys(KW).map(k=>`<span class="ki">${svgI(k)}</span><span><b>${KW[k][0]}</b>: ${KW[k][1]}</span>`).join('')}</div>
 <p><b>Factions</b></p><ul><li><b>The Abyss</b> (violet): ${FAC.v.d}</li><li><b>The Derelict</b> (cyan): ${FAC.m.d}</li><li><b>The Red Communion</b> (crimson): ${FAC.c.d}</li><li><b>Wanderers</b> (grey) are neutral crew that fit any deck.</li></ul>

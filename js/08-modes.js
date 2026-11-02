@@ -4,6 +4,13 @@
    RENDERING_RULES.md applies: no new card visuals animate; codex/achievement tiles are flat images, cosmetics are static CSS gradients. */
 /* ---------------- lore codex text: one field note per card (the Archive of the Hollow Star) ---------------- */
 const LORE={
+v45:'The Cantor never opens its mouth. The hymn comes out of everything else in the room: the walls, the water, the teeth of the people listening.',
+v46:'Sonar charts mark the trench as a canyon eleven miles deep. The charts are wrong. It is eleven miles of the same animal, and it is only beginning to surface.',
+m45:'KESTREL was a shipyard that learned to fly. It still builds. Nobody has told it the fleet it builds for was scrapped four hundred years ago.',
+m46:'The Warden locks itself to the hull and anything beside it. Crews used to joke that it was protecting them. Then they tried to undock.',
+c45:'She opens a wound for every prayer. The faithful drink, and the bleeding stops, and they cannot remember being afraid.',
+c46:'The Litter is always hungry and always grateful. Give the Mother one of yours and she gives you back something smaller, with more teeth.',
+n17:'She keeps two ledgers: the living and the lost. Every night she reads both aloud, so nobody on either list is forgotten.',
 v1:'Spawn are shed by larger entities the way skin is shed. They drift for centuries and wake only when something warm passes close.',
 v2:'Watchers were first logged by deep-survey probes. Every probe that logged one kept transmitting the same frame until its batteries died.',
 v3:'Crews describe the whispering as a voice they almost recognise. Most say it sounds like a parent calling them in from the dark.',
@@ -231,10 +238,10 @@ function gtFoe(run){const n=run.w,R=rng(hash('gtf'+run.seed+':'+n)),f=['v','m','
  const slots=cards.map((c,i)=>C[c].f==='n'||C[c].r==='C'?i:-1).filter(i=>i>=0);for(let i=0;i<k&&slots.length;i++){const id=pool[Math.floor(R()*pool.length)];if(C[id].r==='L'&&(cards.includes(id)||n<5))continue;cards[slots.shift()]=id}
  return{fac:f,name:GT.FOES[f][tier],cards,dif,esan,n}}
 function gtOffer(run){const R=rng(hash('gto'+run.seed+':'+run.w)),n=run.w,f=run.f,pool=[...BASE,...PACK].filter(id=>(C[id].f===f||C[id].f==='n')&&!(C[id].r==='L'&&run.deck.includes(id)));
- const wt={C:Math.max(.2,.6-n*.04),U:.28,R:Math.min(.35,.1+n*.02),L:Math.min(.12,.02+n*.008)},out=[];
- for(let t=0;t<40&&out.length<3;t++){let x=R()*(wt.C+wt.U+wt.R+wt.L),r='C';for(const k of['C','U','R','L']){if(x<wt[k]){r=k;break}x-=wt[k]}const c=pool.filter(id=>C[id].r===r&&!out.includes(id));if(c.length)out.push(c[Math.floor(R()*c.length)])}
+ const wt={C:Math.max(.2,.6-n*.04),U:.28,R:Math.min(.35,.1+n*.02),E:Math.min(.16,.04+n*.01),L:Math.min(.12,.02+n*.008)},out=[];
+ for(let t=0;t<40&&out.length<3;t++){let x=R()*(wt.C+wt.U+wt.R+wt.E+wt.L),r='C';for(const k of['C','U','R','E','L']){if(x<wt[k]){r=k;break}x-=wt[k]}const c=pool.filter(id=>C[id].r===r&&!out.includes(id));if(c.length)out.push(c[Math.floor(R()*c.length)])}
  return out}
-function gtReplace(run){const sc=id=>(C[id].f==='n'?0:10)+{C:0,U:3,R:6,L:9}[C[id].r]+C[id].c*.1;let j=0;for(let i=1;i<run.deck.length;i++)if(sc(run.deck[i])<sc(run.deck[j]))j=i;return j}
+function gtReplace(run){const sc=id=>(C[id].f==='n'?0:10)+{C:0,U:3,R:6,E:7.5,L:9}[C[id].r]+C[id].c*.1;let j=0;for(let i=1;i<run.deck.length;i++)if(sc(run.deck[i])<sc(run.deck[j]))j=i;return j}
 function gtPick(id){const run=gtRun();if(!run||!run.pick)return{ok:0};if(id&&!run.pick.includes(id))return{ok:0};let out=null;if(id){const j=gtReplace(run);out=run.deck[j];run.deck[j]=id;run.log.push(id)}run.pick=null;saveV9();return{ok:1,out}}
 const gtPk=w=>ECON.gauntlet.packs.reduce((a,[n,p])=>w>=n?p:a,0);
 function gtEnd(run){const G9=V9.gaunt,w=run.w,E=ECON.gauntlet,sh=E.perWin*w+(w>=GT.MAXW?E.maxBonus:0),pk=gtPk(w);G9.best=Math.max(G9.best,w);G9.wins+=w;G9.done++;G9.last={w,l:run.l,f:run.f,sh,pk,t:Date.now()};G9.run=null;give({sh,pk},'gauntlet');saveV9();return G9.last}

@@ -116,7 +116,7 @@ function pvBirth(){const st=$('#pstage'),sr=st.getBoundingClientRect(),cx=sr.lef
  st.classList.add('vborn')}
 {const f0=flip;flip=function(s){const was=s&&s.classList.contains('up');const r=f0.apply(this,arguments);if(!s||was)return r;const st=$('#pstage'),rar=C[PO.res[+s.dataset.i].id].r;
   if(rar==='L'){st.classList.remove('vlegend');void st.offsetWidth;st.classList.add('vlegend');{const r=s.getBoundingClientRect();PV.focus={x:(r.left+r.width/2)*PV.s,y:(r.top+r.height/2)*PV.s}}pvMode('surge');hap('legend');setTimeout(()=>sfx('voidLegend'),180);setTimeout(()=>st.classList.remove('vlegend'),3200)}
-  else if(rar==='R'){restartCls(st,'vrare');hap('hitBig');setTimeout(()=>sfx('voidRare'),120);setTimeout(()=>st.classList.remove('vrare'),1600)}
+  else if(rar==='R'||rar==='E'){restartCls(st,'vrare');hap('hitBig');setTimeout(()=>sfx('voidRare'),120);setTimeout(()=>st.classList.remove('vrare'),1600)}
   else hap('drop');return r}}
 {const d=$('#pdone'),d0=d&&d.onclick;if(d&&d0)d.onclick=function(e){pvStop();$('#pstage').classList.remove('vborn','vtear','vrare','vlegend');return d0.call(this,e)}}
 onShow(id=>{if(id!=='packs'&&PV.on){pvStop();const st=$('#pstage');if(st)st.classList.remove('vborn')}},true);

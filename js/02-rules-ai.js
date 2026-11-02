@@ -13,8 +13,14 @@ function destroy(g,u){u.h=0;u.dead=1}
 function buff(u,a,h){u.a+=a;u.h+=h;u.mh+=h}
 function draw(g,pi,n=1){const p=g.p[pi];for(let i=0;i<n;i++){if(!p.deck.length){p.fat++;fx(g,{k:'fatigue',pi,n:p.fat});hurtH(g,pi,p.fat);addMad(g,pi,1);continue}const id=p.deck.pop();if(p.hand.length>=10){fx(g,{k:'burn',pi,cid:id});continue}p.hand.push({uid:g.uid++,id});fx(g,{k:'draw',pi})}}
 function mkUnit(g,pi,id,uid){const d=C[id],R=g.rule||[],gl=R.includes('w_glass');const u={uid:uid??g.uid++,id,o:pi,a:d.a+(gl?2:0),h:Math.max(1,d.h-(gl?1:0)),k:d.k.slice(),ready:d.k.includes('swift')||R.includes('w_swift'),atk:0,dead:0};u.mh=u.h;if(R.includes('w_ward')&&!u.k.includes('ward')&&d.r!=='T')u.k.push('ward');return u}
-function summon(g,pi,id){const p=g.p[pi];if(p.board.length>=6)return null;const u=mkUnit(g,pi,id);p.board.push(u);fx(g,{k:'summon',id:'u'+u.uid});return u}
-function sacrifice(g,pi,ex){const b=g.p[pi].board.filter(u=>u!==ex&&u.h>0);if(!b.length)return null;b.sort((x,y)=>(x.a+x.h)-(y.a+y.h));destroy(g,b[0]);fx(g,{k:'sac',id:'u'+b[0].uid});return b[0]}
+function summon(g,pi,id){const p=g.p[pi];if(p.board.length>=6)return null;const u=mkUnit(g,pi,id);p.board.push(u);fx(g,{k:'summon',id:'u'+u.uid});arrive(g,pi,u);return u}
+/* v2.9: "whenever another friendly unit arrives" (d.allyIn) and "whenever you sacrifice a unit" (d.onSac) */
+function arrive(g,pi,u){for(const q of g.p[pi].board){const dq=C[q.id];if(q!==u&&q.h>0&&dq.allyIn)dq.allyIn(g,pi,q,u)}}
+function sacUnit(g,pi,u){if(!u||u.h<=0)return null;destroy(g,u);fx(g,{k:'sac',id:'u'+u.uid});for(const q of g.p[pi].board){const dq=C[q.id];if(q!==u&&q.h>0&&dq.onSac)dq.onSac(g,pi,q,u)}return u}
+/* neighbours on the board (left and right), for "adjacent" effects */
+function adj(g,u){const b=g.p[u.o].board,i=b.indexOf(u);return[b[i-1],b[i+1]].filter(x=>x&&x.h>0)}
+const unh=(g,pi)=>g.p[pi].mad>=5
+function sacrifice(g,pi,ex){const b=g.p[pi].board.filter(u=>u!==ex&&u.h>0);if(!b.length)return null;b.sort((x,y)=>(x.a+x.h)-(y.a+y.h));return sacUnit(g,pi,b[0])}
 function cleanup(g){for(let n=0;n<30;n++){let any=false;for(let pi=0;pi<2;pi++){const p=g.p[pi],dead=p.board.filter(u=>u.h<=0);if(!dead.length)continue;any=true;p.board=p.board.filter(u=>u.h>0);for(const u of dead){u.dead=1;fx(g,{k:'die',id:'u'+u.uid,cid:u.id,o:u.o});if(u.k.includes('salvage'))draw(g,pi,1);const d=C[u.id];if(d.death)d.death(g,pi,u);for(const q of p.board){const dq=C[q.id];if(dq.ally&&q.h>0)dq.ally(g,pi,q,u)}}}if(!any)break}auras(g);checkWin(g)}
 function checkWin(g){if(g.over)return;const l=g.p.map(p=>p.san<=0||p.mad>=10);if(l[0]||l[1]){g.over=true;g.winner=l[0]&&l[1]?-1:l[0]?1:0;const lp=g.p[l[0]?0:1];g.reason=lp.mad>=10?'mad':'san'}}
 function spellTargets(g,pi,tg){const r=[],add=pj=>{for(const u of g.p[pj].board)r.push('u'+u.uid)};
@@ -35,25 +41,45 @@ function auras(g){for(const p of g.p){const src=p.board.filter(u=>u.h>0&&C[u.id]
   u.ab=a||h||k?{a,h,k}:null}}}
 function canAtk(u){return u.ready&&!u.atk&&u.a>0&&u.h>0}
 function atkTargets(g,pi,u){const ph=u.k.includes('phase');const e=E(g,pi).board.filter(t=>ph||!t.k.includes('phase'));const gd=e.filter(t=>t.k.includes('guard'));if(!ph&&gd.length)return gd.map(t=>'u'+t.uid);return e.map(t=>'u'+t.uid).concat('h'+(1-pi))}
-function canPlay(g,pi,c){const p=g.p[pi],d=C[c.id];if(g.over||g.cur!==pi||d.c>p.flux)return false;if(d.t==='u')return p.board.length<6;if(d.tg)return allTargets(g,pi,d).length>0;return true}
-function play(g,pi,huid,tg){const p=g.p[pi],i=p.hand.findIndex(c=>c.uid===huid);if(i<0)return false;const c=p.hand[i],d=C[c.id];if(!canPlay(g,pi,c))return false;
+/* v2.9: a card's cost can depend on the board (d.cost(g,pi) -> reduction) */
+function costOf(g,pi,c){const d=C[c.id];return Math.max(0,d.c-(d.cost?d.cost(g,pi):0))}
+function canPlay(g,pi,c){const p=g.p[pi],d=C[c.id];if(g.over||g.cur!==pi||costOf(g,pi,c)>p.flux)return false;if(d.t==='u')return p.board.length<6;if(d.tg)return allTargets(g,pi,d).length>0;return true}
+function play(g,pi,huid,tg,pos){const p=g.p[pi],i=p.hand.findIndex(c=>c.uid===huid);if(i<0)return false;const c=p.hand[i],d=C[c.id];if(!canPlay(g,pi,c))return false;
  if(needsTarget(g,pi,d)){if(!validTarget(g,pi,d,tg))return false}else tg=null;
- p.hand.splice(i,1);p.flux-=d.c;g.sf=d.f;if(!c.echo&&(d.k.includes('echo')||(d.t==='s'&&g.rule&&g.rule.includes('w_echo')))&&p.hand.length<10){p.hand.push({uid:g.uid++,id:c.id,echo:1});fx(g,{k:'echo',pi,cid:c.id})}if(pi===0&&g.st&&!g.sim){const t=g.st;if(d.t==='s')t.rites++;else t.units++;if(d.r==='L')t.leg++;t.plays[c.id]=(t.plays[c.id]||0)+1}fx(g,{k:'play',pi,cid:c.id,tg,uid:c.uid,e:c.echo?1:0});
+ const cost=costOf(g,pi,c);p.hand.splice(i,1);p.flux-=cost;g.sf=d.f;if(!c.echo&&(d.k.includes('echo')||(d.t==='s'&&g.rule&&g.rule.includes('w_echo')))&&p.hand.length<10){p.hand.push({uid:g.uid++,id:c.id,echo:1});fx(g,{k:'echo',pi,cid:c.id})}if(pi===0&&g.st&&!g.sim){const t=g.st;if(d.t==='s')t.rites++;else t.units++;if(d.r==='L')t.leg++;t.plays[c.id]=(t.plays[c.id]||0)+1}fx(g,{k:'play',pi,cid:c.id,tg,uid:c.uid,e:c.echo?1:0});
  const[t1,t2]=tg?tg.split('>'):[];
- if(d.t==='u'){const u=mkUnit(g,pi,c.id,c.uid);p.board.push(u);if(d.dread)addMad(g,1-pi,d.dread);if(d.play)d.play(g,pi,u,resolve(g,t1))}
+ if(d.pact)addMad(g,pi,d.pact);
+ if(d.t==='u'){const u=mkUnit(g,pi,c.id,c.uid);if(pos!=null&&pos>=0&&pos<p.board.length)p.board.splice(pos,0,u);else p.board.push(u);auras(g);if(d.dread)addMad(g,1-pi,d.dread);if(d.play)d.play(g,pi,u,resolve(g,t1));arrive(g,pi,u)}
  else{if(t1)fx(g,{k:'spellhit',id:t1,f:d.f});if(t2)fx(g,{k:'spellhit',id:t2,f:d.f});d.cast(g,pi,resolve(g,t1),resolve(g,t2))}
  g.sf=null;cleanup(g);return true}
 function attack(g,pi,uid,tg){const u=g.p[pi].board.find(x=>x.uid===uid);if(!u||g.over||g.cur!==pi||!canAtk(u)||!atkTargets(g,pi,u).includes(tg))return false;const T=resolve(g,tg);u.atk=1;
  if(T.k==='h')hurtH(g,T.pi,u.a,u);else{const v=T.u,va=v.a;hurtU(g,v,u.a,u);hurtU(g,u,va,v);for(const[a,b]of[[u,v],[v,u]])if(a.k.includes('devour')&&a.h>0&&b.h<=0){buff(a,1,1);fx(g,{k:'buff',id:'u'+a.uid})}}
  cleanup(g);return true}
-function startTurn(g){const pi=g.cur,p=g.p[pi];g.turn++;p.max=Math.min(10,p.max+1);p.flux=p.max;if(p.bonusF){p.flux+=p.bonusF;p.bonusF=0}for(const u of p.board){u.ready=true;u.atk=0}
+function startTurn(g){const pi=g.cur,p=g.p[pi];g.turn++;p.max=Math.min(10,p.max+1);p.flux=p.max;p.hpUsed=0;if(p.bonusF){p.flux+=p.bonusF;p.bonusF=0}for(const u of p.board){u.ready=true;u.atk=0}
  fx(g,{k:'turn',pi});for(const u of p.board.slice()){const d=C[u.id];if(d.start&&u.h>0)d.start(g,pi,u)}if(g.rule&&g.rule.length)ruleStart(g,pi);
  if(g.turn>1)draw(g,pi,g.rule&&g.rule.includes('w_draw')&&g.turn>2?2:1);cleanup(g)}
 function endTurn(g){if(g.over)return;const pi=g.cur;for(const u of g.p[pi].board.slice()){const d=C[u.id];if(d.end&&u.h>0)d.end(g,pi,u)}{const h=g.p[pi].hand,n=h.length;g.p[pi].hand=h.filter(c=>!c.echo);if(g.p[pi].hand.length<n)fx(g,{k:'echoFade',pi})}cleanup(g);if(g.over)return;g.cur=1-pi;
  if(g.turn>=120){g.over=true;const s=g.p.map(p=>p.san-p.mad);g.winner=s[0]===s[1]?-1:s[0]>s[1]?0:1;g.reason='time';return}startTurn(g)}
 function newGame(d0,d1,o={}){const g={p:[],cur:0,turn:0,uid:1,fx:[],over:false,winner:null,sim:o.sim?1:0,rule:(o.rule||[]).slice(),dif:o.dif||'normal',st:{rites:0,units:0,dmg:0,leg:0,plays:{}}};
  [d0,d1].forEach((d,pi)=>g.p.push({fac:d.fac,name:d.name,deck:shuffle(d.cards.slice()),hand:[],board:[],san:20,mad:0,flux:0,max:0,fat:0,ai:!!(o.ai&&o.ai[pi])}));
- ruleInit(g,o);for(const p of g.p)p.cap=Math.max(20,p.san);g.cur=o.first??(rnd()<.5?0:1);draw(g,0,5);draw(g,1,5);/* v1.6: the side going second draws a 6th card and gets +1 Flux on its first turn (AI self-play: first-player win rate 70% -> 49%) */{const s2=1-g.cur;draw(g,s2,1);g.p[s2].bonusF=1;g.second=s2}g.fx=[];startTurn(g);return g}
+ ruleInit(g,o);for(const p of g.p)p.cap=Math.max(20,p.san);g.cur=o.first??(rnd()<.5?0:1);draw(g,0,5);draw(g,1,5);/* v1.6: the side going second draws a 6th card and gets +1 Flux on its first turn (AI self-play: first-player win rate 70% -> 49%) */{const s2=1-g.cur;draw(g,s2,1);g.p[s2].bonusF=1;g.second=s2}
+ /* v2.9 mulligan: AI sides replace their expensive cards now; with o.mull the human's choice comes first (mullDone starts the game) */
+ for(let pi=0;pi<2;pi++)if(g.p[pi].ai||!o.mull)mulligan(g,pi,aiMull(g,pi));g.fx=[];if(o.mull&&!g.p[0].ai){g.mullPending=1;return g}startTurn(g);return g}
+function mulligan(g,pi,uids){const p=g.p[pi],back=p.hand.filter(c=>uids.includes(c.uid));if(!back.length)return 0;p.hand=p.hand.filter(c=>!uids.includes(c.uid));draw(g,pi,back.length);for(const c of back)p.deck.splice(Math.floor(rnd()*(p.deck.length+1)),0,c.id);return back.length}
+function aiMull(g,pi){return g.p[pi].hand.filter(c=>C[c.id].c>=5||(C[c.id].c===4&&C[c.id].t==='s')).map(c=>c.uid)}
+function mullDone(g,uids){if(!g.mullPending)return;g.mullPending=0;mulligan(g,0,uids||[]);g.fx=[];startTurn(g)}
+/* ================= v2.9 HERO POWERS: 2 Flux, once per turn =================
+   HP[faction] = {n name, x text, tg target kind (optional), ok(g,pi) extra condition, use(g,pi,T)}. Campaign bosses and Gauntlet foes use their faction's power. */
+const HP_COST=2;
+const HP={v:{n:'Whisper from Below',x:'If you control an Entity, the enemy gains 1 Madness.',ok:(g,pi)=>g.p[pi].board.some(u=>u.h>0&&C[u.id].f==='v'),use:(g,pi)=>addMad(g,1-pi,1)},
+ m:{n:'Deploy Drone',x:'Summon a 1/1 Drone and remove 1 Madness.',ok:(g,pi)=>g.p[pi].board.length<6,use:(g,pi)=>{summon(g,pi,'tD');addMad(g,pi,-1)}},
+ c:{n:'Bloodletting',x:'Sacrifice a friendly unit. Give a random other friendly unit +2/+2.',tg:'friendlyUnit',use:(g,pi,T)=>{sacUnit(g,pi,T.u);const o=g.p[pi].board.filter(q=>q.h>0&&q!==T.u);if(o.length){const q=pick(o);buff(q,2,2);fx(g,{k:'buff',id:'u'+q.uid})}}},
+ n:{n:'Rations',x:'Restore 2 Sanity and remove 1 Madness.',use:(g,pi)=>{healH(g,pi,2);addMad(g,pi,-1)}}};
+function hpTargets(g,pi){const h=HP[g.p[pi].fac];return h&&h.tg?spellTargets(g,pi,h.tg):[]}
+function canHP(g,pi){const p=g.p[pi],h=HP[p.fac];return !!h&&!g.over&&g.cur===pi&&!p.hpUsed&&!g.mullPending&&p.flux>=HP_COST&&(!h.ok||h.ok(g,pi))&&(!h.tg||hpTargets(g,pi).length>0)}
+function heroPower(g,pi,tg){if(!canHP(g,pi))return false;const p=g.p[pi],h=HP[p.fac];let T=null;if(h.tg){if(!hpTargets(g,pi).includes(tg))return false;T=resolve(g,tg)}else tg=null;
+ p.flux-=HP_COST;p.hpUsed=1;fx(g,{k:'hp',pi,fac:p.fac,tg});h.use(g,pi,T);cleanup(g);return true}
+
 /* v8 chapter rules (campaign) + difficulty edge. Rules are plain strings in g.rule; all effects are ordinary engine calls. */
 function ruleInit(g,o){const R=g.rule,me=g.p[0],en=g.p[1];if(R.includes('w_san'))for(const p of g.p)p.san+=5;if(R.includes('w_flux'))for(const p of g.p)p.max+=1;if(R.includes('mad3'))me.mad=3;if(g.dif==='nightmare')me.mad+=1;if(o.esan)en.san+=o.esan;if(R.includes('surge'))en.max+=1}
 function ruleStart(g,pi){const R=g.rule,p=g.p[pi],bt=Math.floor(g.turn/2);
@@ -65,14 +91,17 @@ function ruleStart(g,pi){const R=g.rule,p=g.p[pi],bt=Math.floor(g.turn/2);
 
 /* ================= AI ================= */
 function legal(g,pi){const p=g.p[pi],A=[];if(g.over||g.cur!==pi)return A;
- for(const c of p.hand){const d=C[c.id];if(!canPlay(g,pi,c))continue;const T=d.tg?allTargets(g,pi,d):[];if(T.length)for(const t of T)A.push({t:'play',uid:c.uid,tg:t});else A.push({t:'play',uid:c.uid})}
+ /* units can be placed anywhere on the board; positions are only offered when placement can matter (an adjacency effect is involved) */
+ const adjOn=d=>d.adj||p.board.some(u=>C[u.id].adj),poss=d=>d.t==='u'&&adjOn(d)?Array.from({length:p.board.length+1},(_,i)=>i):[null];
+ for(const c of p.hand){const d=C[c.id];if(!canPlay(g,pi,c))continue;const T=d.tg?allTargets(g,pi,d):[];for(const pos of poss(d)){if(T.length)for(const t of T)A.push({t:'play',uid:c.uid,tg:t,pos});else A.push({t:'play',uid:c.uid,pos})}}
+ if(canHP(g,pi)){const T=hpTargets(g,pi);if(T.length)for(const t of T)A.push({t:'hp',tg:t});else A.push({t:'hp'})}
  for(const u of p.board)if(canAtk(u))for(const T of atkTargets(g,pi,u))A.push({t:'atk',uid:u.uid,tg:T});return A}
-function act(g,pi,a){return a.t==='play'?play(g,pi,a.uid,a.tg):attack(g,pi,a.uid,a.tg)}
+function act(g,pi,a){return a.t==='play'?play(g,pi,a.uid,a.tg,a.pos):a.t==='hp'?heroPower(g,pi,a.tg):attack(g,pi,a.uid,a.tg)}
 const cloneG=typeof structuredClone==='function'?g=>{const c=structuredClone(g);c.fx=[];c.sim=1;return c}:g=>{const c=JSON.parse(JSON.stringify(g));c.fx=[];c.sim=1;return c};
 const sanV=s=>s<=0?-80:s-(s<12?(12-s)*(12-s)*.07:0);
 const madV=m=>m*.7+m*m*.13;
 const KWV={guard:.8,phase:1.1,blight:1.7,salvage:.9,ward:1,devour:.7,corrupt:.6};
-function unitV(u){const d=C[u.id];let v=1+u.a*1.1+Math.max(u.h,0)*.9;for(const k of u.k){v+=KWV[k]||0;if(k==='drain')v+=u.a*.4}if(d.start||d.end)v+=1.8;if(d.aura)v+=2.2;return v}
+function unitV(u){const d=C[u.id];let v=1+u.a*1.1+Math.max(u.h,0)*.9;for(const k of u.k){v+=KWV[k]||0;if(k==='drain')v+=u.a*.4}if(d.start||d.end)v+=1.8;if(d.aura&&!d.selfAura)v+=2.2;if(d.allyIn||d.onSac)v+=1.6;return v}
 function evalS(g,pi){if(g.over)return g.winner===pi?1e6:g.winner===-1?-1e5:-1e6;const m=g.p[pi],o=g.p[1-pi];let s=sanV(m.san)-sanV(o.san)+madV(o.mad)-madV(m.mad);
  for(const u of m.board)s+=unitV(u);for(const u of o.board)s-=unitV(u);const hn=p=>p.hand.reduce((n,c)=>n+(c.echo?.15:1),0);return s+Math.min(hn(m),8)*.9-Math.min(hn(o),8)*.9}
 function aiChoose(g,pi,raw){const A=legal(g,pi);if(!A.length)return null;const dif=raw||pi!==1?'normal':g.dif;

@@ -194,7 +194,7 @@ const CF={id:null};
 function craftSync(){const b=$('#craft');if(!b)return;const id=CF.id;$$('#cgrid .card.csel').forEach(e=>{if(e.dataset.cid!==id)e.classList.remove('csel')});
  if(!id||!C[id]){b.innerHTML=`<p>Tap a card to craft, disenchant or change its frame. <b>${COLL.shards}◆</b></p>`;return}
  const d=C[id],n=owned(id),cc=canCraft(id),cost=CRAFT[d.r],vs=varHas(id);const el=$(`#cgrid .card[data-cid="${id}"]`);if(el)el.classList.add('csel');
- b.innerHTML=`<div class="cfn"><b data-fit="dk">${d.n}</b><small>${{C:'Common',U:'Uncommon',R:'Rare',L:'Legendary'}[d.r]||''} · owned ${n}/${maxC(id)} · ${COLL.shards}◆</small></div>
+ b.innerHTML=`<div class="cfn"><b data-fit="dk">${d.n}</b><small>${{C:'Common',U:'Uncommon',E:'Epic',R:'Rare',L:'Legendary'}[d.r]||''} · owned ${n}/${maxC(id)} · ${COLL.shards}◆</small></div>
  ${cc?`<button class="btn sm" id="cfC" ${n>=maxC(id)||COLL.shards<cost?'disabled':''}>Craft ${cost}◆</button><button class="btn sm ghost" id="cfD" ${n?'':'disabled'}>Disenchant +${SH.dup[d.r]}◆</button>`:`<small class="cfx">${d.cmp?'Campaign reward: earn it in '+CAMP.find(c=>c.id===d.cmp).n:'Starter card: always in your collection'}</small>`}
  ${vs.length&&n?`<div class="seg cfv"><button data-vr="" class="${varShow(id)?'':'on'}">Standard</button>${vs.map(v=>`<button data-vr="${v}" class="${varShow(id)===v?'on':''}">${VARN[v]}</button>`).join('')}</div>`:''}`;fitScan(b)}
 $('#cgrid').addEventListener('click',e=>{if(lpJust){lpJust=0;return}const el=e.target.closest('.card[data-cid]');if(!el)return;CF.id=el.dataset.cid;sfx('click');craftSync()});
