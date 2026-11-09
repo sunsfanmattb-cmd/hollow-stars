@@ -721,7 +721,7 @@ Object.assign(PAINT,{
 });
 const SC4={c1:'chapel',c2:'altar',c3:'flesh',c4:'flesh',c5:'altar',c6:'flesh',c7:'chapel',c8:'flesh',c9:'flesh',c10:'chapel',c11:'flesh',c12:'chapel',c13:'altar',c14:'chapel',c15:'flesh',c16:'chapel',c17:'altar',c18:'flesh',c19:'altar',c20:'chapel',c21:'chapel',c22:'altar',c23:'altar',tC:'flesh'};
 for(const k in SC4)SPEC[k]=k+'@'+SC4[k];
-/* v2.9 Epics: procedural stand-ins until their paintings (art/<id>.webp) arrive */
+/* v2.9 Epics: procedural fallbacks, used only if a painting (art/<id>.webp) fails to load */
 Object.assign(SPEC,{v45:'star,crowd@void',v46:'leviathan@planet',m45:'ark@debris',m46:'shield,drone@hull',c45:'robed,blood@altar',c46:'flesh,robed@flesh',n17:'human,beacon@hull'});
 /* ---------- Wanderers ---------- */
 Object.assign(PAINT,{

@@ -54,3 +54,19 @@ body.q-low .card.r-E .rim::after,body.fxlow .card.r-E .rim::after{animation:none
 .tphp{display:flex;flex-direction:column;align-items:center;gap:4px;width:150px;padding:10px;text-align:center}
 .tphp i{width:72px;height:72px;border-radius:50%;background-size:cover;box-shadow:0 0 0 2px #000,0 0 0 3.5px #c8a070}
 .tphp b{font:400 15px var(--serif);color:#f0e2cc}.tphp small{font-size:10.5px;color:#8ab0e8}.tphp p{margin:0;font-size:12px;color:#c8bca8}
+
+/* ---- Epic art frame (art/epic/frame_<faction>.webp): a faction-tinted ornamental frame laid over the painting.
+   The overlay is 536x416 around a 480x360 window inset 28px, so it sits 28/480 and 28/360 outside the .art box.
+   It sits under the cost, name and stats (later siblings) and never catches taps.
+   Still frame everywhere; the 16-frame breathing loop (1.92s, frame only, the painting never moves) plays only where
+   the card is shown large or held, like the Epic rim sweep, and never on low quality or reduced motion. ---- */
+.card .efr{position:absolute;left:calc(7.5% - 85% * 28 / 480);width:calc(85% * 536 / 480);top:calc(5.5% - 44% * 28 / 360);height:calc(44% * 416 / 360);
+ pointer-events:none;background:var(--efs) center/100% 100% no-repeat}
+.card.r-E .art{box-shadow:0 0 1.4em #000 inset}
+.card.f-v .efr{--efs:url(../art/epic/frame_v_s.webp);--efa:url(../art/epic/frame_v.webp)}
+.card.f-m .efr{--efs:url(../art/epic/frame_m_s.webp);--efa:url(../art/epic/frame_m.webp)}
+.card.f-c .efr{--efs:url(../art/epic/frame_c_s.webp);--efa:url(../art/epic/frame_c.webp)}
+.card.f-n .efr{--efs:url(../art/epic/frame_n_s.webp);--efa:url(../art/epic/frame_n.webp)}
+:is(#zoom .card,.pfront .card,#sheet .card,#hand .card.held,#hand .card.sel) .efr,#ghost .efr{background-image:var(--efa),var(--efs)}
+body.q-low .card .efr,body.fxlow .card .efr{background-image:var(--efs)!important}
+@media (prefers-reduced-motion:reduce){.card .efr{background-image:var(--efs)!important}}

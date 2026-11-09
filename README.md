@@ -3,7 +3,7 @@ Hollow Stars - a card game of cosmic dread
 
 ## Layout
 - `index.html` – page markup; loads the stylesheets and scripts below in order.
-- `css/` – `base.css` (frame, cards, match), `fx.css` (combat effects, foil, living art), `screens.css` (menus and modes), `polish.css` (v1.8 effects + v1.9 performance rules), `packs.css` (v1.9 pack opening), `board3d.css` (v2.0 3D table), `v23.css` (v2.3 turn log, composited-only combat animations, pack opening rework), `v24.css` (v2.4 faction frames, rarity trims, print grain, drifting particles, flavour text, holographic foils), `v25.css` (v2.5 flicker-free zoom, faction stat badges), `v26.css` (v2.6 store, pack odds, save backups), `v27.css` (v2.8 start-up intro, short-screen settings), `v29.css` (v2.9 hero powers, mulligan, placement, Epic trim).
+- `css/` – `base.css` (frame, cards, match), `fx.css` (combat effects, foil, living art), `screens.css` (menus and modes), `polish.css` (v1.8 effects + v1.9 performance rules), `packs.css` (v1.9 pack opening), `board3d.css` (v2.0 3D table), `v23.css` (v2.3 turn log, composited-only combat animations, pack opening rework), `v24.css` (v2.4 faction frames, rarity trims, print grain, drifting particles, flavour text, holographic foils), `v25.css` (v2.5 flicker-free zoom, faction stat badges), `v26.css` (v2.6 store, pack odds, save backups), `v27.css` (v2.8 start-up intro, short-screen settings), `v29.css` (v2.9 hero powers, mulligan, placement, Epic trim and animated Epic art frames).
 - `js/` – loaded in numeric order, sharing one global scope:
   `00-econ` v2.6 every reward, price, drop rate and store product (tune the economy here) · `00-save` v2.6 versioned saves, upgrades, tamper check, backup codes · `01-core` data · `02-rules-ai` rules and AI · `03-art` procedural art · `04-badges` v2.5 faction Flux/Attack/Health badges (built once as images) · `04-engine` battery saver, audio, background ·
   `05-ui` screens, decks, match UI, input · `06-fx` effects engine, tilt, foil · `07-progress` campaign, quests, crafting ·
@@ -16,6 +16,7 @@ Hollow Stars - a card game of cosmic dread
 - `tools/make_void.py` – paints `art/ui/void.webp`, the pack-opening backdrop (seeded, reproducible).
 - `tools/balance.js` – headless AI-vs-AI play-test (node): faction and matchup win rates, first-player edge, card win rates; `tools/balance_avg.sh` averages three deck sets.
 - `docs/epic-art-briefs.md` – painting briefs for the seven Epics.
+- `art/epic/` – the Epic art frames, one per faction: animated (`frame_<f>.webp`) and still (`frame_<f>_s.webp`).
 - `tools/css_dedupe.py` – finds and removes CSS declarations that a later identical selector always overrides (`report`, `verify`, `apply`).
 - `RENDERING_RULES.md` – the performance rules for visuals and animation; read it before changing card visuals or menus.
 - `tools/make_frames.py` – paints the four faction card frames `art/ui/cf_*.webp` (seeded, reproducible).
@@ -36,5 +37,5 @@ Open `index.html` in a browser to play. Tests need Python Playwright: `python3 t
   Wanderers *Rations* (AI opponents only: +2 Sanity, -1 Madness).
 - **The Madness gamble:** *Pact N* (you gain N Madness when you play it) and *Unhinged* (a bonus while you have 5+ Madness).
 - **Mulligan** before the first turn; **placement** (units can be dropped between others) with *adjacent* effects.
-- **Epic** rarity (Rare slot: 78% Rare, 12% Epic, 10% Legendary; craft 800, duplicate 80) and seven Epics, one tribal theme per faction.
+- **Epic** rarity (Rare slot: 78% Rare, 12% Epic, 10% Legendary; craft 800, duplicate 80) and seven Epics, one tribal theme per faction, with painted art in a faction-tinted animated frame.
 - Balance: `node tools/balance.js` / `tools/balance_avg.sh` (AI vs AI). Faction win rates after v2.9 tuning: about 48–52%.
