@@ -723,6 +723,25 @@ const SC4={c1:'chapel',c2:'altar',c3:'flesh',c4:'flesh',c5:'altar',c6:'flesh',c7
 for(const k in SC4)SPEC[k]=k+'@'+SC4[k];
 /* v2.9 Epics: procedural fallbacks, used only if a painting (art/<id>.webp) fails to load */
 Object.assign(SPEC,{v45:'star,crowd@void',v46:'leviathan@planet',m45:'ark@debris',m46:'shield,drone@hull',c45:'robed,blood@altar',c46:'flesh,robed@flesh',n17:'human,beacon@hull'});
+/* v2.9.1 Epic living art: glows on each painting's own lights and a few motes, all in % of the 480x360 painting (css/v29.css .elv).
+   g: [x, y, size, colour, kind, offset s]   kinds: P pulse 4s, S slow 8s, F flame 3s, A arc 2.4s
+   p: [kind, colour, count, x0, y0, x1, y1]  kinds: rise 6s (bubbles, embers), fall 2.4s (sparks), drift 12s (silt, dust) */
+const EPL={
+ v45:{g:[[50,33,30,'#7affd0','P',0],[50,9,14,'#a0ffe0','S',-3],[33,78,12,'#5affc0','P',-2],[64,78,12,'#5affc0','P',-1]],p:['rise','#8affd8',7,20,58,80,96]},
+ v46:{g:[[52,58,24,'#e8ff80','S',0],[55,11,8,'#fff8c0','F',-.5]],p:['drift','#c8e0b0',8,10,15,90,92]},
+ m45:{g:[[36,46,6,'#ffb050','F',0],[46,49,7,'#ffb050','F',-.4],[52,46,5,'#ffa040','F',-.9],[60,48,6,'#ffb050','F',-1.2],[69,49,5,'#ffa040','F',-.7],[73,67,6,'#ffc060','F',-.2],[65,63,6,'#ffc060','F',-1]],p:['fall','#ffb860',7,60,58,76,68]},
+ m46:{g:[[54,44,10,'#ff3020','P',0],[27,64,13,'#60b8ff','A',0],[17,52,10,'#60b8ff','A',-1.1],[73,67,13,'#60b8ff','A',-.6],[29,18,10,'#ff9040','F',-.3],[82,34,9,'#ff9040','F',-.8]],p:['rise','#ffa050',6,15,12,90,48]},
+ c45:{g:[[8,49,6,'#ffb060','F',0],[20,44,6,'#ffb060','F',-.5],[82,53,6,'#ffb060','F',-.9],[74,26,5,'#ffb060','F',-1.3],[96,49,5,'#ffb060','F',-.2],[35,38,9,'#ff2a30','P',0],[64,38,9,'#ff2a30','P',-2]],p:['rise','#ff7040',7,5,45,95,92]},
+ c46:{g:[[7,39,6,'#ffb060','F',0],[15,52,5,'#ffb060','F',-.6],[86,48,6,'#ffb060','F',-1],[82,56,5,'#ffb060','F',-.3],[51,52,14,'#ff3040','S',0]],p:['rise','#ff7040',6,5,48,95,96]},
+ n17:{g:[[15,64,18,'#ffd080','F',0],[52,33,6,'#ffc070','F',-.7]],p:['drift','#ffe0a0',8,5,30,60,90]}};
+const ELK={P:['elPulse','4s'],S:['elSlow','8s'],F:['elFlame','3s'],A:['elArc','2.4s']},EPK={rise:['epRise','6s',6],fall:['epFall','2.4s',2.4],drift:['epDrift','12s',12]};
+const epClock=()=>`${(-(performance.now()/1000)%24).toFixed(2)}s`;
+function elvHTML(id){const L=EPL[id];if(!L)return'';let h='';
+ for(const[x,y,r,c,k,o]of L.g)h+=`<b style="left:${x-r/2}%;top:${(y-r*2/3).toFixed(2)}%;width:${r}%;--c:${c};--k:${ELK[k][0]};--p:${ELK[k][1]};--o:${o}s"></b>`;
+ if(L.p){const[k,c,n,x0,y0,x1,y1]=L.p,[an,du,ds]=EPK[k];let s=0;for(const ch of id)s=s*31+ch.charCodeAt(0);const R=()=>(s=(s*16807)%2147483647)/2147483647;
+  for(let i=0;i<n;i++)h+=`<s style="left:${(x0+R()*(x1-x0)).toFixed(1)}%;top:${(y0+R()*(y1-y0)).toFixed(1)}%;--c:${c};--k:${an};--p:${du};--o:${(-(i/n)*ds).toFixed(2)}s;--dx:${((R()-.5)*(k==='fall'?16:8)+(k==='fall'?6:0)).toFixed(1)}cqw"></s>`}
+ return`<i class="elv" style="--ed:${epClock()}">${h}</i>`}
+const efrHTML=()=>`<i class="efr" style="--ed:${epClock()}"><i class="efg"></i>${'<i class="efh"></i>'.repeat(6)}<i class="egl"></i></i>`;
 /* ---------- Wanderers ---------- */
 Object.assign(PAINT,{
  n1(x,W,H,R,P){const pr=W*1.6,pcx=W*.5,pcy=H+pr*.82;x.fillStyle=RG(x,pcx,pcy-pr,10,pr*.4,['#3a3a34','#14140f']);x.beginPath();x.arc(pcx,pcy,pr,0,TAU);x.fill();rim(x,P.g,1.4,.5);

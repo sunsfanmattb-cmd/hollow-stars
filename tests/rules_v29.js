@@ -39,7 +39,8 @@ g=fresh('c');put(g,0,'c46');put(g,0,'c1');c=hand(g,'c5');X.play(g,0,c.uid);ok('O
 g=fresh();put(g,0,'c1');put(g,0,'c2');c=hand(g,'c9');X.play(g,0,c.uid);const tm=g.p[0].board.find(q=>q.id==='c9');ok('Thousand Mouths: +3/+3 per sacrifice',tm&&tm.a===14&&tm.h===14,tm&&[tm.a,tm.h]);
 // epics
 g=fresh('m');const k=put(g,0,'m45');X.endTurn(g);ok('KESTREL: one Drone with few Constructs',g.p[0].board.filter(q=>q.id==='tD').length===1);
-g=fresh('m');put(g,0,'m45');put(g,0,'m1');put(g,0,'m2');put(g,0,'m5');X.endTurn(g);ok('KESTREL: two Drones with 4+ Constructs',g.p[0].board.filter(q=>q.id==='tD').length===2);
+g=fresh('m');put(g,0,'m45');put(g,0,'m1');put(g,0,'m2');X.endTurn(g);ok('KESTREL: two Drones with 3+ Constructs',g.p[0].board.filter(q=>q.id==='tD').length===2);
+g=fresh('m');put(g,0,'m45');put(g,0,'m1');X.endTurn(g);ok('KESTREL: one Drone with 2 Constructs',g.p[0].board.filter(q=>q.id==='tD').length===1);
 g=fresh('c');const cu=put(g,0,'c1');c=hand(g,'c45');X.play(g,0,c.uid);ok('Abbess: Pact 2, other Cultists get Drain',g.p[0].mad===2&&cu.k.includes('drain'));g.p[0].mad=5;X.cleanup(g);ok('Abbess Unhinged: +1 Attack',cu.a===3);
 g=fresh('n');put(g,0,'n2');put(g,0,'tS');c=hand(g,'n17');X.play(g,0,c.uid);ok('Quartermaster: 1 + 2 Survivors for 2 Crew',g.p[0].board.filter(q=>q.id==='tS').length===4);ok('Quartermaster: other Crew +1 Health',g.p[0].board.find(q=>q.id==='n2').h===4);
 // mulligan

@@ -3,9 +3,9 @@
 Seven paintings for the new Epic cards, now in the game as `art/<id>.webp` (**480 × 360 px, landscape 4:3**, the same size
 as the other non-Legendary cards). If a painting fails to load, the game shows a procedural stand-in.
 
-**Epic frames:** `art/epic/frame_<faction>.webp` (animated, 16 frames, 1.92 s loop) and `frame_<faction>_s.webp` (still) are
-536 × 416 transparent overlays around a 480 × 360 window inset 28 px. Every Epic card shows the still frame; the breathing
-loop plays only on a zoomed, held or revealed card (css/v29.css, `.efr`).
+**Epic frames:** `art/epic/frame_<faction>_s.webp` is a 536 × 416 transparent overlay around a 480 × 360 window inset 28 px.
+Its motion is built from still layers by `tools/epic_frames.py` (`frame_<f>_g.webp` glow, `shine_0..5.webp`, `glint.webp`)
+and the glows on each painting's own lights are listed in `EPL` (js/03-art.js). See RENDERING_RULES.md §7b.
 
 **Shared style (matches the current cards):** dark, densely detailed, hand-drawn look, fine etched linework and
 crosshatching over muted painterly colour, like an engraving with ink washes. Almost black backgrounds; one accent light per

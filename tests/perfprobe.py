@@ -3,7 +3,7 @@ Reports per scenario: frames drawn, worst frame gap, main-thread busy %, paint +
 style/layout work, and the number of composited layers (GPU memory, a common cause of flicker on phones).
 
 Usage: python3 tests/perfprobe.py index.html [scenario ...]
-Scenarios: title, coll, collscroll, zoomL, cinema, match, pack (default: all)
+Scenarios: title, coll, collscroll, zoomL, zoomE (Epic), zoomR (Rare), cinema, match, pack (default: all)
 """
 import sys, json, pathlib, tempfile, os
 from playwright.sync_api import sync_playwright
@@ -49,6 +49,8 @@ SCEN = {
  'coll': ("show('coll')", None, 4000),
  'collscroll': ("show('coll')", "(()=>{const g=document.querySelector('#cgrid');let y=0;const iv=setInterval(()=>{y+=40;g.scrollTop=y;(document.scrollingElement||document.body).scrollTop=y;if(y>3000)clearInterval(iv)},50)})()", 4000),
  'zoomL': ("show('coll')", "(()=>{const s=document.createElement('div');s.dataset.cid='c22';showZoom(s,true);let i=0;const iv=setInterval(()=>{i++;window.__hs.ztFinger(Math.sin(i/9),Math.cos(i/13)*.6);if(i>120)clearInterval(iv)},33)})()", 4000),
+ 'zoomE': ("show('coll')", "(()=>{const s=document.createElement('div');s.dataset.cid='c45';showZoom(s,true);let i=0;const iv=setInterval(()=>{i++;window.__hs.ztFinger(Math.sin(i/9),Math.cos(i/13)*.6);if(i>120)clearInterval(iv)},33)})()", 4000),
+ 'zoomR': ("show('coll')", "(()=>{const s=document.createElement('div');s.dataset.cid='v7';showZoom(s,true);let i=0;const iv=setInterval(()=>{i++;window.__hs.ztFinger(Math.sin(i/9),Math.cos(i/13)*.6);if(i>120)clearInterval(iv)},33)})()", 4000),
  'cinema': ("window.__hs.demo()", "(()=>{const u=mkUnit(G,0,'c22');u.ready=true;G.p[0].board.push(u);renderMatch();lgCinema('c22',u.uid)})()", 3500),
  'match': ("window.__hs.demo()", None, 4000),
  'pack': ("COLL.packs=(COLL.packs||0)+1;saveColl();show('packs')", "startOpen()", 5000),

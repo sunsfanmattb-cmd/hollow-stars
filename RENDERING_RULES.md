@@ -35,6 +35,16 @@ is decoded before the zoom shows it (`BIG` cache), so the zoom never pops in.
 No `perspective()` on the tilting card (it re-rasters the whole card every frame). No masks or rounded clips inside the
 composited card. Opening a modal hides the screens behind it (`body.zmod`), so they don't stack GPU layers.
 
+No mask anywhere on a card, static or not: the rarity trims are SVG images (`tools/rim_svg.py`), not a masked ring. Their
+shine is two still highlights that cross-fade; nothing thin and bright rotates, because a resampled 2 px edge crawls.
+
+## 7b. Epic frames and living art (v2.9.1)
+The Epic frame and its motion are still images that only fade or scale (`tools/epic_frames.py`): a breathing glow, six
+shines that fade in turn so the light travels round the ornament, and a gem glint. No animated image formats on a card:
+an animated WebP or GIF repaints the card layer on every frame. The painting's own lights (`EPL` in `js/03-art.js`) are
+soft radial glows and motes moved by transform/opacity, in a layer that follows the art's tilt parallax. All of it plays
+only where a card is shown large (§5), and loops divide 24 s with a clock-based negative delay (as §4).
+
 ## 8. Quality tiers and motion settings
 Every effect honours `body.q-low` / `body.fxlow` (quality setting or automatic downgrade) and
 `prefers-reduced-motion`. New effects need a cheap or static fallback for both.

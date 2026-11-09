@@ -17,6 +17,10 @@ SC = {
  'zoomnovid': ("show('coll');VID.bad['c22']=1", "(()=>{const s=document.createElement('div');s.dataset.cid='c22';showZoom(s,true)})()"),
  'zoomstill': ("show('coll');VID.bad['c22']=1", "(()=>{const s=document.createElement('div');s.dataset.cid='c22';showZoom(s,true);setTimeout(()=>{for(const a of document.querySelector('#zoom').getAnimations({subtree:true}))if(a instanceof CSSAnimation)a.pause()},300)})()"),
  'zoomhold': ("show('coll')", "(()=>{const s=document.createElement('div');s.dataset.cid='c22';showZoom(s,true);let i=0;window.__tt=setInterval(()=>{i++;const ev=new Event('deviceorientation');ev.gamma=(Math.random()-.5)*1.5+Math.sin(i/7)*.3;ev.beta=40+(Math.random()-.5)*1.5;dispatchEvent(ev)},16)})()"),
+ 'zoomepic': ("show('coll')", "(()=>{const s=document.createElement('div');s.dataset.cid='c45';showZoom(s,true)})()"),
+ 'collepic': ("show('coll');setTimeout(()=>{const e=document.querySelector('#cgrid .card.r-E');if(e)e.scrollIntoView({block:'center'})},50)", None),
+ 'handepic': ("UI.speed=.12;startMatch(prebuilt('c'),'v',{first:0,mull:false})", "(()=>{const p=G.p[0];p.hand=[{uid:G.uid++,id:'c45'},{uid:G.uid++,id:'m45'},{uid:G.uid++,id:'c1'},{uid:G.uid++,id:'v46'}];renderMatch()})()"),
+ 'handsel': ("UI.speed=.12;startMatch(prebuilt('c'),'v',{first:0,mull:false})", "(()=>{const p=G.p[0];p.hand=[{uid:G.uid++,id:'c45'},{uid:G.uid++,id:'m45'},{uid:G.uid++,id:'c1'},{uid:G.uid++,id:'v46'}];p.flux=p.max=10;renderMatch();setTimeout(()=>{const e=document.querySelector('#hand .card[data-cid=c45]');e&&e.classList.add('sel')},300)})()"),
  'zoommove': ("show('coll')", "(()=>{const s=document.createElement('div');s.dataset.cid='c22';showZoom(s,true);let i=0;window.__tt=setInterval(()=>{i++;const ev=new Event('deviceorientation');ev.gamma=6*Math.sin(i/90);ev.beta=40;dispatchEvent(ev)},16)})()"),
 }
 def frames(pg, n=20):

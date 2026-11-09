@@ -15,8 +15,9 @@ Hollow Stars - a card game of cosmic dread
 - `tools/loopfix.py` – makes a legendary animation loop seamlessly (use for new `art/anim/*.mp4`).
 - `tools/make_void.py` – paints `art/ui/void.webp`, the pack-opening backdrop (seeded, reproducible).
 - `tools/balance.js` – headless AI-vs-AI play-test (node): faction and matchup win rates, first-player edge, card win rates; `tools/balance_avg.sh` averages three deck sets.
+- `tools/epic_frames.py` – builds the Epic frame animation layers; `tools/rim_svg.py` – prints the CSS for the rarity trims (SVG, no mask).
 - `docs/epic-art-briefs.md` – painting briefs for the seven Epics.
-- `art/epic/` – the Epic art frames, one per faction: animated (`frame_<f>.webp`) and still (`frame_<f>_s.webp`).
+- `art/epic/` – the Epic art frames, one per faction (`frame_<f>_s.webp`), and the still layers that animate them (glow, shines, gem glint; built by `tools/epic_frames.py`).
 - `tools/css_dedupe.py` – finds and removes CSS declarations that a later identical selector always overrides (`report`, `verify`, `apply`).
 - `RENDERING_RULES.md` – the performance rules for visuals and animation; read it before changing card visuals or menus.
 - `tools/make_frames.py` – paints the four faction card frames `art/ui/cf_*.webp` (seeded, reproducible).
@@ -37,5 +38,5 @@ Open `index.html` in a browser to play. Tests need Python Playwright: `python3 t
   Wanderers *Rations* (AI opponents only: +2 Sanity, -1 Madness).
 - **The Madness gamble:** *Pact N* (you gain N Madness when you play it) and *Unhinged* (a bonus while you have 5+ Madness).
 - **Mulligan** before the first turn; **placement** (units can be dropped between others) with *adjacent* effects.
-- **Epic** rarity (Rare slot: 78% Rare, 12% Epic, 10% Legendary; craft 800, duplicate 80) and seven Epics, one tribal theme per faction, with painted art in a faction-tinted animated frame.
+- **Epic** rarity (Rare slot: 78% Rare, 12% Epic, 10% Legendary; craft 800, duplicate 80) and seven Epics, one tribal theme per faction, with painted art in a faction-tinted frame; shown large, the frame breathes and catches the light and the painting's own lights flicker, pulse and drift.
 - Balance: `node tools/balance.js` / `tools/balance_avg.sh` (AI vs AI). Faction win rates after v2.9 tuning: about 48–52%.
